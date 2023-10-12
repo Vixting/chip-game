@@ -5,6 +5,7 @@ import com.group4.chipgame.tiles.Path;
 import com.group4.chipgame.tiles.Water;
 import com.group4.chipgame.actors.Actor;
 import com.group4.chipgame.actors.Player;
+import com.group4.chipgame.actors.Creeper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +27,6 @@ public class LevelLoader {
         }
     }
 
-
     public Tile[][] loadTiles(String levelFilePath) throws IOException {
         JSONObject levelData = loadJsonFromResource(levelFilePath);
         JSONArray tilesArray = levelData.getJSONArray("tiles");
@@ -41,7 +41,7 @@ public class LevelLoader {
             for (int x = 0; x < width; x++) {
                 String tileType = row.getString(x);
                 switch (tileType) {
-                    case "." -> levelTiles[y][x] = new Path();
+                    case "P" -> levelTiles[y][x] = new Path();
                     case "W" -> levelTiles[y][x] = new Water();
                     // Add more cases as needed
                 }
@@ -64,8 +64,13 @@ public class LevelLoader {
             int y = actorData.getInt("y");
 
             if ("Player".equals(type)) {
-                actors.add(new Player(x, y)); // Assume the Player class has an appropriate constructor.
+                System.out.println("Player found at " + x + ", " + y);
+                actors.add(new Player(x, y));
+                // Assume the Player class has an appropriate constructor.
                 // Add more cases as needed for other actor types.
+            } else if ("Creeper".equals(type)) {
+                actors.add(new Creeper(x, y));
+
             }
         }
 
