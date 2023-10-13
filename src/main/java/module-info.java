@@ -3,6 +3,7 @@ module com.group4.chipgame {
     requires javafx.fxml;
     requires java.xml;
     requires org.json;
+    requires javafx.graphics;
 
 
     opens com.group4.chipgame to javafx.fxml;

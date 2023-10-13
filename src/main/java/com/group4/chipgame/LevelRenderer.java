@@ -14,16 +14,21 @@ import java.util.Optional;
 
 public class LevelRenderer {
 
+    // Constants for offset calculations
     private static final double OFFSET_X = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
     private static final double OFFSET_Y = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
+
+    // Panes for rendering the game components
     private final Pane cameraPane;
     private Camera camera;
-
     private Pane gamePane;
     private Pane tilesPane;
     private Pane actorsPane;
+
+    // 2D array to store tiles
     private Tile[][] tiles;
 
+    // Constructor for LevelRenderer
     public LevelRenderer() {
         this.gamePane = new Pane();
         this.tilesPane = new Pane();
@@ -33,11 +38,13 @@ public class LevelRenderer {
         this.cameraPane = new Pane(this.gamePane); // Initialize cameraPane to contain gamePane
     }
 
+    // Initialize bindings for scaling and positioning game components
     public void initializeBindings(Scene scene) {
         DoubleBinding scaleBinding = calculateScaleBinding(scene);
         gamePane.scaleXProperty().bind(scaleBinding);
         gamePane.scaleYProperty().bind(scaleBinding);
 
+        // Bind the translation properties for centering the game within the scene
         gamePane.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
             double scaleX = scene.getWidth() / (Main.TILE_SIZE * tiles[0].length);
             return (scene.getWidth() - (Main.TILE_SIZE * tiles[0].length) * scaleX) / 2;
@@ -49,8 +56,7 @@ public class LevelRenderer {
         }, scene.heightProperty(), scaleBinding));
     }
 
-
-
+    // Calculate a binding for scaling the game components based on the scene size
     private DoubleBinding calculateScaleBinding(Scene scene) {
         final double HORIZONTAL_TILE_COUNT = tiles[0].length;
         final double VERTICAL_TILE_COUNT = tiles.length;
@@ -67,14 +73,17 @@ public class LevelRenderer {
         );
     }
 
+    // Getter for the gamePane
     public Pane getGamePane() {
         return gamePane;
     }
 
+    // Getter for the cameraPane
     public Pane getCameraPane() {
         return cameraPane;
     }
 
+    // Render the tiles on the gamePane
     public void renderTiles(Tile[][] tiles) {
         this.tiles = tiles;
         for (int y = 0; y < tiles.length; y++) {
@@ -88,6 +97,7 @@ public class LevelRenderer {
         }
     }
 
+    // Retrieve a tile at a given grid position
     public Optional<Tile> getTileAtGridPosition(int x, int y) {
         if (isOutOfBounds(x, y)) {
             return Optional.empty();
@@ -95,14 +105,17 @@ public class LevelRenderer {
         return Optional.of(tiles[y][x]);
     }
 
+    // Check if a grid position is out of bounds
     private boolean isOutOfBounds(int x, int y) {
         return x < 0 || x >= tiles[0].length || y < 0 || y >= tiles.length;
     }
 
+    // Render actors on the gamePane
     public void renderActors(List<Actor> actors) {
         Optional.ofNullable(actors).ifPresent(actorsList -> actorsList.forEach(this::positionAndAddActor));
     }
 
+    // Position and add an actor to the actorsPane
     private void positionAndAddActor(Actor actor) {
         Point2D actorPosition = actor.getPosition();
         if (actorPosition != null) {
@@ -114,6 +127,7 @@ public class LevelRenderer {
         }
     }
 
+    // Clear the tiles and actors from the renderer
     public void clear() {
         tilesPane.getChildren().clear();
         actorsPane.getChildren().clear();
