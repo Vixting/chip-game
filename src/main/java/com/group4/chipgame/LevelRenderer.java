@@ -16,6 +16,8 @@ public class LevelRenderer {
 
     private static final double OFFSET_X = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
     private static final double OFFSET_Y = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
+    private final Pane cameraPane;
+    private Camera camera;
 
     private Pane gamePane;
     private Pane tilesPane;
@@ -27,14 +29,27 @@ public class LevelRenderer {
         this.tilesPane = new Pane();
         this.actorsPane = new Pane();
         this.gamePane.getChildren().addAll(tilesPane, actorsPane);
-        gamePane.setManaged(false);
+
+        this.cameraPane = new Pane(this.gamePane); // Initialize cameraPane to contain gamePane
     }
 
     public void initializeBindings(Scene scene) {
         DoubleBinding scaleBinding = calculateScaleBinding(scene);
         gamePane.scaleXProperty().bind(scaleBinding);
         gamePane.scaleYProperty().bind(scaleBinding);
+
+        gamePane.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
+            double scaleX = scene.getWidth() / (Main.TILE_SIZE * tiles[0].length);
+            return (scene.getWidth() - (Main.TILE_SIZE * tiles[0].length) * scaleX) / 2;
+        }, scene.widthProperty(), scaleBinding));
+
+        gamePane.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
+            double scaleY = scene.getHeight() / (Main.TILE_SIZE * tiles.length);
+            return (scene.getHeight() - (Main.TILE_SIZE * tiles.length) * scaleY) / 2;
+        }, scene.heightProperty(), scaleBinding));
     }
+
+
 
     private DoubleBinding calculateScaleBinding(Scene scene) {
         final double HORIZONTAL_TILE_COUNT = tiles[0].length;
@@ -54,6 +69,10 @@ public class LevelRenderer {
 
     public Pane getGamePane() {
         return gamePane;
+    }
+
+    public Pane getCameraPane() {
+        return cameraPane;
     }
 
     public void renderTiles(Tile[][] tiles) {

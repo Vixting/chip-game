@@ -2,21 +2,23 @@ package com.group4.chipgame;
 
 import com.group4.chipgame.actors.Actor;
 import com.group4.chipgame.actors.Player;
-import com.group4.chipgame.CollisionHandler;
 import com.group4.chipgame.tiles.Tile;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class Main extends Application {
-    public static final int TILE_SIZE = 100;
-    public static final int ACTOR_SIZE = TILE_SIZE - 20;
+    public static final int TILE_SIZE = 200;
+    public static final int ACTOR_SIZE = (int) (TILE_SIZE / 1.5);
 
     public static void main(String[] args) {
         launch(args);
@@ -25,8 +27,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         LevelLoader levelLoader = new LevelLoader();
-        Tile[][] tiles = levelLoader.loadTiles("/levels/island.json");
-        List<Actor> actors = levelLoader.loadActors("/levels/island.json");
+        Tile[][] tiles = levelLoader.loadTiles("/levels/level.json");
+        List<Actor> actors = levelLoader.loadActors("/levels/level.json");
 
         int gridWidth = tiles[0].length;
         int gridHeight = tiles.length;
@@ -35,10 +37,8 @@ public class Main extends Application {
         levelRenderer.renderTiles(tiles);
         levelRenderer.renderActors(actors);
 
-        Scene scene = new Scene(levelRenderer.getGamePane(), gridWidth * TILE_SIZE, gridHeight * TILE_SIZE);
-
-        // Initialize bindings before setting the scene.
-        levelRenderer.initializeBindings(scene);
+        StackPane rootPane = new StackPane(levelRenderer.getGamePane());
+        Scene scene = new Scene(rootPane, gridWidth * TILE_SIZE, gridHeight * TILE_SIZE);
 
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);
@@ -46,19 +46,30 @@ public class Main extends Application {
         primaryStage.show();
 
         Set<KeyCode> pressedKeys = new HashSet<>();
-
         scene.setOnKeyPressed(event -> pressedKeys.add(event.getCode()));
-
         scene.setOnKeyReleased(event -> pressedKeys.remove(event.getCode()));
 
-        Camera camera = new Camera(levelRenderer.getGamePane(), gridWidth * Main.TILE_SIZE, gridHeight * Main.TILE_SIZE);
-        CollisionHandler collisionHandler = new CollisionHandler();
+        Camera camera = new Camera(levelRenderer.getGamePane(), gridWidth * TILE_SIZE, gridHeight * TILE_SIZE);
 
+        CollisionHandler collisionHandler = new CollisionHandler();
+        levelRenderer.initializeBindings(scene);
+
+
+        startGameLoop(actors, pressedKeys, levelRenderer, tiles, collisionHandler, camera);
+
+
+
+
+    }
+
+
+    private void startGameLoop(List<Actor> actors, Set<KeyCode> pressedKeys, LevelRenderer levelRenderer, Tile[][] tiles, CollisionHandler collisionHandler, Camera camera) {
         for (Actor actor : actors) {
             if (actor instanceof Player) {
                 camera.setTarget(actor);
-                long[] lastMoveTime = {0}; // To store the timestamp of the last movement
-                final long MOVE_INTERVAL = 250_000_000; // Cooldown period, 250ms in nanoseconds
+                long[] lastMoveTime = {0};
+                final long MOVE_INTERVAL = 250_000_000;
+
 
                 AnimationTimer gameLoop = new AnimationTimer() {
                     @Override
@@ -69,7 +80,7 @@ public class Main extends Application {
 
                         if (pressedKeys.contains(KeyCode.UP)) {
                             actor.move(0, -1, levelRenderer);
-                            pressedKeys.remove(KeyCode.UP); // Prevent continuous movement when key is held down
+                            pressedKeys.remove(KeyCode.UP);
                         } else if (pressedKeys.contains(KeyCode.DOWN)) {
                             actor.move(0, 1, levelRenderer);
                             pressedKeys.remove(KeyCode.DOWN);
@@ -83,28 +94,29 @@ public class Main extends Application {
                             return;
                         }
 
-                        // Check for collisions after the movement
-                        for (Actor otherActor : actors) {
-                            if (otherActor != actor && collisionHandler.actorsCollide(actor, otherActor)) {
-                                collisionHandler.handleActorOnActorCollision(actor, otherActor);
-                            }
-                        }
-
-                        // Check for collisions with tiles
-                        for (Tile[] tile : tiles) {
-                            for (Tile value : tile) {
-                                if (collisionHandler.actorTileCollide(actor, value)) {
-                                    collisionHandler.handleActorOnTileCollision(actor, value);
-                                }
-                            }
-                        }
-
+                        checkCollisions(actor, actors, tiles, collisionHandler);
                         lastMoveTime[0] = now;
                     }
                 };
 
                 gameLoop.start();
                 break;
+            }
+        }
+    }
+
+    private void checkCollisions(Actor actor, List<Actor> actors, Tile[][] tiles, CollisionHandler collisionHandler) {
+        for (Actor otherActor : actors) {
+            if (otherActor != actor && collisionHandler.actorsCollide(actor, otherActor)) {
+                collisionHandler.handleActorOnActorCollision(actor, otherActor);
+            }
+        }
+
+        for (Tile[] tileRow : tiles) {
+            for (Tile tile : tileRow) {
+                if (collisionHandler.actorTileCollide(actor, tile)) {
+                    collisionHandler.handleActorOnTileCollision(actor, tile);
+                }
             }
         }
     }

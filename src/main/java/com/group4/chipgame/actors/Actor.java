@@ -60,8 +60,10 @@ public abstract class Actor extends ImageView {
             this.currentPosition = new Point2D(newX, newY);
             this.setLayoutX(newX * Main.TILE_SIZE + offsetX);
             this.setLayoutY(newY * Main.TILE_SIZE + offsetY);
+
         }
     }
+
 
     // Override this in specific collectibles to define behavior upon collection.
     public abstract void onCollect(Actor actor);
