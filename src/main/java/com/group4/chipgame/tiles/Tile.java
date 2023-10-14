@@ -9,11 +9,15 @@ import javafx.scene.layout.Pane;
 import java.util.Objects;
 
 public abstract class Tile extends ImageView {
+    private final boolean isWalkable;
+    private boolean occupied;
 
     public Tile(String imagePath, boolean isWalkable) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         setImage(image);
         this.setSmooth(true);
+        this.isWalkable = isWalkable;
+
     }
 
     public void bindSize(Pane gamePane) {
@@ -23,7 +27,7 @@ public abstract class Tile extends ImageView {
     }
 
     public boolean isWalkable() {
-        return true;
+        return isWalkable;
     }
 
     // Can override this method in subclasses for specific behavior when stepped on.

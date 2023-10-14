@@ -1,6 +1,7 @@
 package com.group4.chipgame;
 
 import com.group4.chipgame.actors.Actor;
+import com.group4.chipgame.actors.MovableBlock;
 import com.group4.chipgame.actors.Player;
 import com.group4.chipgame.tiles.Tile;
 
@@ -12,13 +13,18 @@ public class CollisionHandler {
     }
 
     // Handle the specific logic when an actor collides with another actor.
-    public void handleActorOnActorCollision(Actor actor1, Actor actor2) {
-        if ((actor1 instanceof Player && actor2 != null) || (actor2 instanceof Player && actor1 != null)) {
-            // Handle Player-Enemy collision. For now, I'm printing a message.
-            // You can replace this with whatever game logic you want, such as reducing player health.
-            System.out.println("Player collided with an enemy!");
+    public void handleActorOnActorCollision(Actor actor1, Actor actor2, double dx, double dy, LevelRenderer levelRenderer) {
+        if (actor1 instanceof Player && actor2 instanceof MovableBlock) {
+            pushBlock((MovableBlock) actor2, dx, dy, levelRenderer);
+        } else if (actor2 instanceof Player && actor1 instanceof MovableBlock) {
+            pushBlock((MovableBlock) actor1, -dx, -dy, levelRenderer);
+        } else if (actor1 instanceof Player || actor2 instanceof Player) {
+            System.out.println("Player collided with something else!");
         }
-        // You can add more conditions here to handle other types of actor collisions.
+    }
+
+    private void pushBlock(MovableBlock block, double dx, double dy, LevelRenderer levelRenderer) {
+        block.move(dx, dy, levelRenderer);
     }
 
     // If you need to handle collisions between an actor and a tile.

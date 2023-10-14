@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public abstract class Actor extends ImageView {
-    protected Point2D currentPosition;  // Current position of the actor on the grid
+    public Point2D currentPosition;  // Current position of the actor on the grid
     protected Point2D targetPosition;   // Target position for the actor's movement
     private Point2D position;            // Actor's position (not grid-based)
 
@@ -62,6 +62,7 @@ public abstract class Actor extends ImageView {
             this.currentPosition = new Point2D(newX, newY);
             this.setLayoutX(newX * Main.TILE_SIZE + offsetX);
             this.setLayoutY(newY * Main.TILE_SIZE + offsetY);
+
         }
     }
 
