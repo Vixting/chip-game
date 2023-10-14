@@ -1,4 +1,4 @@
-module com.group4.chipgame {
+module com.group.chipgame {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.xml;
@@ -9,5 +9,6 @@ module com.group4.chipgame {
     opens com.group4.chipgame to javafx.fxml;
     exports com.group4.chipgame;
     exports com.group4.chipgame.actors;
+    exports com.group4.chipgame.tiles;
     opens com.group4.chipgame.actors to javafx.fxml;
 }
