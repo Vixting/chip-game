@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LevelLoader {
-
     private JSONObject loadJsonFromResource(String path) throws IOException {
         try (InputStream resourceStream = Main.class.getResourceAsStream(path)) {
             if (resourceStream == null) {
@@ -47,7 +46,6 @@ public class LevelLoader {
                 }
             }
         }
-
         return levelTiles;
     }
 
@@ -66,8 +64,6 @@ public class LevelLoader {
             if ("Player".equals(type)) {
                 System.out.println("Player found at " + x + ", " + y);
                 actors.add(new Player(x, y));
-                // Assume the Player class has an appropriate constructor.
-                // Add more cases as needed for other actor types.
             } else if ("Creeper".equals(type)) {
                 actors.add(new Creeper(x, y));
 
