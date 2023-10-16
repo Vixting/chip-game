@@ -9,6 +9,6 @@ public class MovableBlock extends Actor {
 
     @Override
     public void onCollect(Actor actor) {
-        System.out.println("Movable block collected!");
+
     }
 }

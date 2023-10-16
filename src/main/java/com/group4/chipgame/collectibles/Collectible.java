@@ -11,12 +11,9 @@ public class Collectible extends Actor {
     }
 
     @Override
-    public void move(double dx, double dy, LevelRenderer levelRenderer) {
-
-    }
-
-    @Override
     public void onCollect(Actor actor) {
 
     }
+
+
 }
