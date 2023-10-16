@@ -1,6 +1,7 @@
 package com.group4.chipgame;
 
 import com.group4.chipgame.actors.*;
+import com.group4.chipgame.collectibles.Key;
 import com.group4.chipgame.tiles.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,17 +24,28 @@ public class LevelLoader {
         }
     }
 
+
     private final Map<String, BiFunction<Integer, Integer, Tile>> tileCreators = new HashMap<>() {{
         put("P", (x, y) -> new Path());
         put("W", (x, y) -> new Water());
-        put("I", (x, y) -> new Wall());
-        // Add more tiles as needed
+        put("G", (x, y) -> new Wall());
+        put("D", (x, y) -> new LockedDoor(Key.KeyColor.BLUE));
+
+        put("I", (x, y) -> new Ice(Direction.Corner.NONE ));
+        put("I_BL", (x, y) -> new Ice(Direction.Corner.BOTTOM_LEFT));
+        put("I_BR", (x, y) -> new Ice(Direction.Corner.BOTTOM_RIGHT));
+        put("I_TL", (x, y) -> new Ice(Direction.Corner.TOP_LEFT));
+        put("I_TR", (x, y) -> new Ice(Direction.Corner.TOP_RIGHT));
     }};
+
 
     private final Map<String, BiFunction<Integer, Integer, Actor>> actorCreators = new HashMap<>() {{
         put("Player", Player::new);
         put("Creeper", Creeper::new);
         put("MovableBlock", MovableBlock::new);
+
+        put("Key", (x, y) -> new Key(Key.KeyColor.BLUE, x, y));
+
         // Add more actors as needed
     }};
 
@@ -56,11 +68,13 @@ public class LevelLoader {
         return levelTiles;
     }
 
-    public List<Actor> loadActors(String levelFilePath) throws IOException {
+    public List<Actor> loadActors(String levelFilePath, LevelRenderer levelRenderer) throws IOException {
         JSONObject levelData = loadJsonFromResource(levelFilePath);
         JSONArray actorsArray = levelData.getJSONArray("actors");
 
         List<Actor> actors = new ArrayList<>();
+
+        Tile[][] levelTiles = levelRenderer.getTiles();
 
         for (int i = 0; i < actorsArray.length(); i++) {
             JSONObject actorData = actorsArray.getJSONObject(i);
@@ -68,7 +82,16 @@ public class LevelLoader {
             int x = actorData.getInt("x");
             int y = actorData.getInt("y");
 
-            actors.add(actorCreators.getOrDefault(type, (a, b) -> null).apply(x, y));
+            Actor actor = actorCreators.getOrDefault(type, (a, b) -> null).apply(x, y);
+            if (actor != null) {
+                actors.add(actor);
+
+                // Set the tile's occupiedBy property with the actor
+                if (levelTiles[y][x] != null) {
+                    levelTiles[y][x].setOccupiedBy(actor);
+                    System.out.println("Setting tile (" + x + ", " + y + ") as occupied by " + type + ".");
+                }
+            }
         }
 
         return actors;

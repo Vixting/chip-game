@@ -1,5 +1,6 @@
 package com.group4.chipgame.actors;
-
+import com.group4.chipgame.Direction;
+import com.group4.chipgame.CollisionHandler;
 import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.Main;
 import com.group4.chipgame.tiles.Tile;
@@ -15,10 +16,7 @@ public abstract class Actor extends ImageView {
     protected Point2D targetPosition;   // Target position for the actor's movement
     private Point2D position;            // Actor's position (not grid-based)
 
-    // Constructor for the Actor class
     public Actor(String imagePath, double x, double y) {
-        // Load the actor's image from the provided image path
-        // Image for the actor
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)), Main.ACTOR_SIZE, Main.ACTOR_SIZE, true, true);
         setImage(image);
         this.setSmooth(true);
@@ -34,36 +32,49 @@ public abstract class Actor extends ImageView {
         return position;
     }
 
-    // Setter for the actor's position
-    public void setPosition(Point2D newPosition) {
-        this.position = newPosition;
-    }
 
-    // Method to move the actor by a specified amount (dx, dy) on the grid
-    public void move(double dx, double dy, LevelRenderer levelRenderer) {
-        // Calculate the new target position
+// Method to move the actor by a specified amount (dx, dy) on the grid
+    public void move(double dx, double dy, LevelRenderer levelRenderer, CollisionHandler collisionHandler) {
         double newX = this.currentPosition.getX() + dx;
         double newY = this.currentPosition.getY() + dy;
 
-        // Convert the target position to grid coordinates
-        int targetGridX = (int) newX;
-        int targetGridY = (int) newY;
+        Direction direction = Direction.fromDelta(dx, dy); // convert dx, dy to Direction enum
 
-        // Fetch the tile at the target position using the Optional
-        Optional<Tile> optionalTargetTile = levelRenderer.getTileAtGridPosition(targetGridX, targetGridY);
+        Optional<Tile> optionalTargetTile = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
 
-        // Use the Tile inside the Optional if it exists and is walkable
         if (optionalTargetTile.isPresent() && optionalTargetTile.get().isWalkable()) {
-            // Now, update the actor's position on the pane
-            double offsetX = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
-            double offsetY = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
+            Actor actorOnTargetTile = optionalTargetTile.get().getOccupiedBy();
 
-            // Update the current position and layout position of the actor
-            this.currentPosition = new Point2D(newX, newY);
-            this.setLayoutX(newX * Main.TILE_SIZE + offsetX);
-            this.setLayoutY(newY * Main.TILE_SIZE + offsetY);
-
+            if (actorOnTargetTile == null) {
+                performMove(newX, newY, levelRenderer, direction); // Updated to pass direction
+            } else {
+                collisionHandler.handleActorOnActorCollision(this, actorOnTargetTile, dx, dy, levelRenderer);
+            }
         }
+    }
+
+
+    public void performMove(double newX, double newY, LevelRenderer levelRenderer, Direction direction) {
+        double offsetX = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
+        double offsetY = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
+
+        // Get the current tile the actor is on
+        Optional<Tile> currentTile = levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY());
+
+        // If the actor is on a tile, mark it as unoccupied
+        currentTile.ifPresent(tile -> tile.setOccupiedBy(null));
+
+        // Update the actor's position
+        this.currentPosition = new Point2D(newX, newY);
+        this.setLayoutX(newX * Main.TILE_SIZE + offsetX);
+        this.setLayoutY(newY * Main.TILE_SIZE + offsetY);
+
+        // Get the tile the actor moved to
+        Optional<Tile> targetTile = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
+
+        // Mark the new tile as occupied by the actor
+        targetTile.ifPresent(tile -> tile.setOccupiedBy(this));
+        targetTile.ifPresent(tile -> tile.onStep(this, levelRenderer, direction)); // Updated to pass direction
     }
 
     // Abstract method that must be implemented by subclasses to define behavior upon collection

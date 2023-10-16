@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Main extends Application {
-    public static final int TILE_SIZE = 100;
+    public static final int TILE_SIZE = 200;
     public static final int ACTOR_SIZE = (int) (TILE_SIZE / 1.5);
 
     public static void main(String[] args) {
@@ -28,7 +28,6 @@ public class Main extends Application {
         // Load tiles and actors from a level file
         LevelLoader levelLoader = new LevelLoader();
         Tile[][] tiles = levelLoader.loadTiles("/levels/island.json");
-        List<Actor> actors = levelLoader.loadActors("/levels/island.json");
 
         int gridWidth = tiles[0].length;
         int gridHeight = tiles.length;
@@ -36,6 +35,7 @@ public class Main extends Application {
         // Create a level renderer to render game components
         LevelRenderer levelRenderer = new LevelRenderer();
         levelRenderer.renderTiles(tiles);
+        List<Actor> actors = levelLoader.loadActors("/levels/island.json", levelRenderer);
         levelRenderer.renderActors(actors);
 
         // Create a scene with the game rendering components
@@ -88,24 +88,25 @@ public class Main extends Application {
 
                         // Handle player movement based on pressed keys
                         if (pressedKeys.contains(KeyCode.UP)) {
-                            actor.move(0, -1, levelRenderer);
                             checkCollisions(actor, actors, tiles, collisionHandler, 0, -1, levelRenderer);
+                            actor.move(0, -1, levelRenderer, collisionHandler);
                             pressedKeys.remove(KeyCode.UP);
                         } else if (pressedKeys.contains(KeyCode.DOWN)) {
-                            actor.move(0, 1, levelRenderer);
                             checkCollisions(actor, actors, tiles, collisionHandler, 0, 1, levelRenderer);
+                            actor.move(0, 1, levelRenderer, collisionHandler);
                             pressedKeys.remove(KeyCode.DOWN);
                         } else if (pressedKeys.contains(KeyCode.LEFT)) {
-                            actor.move(-1, 0, levelRenderer);
                             checkCollisions(actor, actors, tiles, collisionHandler, -1, 0, levelRenderer);
+                            actor.move(-1, 0, levelRenderer, collisionHandler);
                             pressedKeys.remove(KeyCode.LEFT);
                         } else if (pressedKeys.contains(KeyCode.RIGHT)) {
-                            actor.move(1, 0, levelRenderer);
                             checkCollisions(actor, actors, tiles, collisionHandler, 1, 0, levelRenderer);
+                            actor.move(1, 0, levelRenderer, collisionHandler);
                             pressedKeys.remove(KeyCode.RIGHT);
                         } else {
                             return;
                         }
+
 
                         // Check for collisions between the player and other game components
                         lastMoveTime[0] = now;
@@ -119,19 +120,24 @@ public class Main extends Application {
     }
 
     private void checkCollisions(Actor actor, List<Actor> actors, Tile[][] tiles, CollisionHandler collisionHandler, double dx, double dy, LevelRenderer levelRenderer) {
+        // Check for collisions between the player actor and tiles FIRST
+        for (Tile[] tileRow : tiles) {
+            for (Tile tile : tileRow) {
+                if (collisionHandler.actorTileCollide(actor, tile, dx, dy)) {
+                    System.out.println("Actor-tile collision!");
+                    collisionHandler.handleTileInteraction(actor, dx, dy, levelRenderer);
+                    collisionHandler.handleActorOnTileCollision(actor, tile, levelRenderer);
+                }
+            }
+        }
+
+        // THEN check for collisions between actors
         for (Actor otherActor : actors) {
             if (otherActor != actor && collisionHandler.actorsCollide(actor, otherActor)) {
                 collisionHandler.handleActorOnActorCollision(actor, otherActor, dx, dy, levelRenderer);
             }
         }
-
-        // Check for collisions between the player actor and tiles
-        for (Tile[] tileRow : tiles) {
-            for (Tile tile : tileRow) {
-                if (collisionHandler.actorTileCollide(actor, tile)) {
-                    collisionHandler.handleActorOnTileCollision(actor, tile);
-                }
-            }
-        }
     }
+
+
 }

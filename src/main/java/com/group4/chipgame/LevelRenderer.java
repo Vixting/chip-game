@@ -34,6 +34,38 @@ public class LevelRenderer {
         this.gamePane.getChildren().addAll(tilesPane, actorsPane);
     }
 
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public void removeActor(Actor actor) {
+        // Removing actor from the visual pane
+        actorsPane.getChildren().remove(actor);
+
+        // Clearing tile's occupied status
+        Point2D actorPosition = actor.getPosition();
+        if (actorPosition != null) {
+            int x = (int) actorPosition.getX();
+            int y = (int) actorPosition.getY();
+            if (!isOutOfBounds(x, y)) {
+                Tile tile = tiles[y][x];
+                if (tile.getOccupiedBy() == actor) {
+                    tile.setOccupiedBy(null);
+                }
+            }
+        }
+    }
+
+
+    public void updateTile(int x, int y, Tile newTile) {
+        tiles[y][x] = newTile;
+        newTile.bindSize();
+        newTile.setLayoutX(x * Main.TILE_SIZE);
+        newTile.setLayoutY(y * Main.TILE_SIZE);
+        tilesPane.getChildren().set(y * tiles[0].length + x, newTile);
+    }
+
+
     // Initialize bindings for scaling and positioning game components
     public void initializeBindings(Scene scene) {
         DoubleBinding scaleBinding = calculateScaleBinding(scene);
@@ -80,7 +112,8 @@ public class LevelRenderer {
         for (int y = 0; y < tiles.length; y++) {
             for (int x = 0; x < tiles[y].length; x++) {
                 Tile tile = tiles[y][x];
-                tile.bindSize(gamePane);
+                tile.setGridPosition(x, y);
+                tile.bindSize();
                 tile.setLayoutX(x * Main.TILE_SIZE);
                 tile.setLayoutY(y * Main.TILE_SIZE);
                 tilesPane.getChildren().add(tile);
