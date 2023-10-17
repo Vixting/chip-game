@@ -65,7 +65,7 @@ public class CollisionHandler {
                 System.out.println(tile.getOccupiedBy());
 
                 levelRenderer.removeActor(block);
-                levelRenderer.updateTile((int) blockNewX, (int) blockNewY, new Dirt()); 
+                levelRenderer.updateTile((int) blockNewX, (int) blockNewY, new Dirt());
 
             } else if (blockTargetTile.get().isWalkable() && blockTargetTile.get().isOccupied()) {
                 block.move(dx, dy, levelRenderer, this);
