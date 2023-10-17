@@ -31,19 +31,20 @@ public class CollisionHandler {
             (actor2).onCollect(actor1);
             levelRenderer.removeActor(actor1);
         }
-
-
     }
 
     private void handlePlayerBlockInteraction(Player player, MovableBlock block, double dx, double dy, LevelRenderer levelRenderer) {
-        pushBlock(block, dx, dy, levelRenderer);
-        if (!levelRenderer.getTileAtGridPosition((int) (player.currentPosition.getX() + dx), (int) (player.currentPosition.getY() + dy)).get().isOccupied()) {
-            handleTileInteraction(player, dx, dy, levelRenderer); // Check for tile collisions before moving the player
-            Direction direction = Direction.fromDelta(dx, dy);
-            player.performMove(player.currentPosition.getX() + dx, player.currentPosition.getY() + dy, levelRenderer, direction);
+        double blockNewX = block.currentPosition.getX() + dx;
+        double blockNewY = block.currentPosition.getY() + dy;
+        Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
+
+        if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && !blockTargetTile.get().isOccupied()) {
+            block.move(dx, dy, levelRenderer, this); // Move the block
+            player.performMove(player.currentPosition.getX() + dx, player.currentPosition.getY() + dy, levelRenderer, Direction.fromDelta(dx, dy)); // Continue the player's slide
+        } else {
+            player.performMove(player.currentPosition.getX() - dx, player.currentPosition.getY() - dy, levelRenderer, Direction.fromDelta(-dx, -dy));
         }
     }
-
 
     private void pushBlock(MovableBlock block, double dx, double dy, LevelRenderer levelRenderer) {
         double newX = block.currentPosition.getX() + dx;
@@ -54,8 +55,6 @@ public class CollisionHandler {
             block.move(dx, dy, levelRenderer, this);
         }
     }
-
-//...
 
     public boolean actorTileCollide(Actor actor, Tile tile, double dx, double dy) {
         // Create a new bounding box based on actor's future position
@@ -84,11 +83,6 @@ public class CollisionHandler {
             }
         }
     }
-
-//...
-
-
-
 
     public void handleActorOnTileCollision(Actor actor, Tile tile, LevelRenderer levelRenderer){
         // Other tile interactions...

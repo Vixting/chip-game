@@ -4,6 +4,7 @@ import com.group4.chipgame.Direction;
 import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.actors.Actor;
 import com.group4.chipgame.actors.Player;
+import com.group4.chipgame.collectibles.Collectible;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
@@ -30,6 +31,7 @@ public class Ice extends Tile {
 
     public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
         System.out.println("Sliding!");
+
 
         PauseTransition pause = new PauseTransition(Duration.millis(500));
         pause.setOnFinished(event -> {
@@ -82,6 +84,10 @@ public class Ice extends Tile {
                     if (actorOnTile instanceof Player) {
                         levelRenderer.removeActor(actorOnTile);
                         System.out.println("Player has been killed due to being hit by a sliding actor!");
+                    } else if (actor instanceof Player && actorOnTile instanceof Collectible) {
+                        actor.onCollect(actorOnTile);
+                        levelRenderer.removeActor(actorOnTile);
+                        onStep(actor, levelRenderer, incomingDirection);
                     } else {
                         handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
                     }
