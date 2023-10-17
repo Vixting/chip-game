@@ -4,8 +4,10 @@ import com.group4.chipgame.actors.Actor;
 import com.group4.chipgame.actors.MovableBlock;
 import com.group4.chipgame.actors.Player;
 import com.group4.chipgame.collectibles.Key;
+import com.group4.chipgame.tiles.Dirt;
 import com.group4.chipgame.tiles.LockedDoor;
 import com.group4.chipgame.tiles.Tile;
+import com.group4.chipgame.tiles.Water;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 
@@ -18,15 +20,11 @@ public class CollisionHandler {
     }
 
     public void handleActorOnActorCollision(Actor actor1, Actor actor2, double dx, double dy, LevelRenderer levelRenderer) {
-        if (actor1 instanceof MovableBlock || actor2 instanceof MovableBlock) {
-            if (actor1 instanceof Player || actor2 instanceof Player) {
-                assert actor1 instanceof Player;
-                handlePlayerBlockInteraction((Player) actor1, (MovableBlock) actor2, dx, dy, levelRenderer);
-            }
-        }
-
-        // Handle key collection
-        if (actor1 instanceof Key || actor2 instanceof Key) {
+        if ((actor1 instanceof MovableBlock && actor2 instanceof Player) || (actor1 instanceof Player && actor2 instanceof MovableBlock)) {
+            Player player = (actor1 instanceof Player) ? (Player) actor1 : (Player) actor2;
+            MovableBlock block = (actor1 instanceof MovableBlock) ? (MovableBlock) actor1 : (MovableBlock) actor2;
+            handlePlayerBlockInteraction(player, block, dx, dy, levelRenderer);
+        } else if (actor1 instanceof Key || actor2 instanceof Key) {
             Actor player = (actor1 instanceof Player) ? actor1 : actor2;
             Actor key = (actor1 instanceof Key) ? actor1 : actor2;
             player.onCollect(key);
@@ -47,7 +45,8 @@ public class CollisionHandler {
         int newY = (int) (actor.currentPosition.getY() + dy);
 
         Optional<Tile> nextTile = levelRenderer.getTileAtGridPosition(newX, newY);
-        if (nextTile.isPresent() && nextTile.get() instanceof LockedDoor && actor instanceof Player) {
+        System.out.println(nextTile);
+        if (nextTile.isPresent() && nextTile.get() instanceof LockedDoor  && actor instanceof Player) {
             nextTile.get().onStep(actor, levelRenderer, null);
         }
     }
@@ -57,19 +56,21 @@ public class CollisionHandler {
         double blockNewY = block.currentPosition.getY() + dy;
         Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
 
-        if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && !blockTargetTile.get().isOccupied()) {
-            block.move(dx, dy, levelRenderer, this);
-            player.performMove(player.currentPosition.getX() + dx, player.currentPosition.getY() + dy, levelRenderer, Direction.fromDelta(dx, dy));
-        }
-    }
+        System.out.println(block);
 
-    private void pushBlock(MovableBlock block, double dx, double dy, LevelRenderer levelRenderer) {
-        double newX = block.currentPosition.getX() + dx;
-        double newY = block.currentPosition.getY() + dy;
-        Optional<Tile> optionalTargetTile = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
+        if (blockTargetTile.isPresent()) {
+            if (blockTargetTile.get() instanceof Water) {
+                Tile tile = levelRenderer.getTileAtGridPosition((int)block.getPosition().getX(), (int)block.getPosition().getY()).orElse(null);
+                assert tile != null;
+                System.out.println(tile.getOccupiedBy());
 
-        if (optionalTargetTile.isPresent() && optionalTargetTile.get().isWalkable() && !optionalTargetTile.get().isOccupied()) {
-            block.move(dx, dy, levelRenderer, this);
+                levelRenderer.removeActor(block);
+                levelRenderer.updateTile((int) blockNewX, (int) blockNewY, new Dirt()); 
+
+            } else if (blockTargetTile.get().isWalkable() && blockTargetTile.get().isOccupied()) {
+                block.move(dx, dy, levelRenderer, this);
+                player.performMove(player.currentPosition.getX() + dx, player.currentPosition.getY() + dy, levelRenderer, Direction.fromDelta(dx, dy));
+            }
         }
     }
 }

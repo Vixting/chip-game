@@ -24,12 +24,12 @@ public class LevelLoader {
         }
     }
 
-
     private final Map<String, BiFunction<Integer, Integer, Tile>> tileCreators = new HashMap<>() {{
         put("P", (x, y) -> new Path());
         put("W", (x, y) -> new Water());
         put("G", (x, y) -> new Wall());
         put("D", (x, y) -> new LockedDoor(Key.KeyColor.BLUE));
+        put("S", (x, y) -> new Dirt());
 
         put("I", (x, y) -> new Ice(Direction.Corner.NONE ));
         put("I_BL", (x, y) -> new Ice(Direction.Corner.BOTTOM_LEFT));
@@ -86,14 +86,12 @@ public class LevelLoader {
             if (actor != null) {
                 actors.add(actor);
 
-                // Set the tile's occupiedBy property with the actor
                 if (levelTiles[y][x] != null) {
                     levelTiles[y][x].setOccupiedBy(actor);
                     System.out.println("Setting tile (" + x + ", " + y + ") as occupied by " + type + ".");
                 }
             }
         }
-
         return actors;
     }
 }

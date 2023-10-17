@@ -19,42 +19,30 @@ public abstract class Tile extends ImageView {
     public Tile(String imagePath, boolean isWalkable) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         setImage(image);
-        this.setSmooth(true);
+        setSmooth(true);
         this.isWalkable = isWalkable;
     }
 
     public void setGridPosition(int x, int y) {
-        this.gridX = x;
-        this.gridY = y;
+        gridX = x;
+        gridY = y;
     }
 
     public void bindSize() {
-        this.setFitWidth(Main.TILE_SIZE);
-        this.setFitHeight(Main.TILE_SIZE);
+        setFitWidth(Main.TILE_SIZE);
+        setFitHeight(Main.TILE_SIZE);
     }
 
     public void setOccupiedBy(Actor actor) {
-        this.occupiedBy = actor;
-        setOccupied(actor != null);
+        occupiedBy = actor;
+        occupied = actor != null;
     }
 
-    public Actor getOccupiedBy() {
-        return occupiedBy;
-    }
+    public Actor getOccupiedBy() { return occupiedBy; }
+    public boolean isWalkable() { return isWalkable; }
+    public boolean isOccupied() { return !occupied; }
 
-    public boolean isWalkable() {
-        return isWalkable;
-    }
-
-    public boolean isOccupied() {
-        return occupied;
-    }
-
-    public void setOccupied(boolean occupied) {
-        this.occupied = occupied;
-    }
-
-    // Abstract method to be implemented by subclasses with specific behavior when stepped on.
     public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
+        // To be implemented by subclasses
     }
 }

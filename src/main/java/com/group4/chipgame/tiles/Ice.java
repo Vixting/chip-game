@@ -76,7 +76,7 @@ public class Ice extends Tile {
     }
 
     private void handleTileOccupancy(Tile targetTile, Actor actor, double newX, double newY, LevelRenderer levelRenderer, Direction incomingDirection) {
-        if (!targetTile.isOccupied()) {
+        if (targetTile.isOccupied()) {
             actor.performMove(newX, newY, levelRenderer, incomingDirection);
         } else {
             Actor actorOnTile = targetTile.getOccupiedBy();
@@ -105,7 +105,7 @@ public class Ice extends Tile {
         double blockNewY = block.currentPosition.getY() + direction.getDy();
         Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
 
-        if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && !blockTargetTile.get().isOccupied()) {
+        if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && blockTargetTile.get().isOccupied()) {
             block.performMove(blockNewX, blockNewY, levelRenderer, direction);
             actor.performMove(actor.currentPosition.getX() + direction.getDx(), actor.currentPosition.getY() + direction.getDy(), levelRenderer, direction);
             return true;
@@ -113,14 +113,13 @@ public class Ice extends Tile {
         return false;
     }
 
-
     private void handleReverseSlide(Actor actor, LevelRenderer levelRenderer, Direction reverseDirection) {
         Direction effectiveReverseDirection = determineSlideDirection(reverseDirection);
         double reverseX = actor.currentPosition.getX() + effectiveReverseDirection.getDx();
         double reverseY = actor.currentPosition.getY() + effectiveReverseDirection.getDy();
 
         Optional<Tile> reverseTileOptional = levelRenderer.getTileAtGridPosition((int) reverseX, (int) reverseY);
-        if (reverseTileOptional.isPresent() && reverseTileOptional.get().isWalkable() && !reverseTileOptional.get().isOccupied()) {
+        if (reverseTileOptional.isPresent() && reverseTileOptional.get().isWalkable() && reverseTileOptional.get().isOccupied()) {
             actor.performMove(reverseX, reverseY, levelRenderer, effectiveReverseDirection);
         }
     }

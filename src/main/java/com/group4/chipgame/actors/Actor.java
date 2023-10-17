@@ -14,45 +14,38 @@ import java.util.Optional;
 public abstract class Actor extends ImageView {
     public Point2D currentPosition;  // Current position of the actor on the grid
     protected Point2D targetPosition;   // Target position for the actor's movement
-    private Point2D position;            // Actor's position (not grid-based)
 
     public Actor(String imagePath, double x, double y) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)), Main.ACTOR_SIZE, Main.ACTOR_SIZE, true, true);
         setImage(image);
         this.setSmooth(true);
 
-        // Set the actor's initial position (both current and target)
-        this.position = new Point2D(x, y);
         this.currentPosition = new Point2D(x, y);
         this.targetPosition = new Point2D(x, y);
     }
 
-    // Getter for the actor's position
     public Point2D getPosition() {
-        return position;
+        return currentPosition;
     }
-
 
 // Method to move the actor by a specified amount (dx, dy) on the grid
-    public void move(double dx, double dy, LevelRenderer levelRenderer, CollisionHandler collisionHandler) {
-        double newX = this.currentPosition.getX() + dx;
-        double newY = this.currentPosition.getY() + dy;
+public void move(double dx, double dy, LevelRenderer levelRenderer, CollisionHandler collisionHandler) {
+    double newX = this.currentPosition.getX() + dx;
+    double newY = this.currentPosition.getY() + dy;
+    Direction direction = Direction.fromDelta(dx, dy);
+    Optional<Tile> optionalTargetTile = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
 
-        Direction direction = Direction.fromDelta(dx, dy); // convert dx, dy to Direction enum
+    if (optionalTargetTile.isPresent()) {
+        Tile targetTile = optionalTargetTile.get();
+        System.out.println("Tile at (" + newX + ", " + newY + ") isWalkable: " + targetTile.isWalkable() + ", occupiedBy: " + targetTile.getOccupiedBy());
 
-        Optional<Tile> optionalTargetTile = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
-
-        if (optionalTargetTile.isPresent() && optionalTargetTile.get().isWalkable()) {
-            Actor actorOnTargetTile = optionalTargetTile.get().getOccupiedBy();
-
-            if (actorOnTargetTile == null) {
-                performMove(newX, newY, levelRenderer, direction); // Updated to pass direction
-            } else {
-                collisionHandler.handleActorOnActorCollision(this, actorOnTargetTile, dx, dy, levelRenderer);
-            }
+        if (targetTile.isWalkable() && targetTile.getOccupiedBy() == null) {
+            performMove(newX, newY, levelRenderer, direction);
+        } else if (targetTile.getOccupiedBy() != null) {
+            collisionHandler.handleActorOnActorCollision(this, targetTile.getOccupiedBy(), dx, dy, levelRenderer);
         }
     }
-
+}
 
     public void performMove(double newX, double newY, LevelRenderer levelRenderer, Direction direction) {
         double offsetX = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;

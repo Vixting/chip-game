@@ -3,6 +3,7 @@ package com.group4.chipgame;
 import com.group4.chipgame.tiles.Tile;
 import com.group4.chipgame.actors.Actor;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Point2D;
@@ -11,6 +12,7 @@ import javafx.scene.layout.Pane;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class LevelRenderer {
 
@@ -26,7 +28,6 @@ public class LevelRenderer {
     // 2D array to store tiles
     private Tile[][] tiles;
 
-    // Constructor for LevelRenderer
     public LevelRenderer() {
         this.gamePane = new Pane();
         this.tilesPane = new Pane();
@@ -34,79 +35,21 @@ public class LevelRenderer {
         this.gamePane.getChildren().addAll(tilesPane, actorsPane);
     }
 
-    public Tile[][] getTiles() {
-        return tiles;
-    }
-
-    public void removeActor(Actor actor) {
-        // Removing actor from the visual pane
-        actorsPane.getChildren().remove(actor);
-
-        // Clearing tile's occupied status
-        Point2D actorPosition = actor.getPosition();
-        if (actorPosition != null) {
-            int x = (int) actorPosition.getX();
-            int y = (int) actorPosition.getY();
-            if (!isOutOfBounds(x, y)) {
-                Tile tile = tiles[y][x];
-                if (tile.getOccupiedBy() == actor) {
-                    tile.setOccupiedBy(null);
-                }
-            }
-        }
-    }
-
-
-    public void updateTile(int x, int y, Tile newTile) {
-        tiles[y][x] = newTile;
-        newTile.bindSize();
-        newTile.setLayoutX(x * Main.TILE_SIZE);
-        newTile.setLayoutY(y * Main.TILE_SIZE);
-        tilesPane.getChildren().set(y * tiles[0].length + x, newTile);
-    }
-
-
-    // Initialize bindings for scaling and positioning game components
-    public void initializeBindings(Scene scene) {
-        DoubleBinding scaleBinding = calculateScaleBinding(scene);
-        gamePane.scaleXProperty().bind(scaleBinding);
-        gamePane.scaleYProperty().bind(scaleBinding);
-
-        // Bind the translation properties for centering the game within the scene
-        gamePane.translateXProperty().bind(Bindings.createDoubleBinding(() -> {
-            double scaleX = scene.getWidth() / (Main.TILE_SIZE * tiles[0].length);
-            return (scene.getWidth() - (Main.TILE_SIZE * tiles[0].length) * scaleX) / 2;
-        }, scene.widthProperty(), scaleBinding));
-
-        gamePane.translateYProperty().bind(Bindings.createDoubleBinding(() -> {
-            double scaleY = scene.getHeight() / (Main.TILE_SIZE * tiles.length);
-            return (scene.getHeight() - (Main.TILE_SIZE * tiles.length) * scaleY) / 2;
-        }, scene.heightProperty(), scaleBinding));
-    }
-
-    // Calculate a binding for scaling the game components based on the scene size
-    private DoubleBinding calculateScaleBinding(Scene scene) {
-        final double HORIZONTAL_TILE_COUNT = tiles[0].length;
-        final double VERTICAL_TILE_COUNT = tiles.length;
-        final double ORIGINAL_GAME_WIDTH = Main.TILE_SIZE * HORIZONTAL_TILE_COUNT;
-        final double ORIGINAL_GAME_HEIGHT = Main.TILE_SIZE * VERTICAL_TILE_COUNT;
-
-        return Bindings.createDoubleBinding(
-                () -> {
-                    double scaleX = scene.getWidth() / ORIGINAL_GAME_WIDTH;
-                    double scaleY = scene.getHeight() / ORIGINAL_GAME_HEIGHT;
-                    return Math.min(scaleX, scaleY);
-                },
-                scene.widthProperty(), scene.heightProperty()
-        );
-    }
-
-    // Getter for the gamePane
     public Pane getGamePane() {
         return gamePane;
     }
 
-    // Render the tiles on the gamePane
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public List<Actor> getActors() {
+        return actorsPane.getChildren().stream()
+                .filter(node -> node instanceof Actor)
+                .map(node -> (Actor) node)
+                .collect(Collectors.toList());
+    }
+
     public void renderTiles(Tile[][] tiles) {
         this.tiles = tiles;
         for (int y = 0; y < tiles.length; y++) {
@@ -121,25 +64,52 @@ public class LevelRenderer {
         }
     }
 
-    // Retrieve a tile at a given grid position
-    public Optional<Tile> getTileAtGridPosition(int x, int y) {
-        if (isOutOfBounds(x, y)) {
-            return Optional.empty();
-        }
-        return Optional.of(tiles[y][x]);
-    }
-
-    // Check if a grid position is out of bounds
-    private boolean isOutOfBounds(int x, int y) {
-        return x < 0 || x >= tiles[0].length || y < 0 || y >= tiles.length;
-    }
-
-    // Render actors on the gamePane
     public void renderActors(List<Actor> actors) {
         Optional.ofNullable(actors).ifPresent(actorsList -> actorsList.forEach(this::positionAndAddActor));
     }
 
-    // Position and add an actor to the actorsPane
+    public void clear() {
+        tilesPane.getChildren().clear();
+        actorsPane.getChildren().clear();
+    }
+
+    public void removeActor(Actor actor) {
+        if (actor == null || actor.getPosition() == null) return;
+
+        Point2D actorPosition = actor.getPosition();
+        int x = (int) actorPosition.getX();
+        int y = (int) actorPosition.getY();
+
+        if (isOutOfBounds(x, y)) return;
+
+        getTileAtGridPosition(x, y).ifPresent(tile -> tile.setOccupiedBy(null));
+
+        Platform.runLater(() -> actorsPane.getChildren().remove(actor));
+    }
+
+    public void updateTile(int x, int y, Tile newTile) {
+        if (isOutOfBounds(x, y) || newTile == null) return;
+
+        newTile.setGridPosition(x, y);
+        tiles[y][x] = newTile;
+
+        System.out.printf("Tile at (%d, %d) updated to %s%n", x, y, newTile.getClass().getSimpleName());
+
+        newTile.bindSize();
+        newTile.setLayoutX(x * Main.TILE_SIZE);
+        newTile.setLayoutY(y * Main.TILE_SIZE);
+        tilesPane.getChildren().set(y * tiles[0].length + x, newTile);
+    }
+
+    private boolean isOutOfBounds(int x, int y) {
+        return x < 0 || x >= tiles[0].length || y < 0 || y >= tiles.length;
+    }
+
+    public Optional<Tile> getTileAtGridPosition(int x, int y) {
+        if (isOutOfBounds(x, y)) return Optional.empty();
+        return Optional.of(tiles[y][x]);
+    }
+
     private void positionAndAddActor(Actor actor) {
         Point2D actorPosition = actor.getPosition();
         if (actorPosition != null) {
@@ -151,9 +121,33 @@ public class LevelRenderer {
         }
     }
 
-    // Clear the tiles and actors from the renderer
-    public void clear() {
-        tilesPane.getChildren().clear();
-        actorsPane.getChildren().clear();
+    public void initializeBindings(Scene scene) {
+        DoubleBinding scaleBinding = calculateScaleBinding(scene);
+        gamePane.scaleXProperty().bind(scaleBinding);
+        gamePane.scaleYProperty().bind(scaleBinding);
+        gamePane.translateXProperty().bind(Bindings.createDoubleBinding(() ->
+                        calculateTranslateValue(scene.getWidth(), tiles[0].length),
+                scene.widthProperty(), scaleBinding));
+        gamePane.translateYProperty().bind(Bindings.createDoubleBinding(() ->
+                        calculateTranslateValue(scene.getHeight(), tiles.length),
+                scene.heightProperty(), scaleBinding));
+    }
+
+    private DoubleBinding calculateScaleBinding(Scene scene) {
+        final double HORIZONTAL_TILE_COUNT = tiles[0].length;
+        final double VERTICAL_TILE_COUNT = tiles.length;
+        final double ORIGINAL_GAME_WIDTH = Main.TILE_SIZE * HORIZONTAL_TILE_COUNT;
+        final double ORIGINAL_GAME_HEIGHT = Main.TILE_SIZE * VERTICAL_TILE_COUNT;
+
+        return Bindings.createDoubleBinding(() -> {
+            double scaleX = scene.getWidth() / ORIGINAL_GAME_WIDTH;
+            double scaleY = scene.getHeight() / ORIGINAL_GAME_HEIGHT;
+            return Math.min(scaleX, scaleY);
+        }, scene.widthProperty(), scene.heightProperty());
+    }
+
+    private double calculateTranslateValue(double sceneDimension, int tileCount) {
+        double scaleValue = sceneDimension / (Main.TILE_SIZE * tileCount);
+        return (sceneDimension - (Main.TILE_SIZE * tileCount) * scaleValue) / 2;
     }
 }
