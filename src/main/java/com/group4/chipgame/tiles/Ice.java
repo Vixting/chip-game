@@ -60,12 +60,16 @@ public class Ice extends Tile {
         if (targetTileOptional.isPresent()) {
             Tile targetTile = targetTileOptional.get();
 
-            if (actor instanceof Player && targetTile instanceof LockedDoor) {
-                System.out.println("Player has reached the exit!");
-                targetTile.onStep(actor, levelRenderer, incomingDirection);
-                onStep(actor, levelRenderer, incomingDirection);
+            if (actor instanceof Player player && targetTile instanceof LockedDoor door) {
+
+                if (player.hasKey(door.getRequiredKeyColor())) {
+                    targetTile.onStep(actor, levelRenderer, incomingDirection);
+                } else {
+                    handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
+                }
                 return;
             }
+
 
             if (targetTile.isWalkable()) {
                 handleTileOccupancy(targetTile, actor, newX, newY, levelRenderer, incomingDirection);
