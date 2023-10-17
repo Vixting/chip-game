@@ -89,7 +89,10 @@ public class Ice extends Tile {
                     levelRenderer.removeActor(actorOnTile);
                     onStep(actor, levelRenderer, incomingDirection);
                 } else if (actorOnTile instanceof MovableBlock) {
-                    handleMovableBlockInteraction(actor, actorOnTile, incomingDirection, levelRenderer);
+                    boolean blockMoved = handleMovableBlockInteraction(actor, actorOnTile, incomingDirection, levelRenderer);
+                    if (!blockMoved) {
+                        handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
+                    }
                 }
             } else {
                 handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
@@ -97,7 +100,7 @@ public class Ice extends Tile {
         }
     }
 
-    private void handleMovableBlockInteraction(Actor actor, Actor block, Direction direction, LevelRenderer levelRenderer) {
+    private boolean handleMovableBlockInteraction(Actor actor, Actor block, Direction direction, LevelRenderer levelRenderer) {
         double blockNewX = block.currentPosition.getX() + direction.getDx();
         double blockNewY = block.currentPosition.getY() + direction.getDy();
         Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
@@ -105,8 +108,11 @@ public class Ice extends Tile {
         if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && !blockTargetTile.get().isOccupied()) {
             block.performMove(blockNewX, blockNewY, levelRenderer, direction);
             actor.performMove(actor.currentPosition.getX() + direction.getDx(), actor.currentPosition.getY() + direction.getDy(), levelRenderer, direction);
+            return true;
         }
+        return false;
     }
+
 
     private void handleReverseSlide(Actor actor, LevelRenderer levelRenderer, Direction reverseDirection) {
         Direction effectiveReverseDirection = determineSlideDirection(reverseDirection);
