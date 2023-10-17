@@ -3,6 +3,7 @@ package com.group4.chipgame.tiles;
 import com.group4.chipgame.Direction;
 import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.actors.Actor;
+import com.group4.chipgame.actors.MovableBlock;
 import com.group4.chipgame.actors.Player;
 import com.group4.chipgame.collectibles.Collectible;
 import javafx.animation.PauseTransition;
@@ -32,14 +33,12 @@ public class Ice extends Tile {
     public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
         System.out.println("Sliding!");
 
-
         PauseTransition pause = new PauseTransition(Duration.millis(500));
         pause.setOnFinished(event -> {
-            Direction effectiveSlideDirection = determineSlideDirection(incomingDirection);
-            double newX = actor.currentPosition.getX() + effectiveSlideDirection.getDx();
-            double newY = actor.currentPosition.getY() + effectiveSlideDirection.getDy();
-
-            handleActorOnIce(actor, newX, newY, levelRenderer, effectiveSlideDirection);
+            Direction slideDirection = determineSlideDirection(incomingDirection);
+            double newX = actor.currentPosition.getX() + slideDirection.getDx();
+            double newY = actor.currentPosition.getY() + slideDirection.getDy();
+            handleActorOnIce(actor, newX, newY, levelRenderer, slideDirection);
         });
 
         pause.play();
@@ -47,54 +46,65 @@ public class Ice extends Tile {
 
     private Direction determineSlideDirection(Direction incomingDirection) {
         return switch (corner) {
-            case BOTTOM_LEFT -> {
-                if (incomingDirection == Direction.LEFT) yield Direction.UP;
-                if (incomingDirection == Direction.DOWN) yield Direction.RIGHT;
-                yield incomingDirection;
-            }
-            case BOTTOM_RIGHT -> {
-                if (incomingDirection == Direction.RIGHT) yield Direction.UP;
-                if (incomingDirection == Direction.DOWN) yield Direction.LEFT;
-                yield incomingDirection;
-            }
-            case TOP_LEFT -> {
-                if (incomingDirection == Direction.LEFT) yield Direction.DOWN;
-                if (incomingDirection == Direction.UP) yield Direction.RIGHT;
-                yield incomingDirection;
-            }
-            case TOP_RIGHT -> {
-                if (incomingDirection == Direction.RIGHT) yield Direction.DOWN;
-                if (incomingDirection == Direction.UP) yield Direction.LEFT;
-                yield incomingDirection;
-            }
-            case NONE, default -> incomingDirection;
+            case BOTTOM_LEFT -> (incomingDirection == Direction.LEFT) ? Direction.UP : (incomingDirection == Direction.DOWN) ? Direction.RIGHT : incomingDirection;
+            case BOTTOM_RIGHT -> (incomingDirection == Direction.RIGHT) ? Direction.UP : (incomingDirection == Direction.DOWN) ? Direction.LEFT : incomingDirection;
+            case TOP_LEFT -> (incomingDirection == Direction.LEFT) ? Direction.DOWN : (incomingDirection == Direction.UP) ? Direction.RIGHT : incomingDirection;
+            case TOP_RIGHT -> (incomingDirection == Direction.RIGHT) ? Direction.DOWN : (incomingDirection == Direction.UP) ? Direction.LEFT : incomingDirection;
+            default -> incomingDirection;
         };
     }
 
     private void handleActorOnIce(Actor actor, double newX, double newY, LevelRenderer levelRenderer, Direction incomingDirection) {
-        Optional<Tile> optionalTargetTile = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
+        Optional<Tile> targetTileOptional = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
 
-        if (optionalTargetTile.isPresent()) {
-            Tile targetTile = optionalTargetTile.get();
+        if (targetTileOptional.isPresent()) {
+            Tile targetTile = targetTileOptional.get();
+
+            if (actor instanceof Player && targetTile instanceof LockedDoor) {
+                System.out.println("Player has reached the exit!");
+                targetTile.onStep(actor, levelRenderer, incomingDirection);
+                onStep(actor, levelRenderer, incomingDirection);
+                return;
+            }
+
             if (targetTile.isWalkable()) {
-                if (!targetTile.isOccupied()) {
-                    actor.performMove(newX, newY, levelRenderer, incomingDirection);
-                } else {
-                    Actor actorOnTile = targetTile.getOccupiedBy();
-                    if (actorOnTile instanceof Player) {
-                        levelRenderer.removeActor(actorOnTile);
-                        System.out.println("Player has been killed due to being hit by a sliding actor!");
-                    } else if (actor instanceof Player && actorOnTile instanceof Collectible) {
-                        actor.onCollect(actorOnTile);
-                        levelRenderer.removeActor(actorOnTile);
-                        onStep(actor, levelRenderer, incomingDirection);
-                    } else {
-                        handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
-                    }
+                handleTileOccupancy(targetTile, actor, newX, newY, levelRenderer, incomingDirection);
+            } else {
+                handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
+            }
+        }
+    }
+
+    private void handleTileOccupancy(Tile targetTile, Actor actor, double newX, double newY, LevelRenderer levelRenderer, Direction incomingDirection) {
+        if (!targetTile.isOccupied()) {
+            actor.performMove(newX, newY, levelRenderer, incomingDirection);
+        } else {
+            Actor actorOnTile = targetTile.getOccupiedBy();
+            if (actorOnTile instanceof Player) {
+                levelRenderer.removeActor(actorOnTile);
+                System.out.println("Player has been killed due to being hit by a sliding actor!");
+            } else if (actor instanceof Player) {
+                if (actorOnTile instanceof Collectible) {
+                    actor.onCollect(actorOnTile);
+                    levelRenderer.removeActor(actorOnTile);
+                    onStep(actor, levelRenderer, incomingDirection);
+                } else if (actorOnTile instanceof MovableBlock) {
+                    handleMovableBlockInteraction(actor, actorOnTile, incomingDirection, levelRenderer);
                 }
             } else {
                 handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
             }
+        }
+    }
+
+    private void handleMovableBlockInteraction(Actor actor, Actor block, Direction direction, LevelRenderer levelRenderer) {
+        double blockNewX = block.currentPosition.getX() + direction.getDx();
+        double blockNewY = block.currentPosition.getY() + direction.getDy();
+        Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
+
+        if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && !blockTargetTile.get().isOccupied()) {
+            block.performMove(blockNewX, blockNewY, levelRenderer, direction);
+            actor.performMove(actor.currentPosition.getX() + direction.getDx(), actor.currentPosition.getY() + direction.getDy(), levelRenderer, direction);
         }
     }
 
@@ -106,7 +116,6 @@ public class Ice extends Tile {
         Optional<Tile> reverseTileOptional = levelRenderer.getTileAtGridPosition((int) reverseX, (int) reverseY);
         if (reverseTileOptional.isPresent() && reverseTileOptional.get().isWalkable() && !reverseTileOptional.get().isOccupied()) {
             actor.performMove(reverseX, reverseY, levelRenderer, effectiveReverseDirection);
-        }  // Additional logic if needed, e.g., actor.stop();
-
+        }
     }
 }

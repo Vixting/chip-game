@@ -14,6 +14,7 @@
   "actors": [
     {"type": "Player", "x": 4, "y": 4},
     {"type": "MovableBlock", "x": 5, "y": 5},
+    {"type": "MovableBlock", "x": 6, "y": 7},
     {"type": "Key", "x": 6, "y": 5}
   ]
 }

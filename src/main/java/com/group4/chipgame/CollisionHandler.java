@@ -18,18 +18,37 @@ public class CollisionHandler {
     }
 
     public void handleActorOnActorCollision(Actor actor1, Actor actor2, double dx, double dy, LevelRenderer levelRenderer) {
-        if (actor1 instanceof Player && actor2 instanceof MovableBlock) {
-            handlePlayerBlockInteraction((Player) actor1, (MovableBlock) actor2, dx, dy, levelRenderer);
-        } else if (actor2 instanceof Player && actor1 instanceof MovableBlock) {
-            handlePlayerBlockInteraction((Player) actor2, (MovableBlock) actor1, -dx, -dy, levelRenderer);
+        if (actor1 instanceof MovableBlock || actor2 instanceof MovableBlock) {
+            if (actor1 instanceof Player || actor2 instanceof Player) {
+                assert actor1 instanceof Player;
+                handlePlayerBlockInteraction((Player) actor1, (MovableBlock) actor2, dx, dy, levelRenderer);
+            }
         }
 
-        if (actor1 instanceof Player && actor2 instanceof Key) {
-            (actor1).onCollect(actor2);
-            levelRenderer.removeActor(actor2);
-        } else if (actor2 instanceof Player && actor1 instanceof Key) {
-            (actor2).onCollect(actor1);
-            levelRenderer.removeActor(actor1);
+        // Handle key collection
+        if (actor1 instanceof Key || actor2 instanceof Key) {
+            Actor player = (actor1 instanceof Player) ? actor1 : actor2;
+            Actor key = (actor1 instanceof Key) ? actor1 : actor2;
+            player.onCollect(key);
+            levelRenderer.removeActor(key);
+        }
+    }
+
+    public boolean actorTileCollide(Actor actor, Tile tile, double dx, double dy) {
+        Bounds futureBounds = new BoundingBox(actor.getBoundsInParent().getMinX() + dx,
+                actor.getBoundsInParent().getMinY() + dy,
+                actor.getBoundsInParent().getWidth(),
+                actor.getBoundsInParent().getHeight());
+        return futureBounds.intersects(tile.getBoundsInParent());
+    }
+
+    public void handleTileInteraction(Actor actor, double dx, double dy, LevelRenderer levelRenderer) {
+        int newX = (int) (actor.currentPosition.getX() + dx);
+        int newY = (int) (actor.currentPosition.getY() + dy);
+
+        Optional<Tile> nextTile = levelRenderer.getTileAtGridPosition(newX, newY);
+        if (nextTile.isPresent() && nextTile.get() instanceof LockedDoor && actor instanceof Player) {
+            nextTile.get().onStep(actor, levelRenderer, null);
         }
     }
 
@@ -39,10 +58,8 @@ public class CollisionHandler {
         Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
 
         if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && !blockTargetTile.get().isOccupied()) {
-            block.move(dx, dy, levelRenderer, this); // Move the block
-            player.performMove(player.currentPosition.getX() + dx, player.currentPosition.getY() + dy, levelRenderer, Direction.fromDelta(dx, dy)); // Continue the player's slide
-        } else {
-            player.performMove(player.currentPosition.getX() - dx, player.currentPosition.getY() - dy, levelRenderer, Direction.fromDelta(-dx, -dy));
+            block.move(dx, dy, levelRenderer, this);
+            player.performMove(player.currentPosition.getX() + dx, player.currentPosition.getY() + dy, levelRenderer, Direction.fromDelta(dx, dy));
         }
     }
 
@@ -54,37 +71,5 @@ public class CollisionHandler {
         if (optionalTargetTile.isPresent() && optionalTargetTile.get().isWalkable() && !optionalTargetTile.get().isOccupied()) {
             block.move(dx, dy, levelRenderer, this);
         }
-    }
-
-    public boolean actorTileCollide(Actor actor, Tile tile, double dx, double dy) {
-        // Create a new bounding box based on actor's future position
-        Bounds futureBounds = new BoundingBox(actor.getBoundsInParent().getMinX() + dx,
-                actor.getBoundsInParent().getMinY() + dy,
-                actor.getBoundsInParent().getWidth(),
-                actor.getBoundsInParent().getHeight());
-        return futureBounds.intersects(tile.getBoundsInParent());
-    }
-
-    public void handleTileInteraction(Actor actor, double dx, double dy, LevelRenderer levelRenderer) {
-        System.out.printf("Actor is at (%.2f, %.2f)\n", actor.currentPosition.getX(), actor.currentPosition.getY());
-        int newX = (int) (actor.currentPosition.getX() + dx);
-        int newY = (int) (actor.currentPosition.getY() + dy);
-
-        Optional<Tile> nextTile = levelRenderer.getTileAtGridPosition(newX, newY);
-        if (nextTile.isPresent()) {
-            System.out.println("Next tile is present!");
-            System.out.println("Next tile class: " + nextTile.get().getClass().getSimpleName());
-
-            if (nextTile.get() instanceof LockedDoor) {
-                System.out.println("Next tile is a locked door!");
-                if (actor instanceof Player) {
-                    nextTile.get().onStep(actor, levelRenderer, null);
-                }
-            }
-        }
-    }
-
-    public void handleActorOnTileCollision(Actor actor, Tile tile, LevelRenderer levelRenderer){
-        // Other tile interactions...
     }
 }

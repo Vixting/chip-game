@@ -126,7 +126,6 @@ public class Main extends Application {
                 if (collisionHandler.actorTileCollide(actor, tile, dx, dy)) {
                     System.out.println("Actor-tile collision!");
                     collisionHandler.handleTileInteraction(actor, dx, dy, levelRenderer);
-                    collisionHandler.handleActorOnTileCollision(actor, tile, levelRenderer);
                 }
             }
         }
