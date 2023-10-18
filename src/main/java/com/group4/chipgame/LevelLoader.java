@@ -36,6 +36,8 @@ public class LevelLoader {
         put("I_BR", (x, y) -> new Ice(Direction.Corner.BOTTOM_RIGHT));
         put("I_TL", (x, y) -> new Ice(Direction.Corner.TOP_LEFT));
         put("I_TR", (x, y) -> new Ice(Direction.Corner.TOP_RIGHT));
+
+        put("Button", (x, y) -> new Button());
     }};
 
 
@@ -57,14 +59,36 @@ public class LevelLoader {
         int height = tilesArray.length();
 
         Tile[][] levelTiles = new Tile[height][width];
+        Map<String, Button> buttonMap = new HashMap<>();
 
         for (int y = 0; y < height; y++) {
             JSONArray row = tilesArray.getJSONArray(y);
             for (int x = 0; x < width; x++) {
                 String tileType = row.getString(x);
-                levelTiles[y][x] = tileCreators.getOrDefault(tileType, (a, b) -> null).apply(x, y);
+                if (tileType.startsWith("B_")) {
+                    Button button = new Button();
+                    levelTiles[y][x] = button;
+                    buttonMap.put(tileType, button);
+                } else {
+                    levelTiles[y][x] = tileCreators.getOrDefault(tileType, (a, b) -> null).apply(x, y);
+                }
             }
         }
+
+        for (int y = 0; y < height; y++) {
+            JSONArray row = tilesArray.getJSONArray(y);
+            for (int x = 0; x < width; x++) {
+                String tileType = row.getString(x);
+                if (tileType.startsWith("T_")) {
+                    String buttonKey = "B" + tileType.substring(1);
+                    Button linkedButton = buttonMap.get(buttonKey);
+                    if (linkedButton != null) {
+                        levelTiles[y][x] = new Trap(linkedButton);
+                    }
+                }
+            }
+        }
+
         return levelTiles;
     }
 

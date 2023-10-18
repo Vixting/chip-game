@@ -1,8 +1,5 @@
 package com.group4.chipgame.collectibles;
 
-import com.group4.chipgame.actors.Actor;
-import com.group4.chipgame.actors.Player;
-
 public class Key extends Collectible {
 
     public enum KeyColor {
@@ -28,13 +25,5 @@ public class Key extends Collectible {
 
     public KeyColor getColor() {
         return color;
-    }
-
-    @Override
-    public void onCollect(Actor actor) {
-        if (actor instanceof Player) {
-            Player player = (Player) actor;
-            this.setVisible(false);
-        }
     }
 }

@@ -55,14 +55,19 @@ public class LevelRenderer {
         for (int y = 0; y < tiles.length; y++) {
             for (int x = 0; x < tiles[y].length; x++) {
                 Tile tile = tiles[y][x];
-                tile.setGridPosition(x, y);
-                tile.bindSize();
-                tile.setLayoutX(x * Main.TILE_SIZE);
-                tile.setLayoutY(y * Main.TILE_SIZE);
-                tilesPane.getChildren().add(tile);
+                if (tile != null) {
+                    tile.setGridPosition(x, y);
+                    tile.bindSize();
+                    tile.setLayoutX(x * Main.TILE_SIZE);
+                    tile.setLayoutY(y * Main.TILE_SIZE);
+                    tilesPane.getChildren().add(tile);
+                } else {
+                    System.out.println("Warning: Tile at position (" + x + ", " + y + ") is null.");
+                }
             }
         }
     }
+
 
     public void renderActors(List<Actor> actors) {
         Optional.ofNullable(actors).ifPresent(actorsList -> actorsList.forEach(this::positionAndAddActor));

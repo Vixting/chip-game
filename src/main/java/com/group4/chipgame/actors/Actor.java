@@ -4,6 +4,7 @@ import com.group4.chipgame.CollisionHandler;
 import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.Main;
 import com.group4.chipgame.tiles.Tile;
+import com.group4.chipgame.tiles.Trap;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -35,10 +36,17 @@ public void move(double dx, double dy, LevelRenderer levelRenderer, CollisionHan
     Direction direction = Direction.fromDelta(dx, dy);
     Optional<Tile> optionalTargetTile = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
 
+    // Check if the actor is currently on a Trap
+    Optional<Tile> currentTileOpt = levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY());
+    if (currentTileOpt.isPresent() && currentTileOpt.get() instanceof Trap currentTrap) {
+        if (!currentTrap.linkedButton.isActive()) {
+            return;
+        }
+    }
+
     if (optionalTargetTile.isPresent()) {
         Tile targetTile = optionalTargetTile.get();
         System.out.println("Tile at (" + newX + ", " + newY + ") isWalkable: " + targetTile.isWalkable() + ", occupiedBy: " + targetTile.getOccupiedBy());
-
         if (targetTile.isWalkable() && targetTile.getOccupiedBy() == null) {
             performMove(newX, newY, levelRenderer, direction);
         } else if (targetTile.getOccupiedBy() != null) {

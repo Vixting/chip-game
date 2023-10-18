@@ -112,6 +112,13 @@ public class Camera {
         newTranslateX = -clampTranslate(-newTranslateX, minX, maxX);
         newTranslateY = -clampTranslate(-newTranslateY, minY, maxY);
 
+        // Calculate the differences in translation
+        double diffX = Math.abs(gamePane.getTranslateX() - newTranslateX);
+        double diffY = Math.abs(gamePane.getTranslateY() - newTranslateY);
+
+        // If the difference is small, update immediately; otherwise, animate over a duration
+        Duration animationDuration = (diffX < 20 && diffY < 20) ? Duration.millis(0) : Duration.millis(1000);
+
         // Unbind previous translations and create a Timeline to smoothly update the camera position
         gamePane.translateXProperty().unbind();
         gamePane.translateYProperty().unbind();
@@ -121,7 +128,7 @@ public class Camera {
         // Define keyframes to animate the camera's translation
         KeyValue kvX = new KeyValue(gamePane.translateXProperty(), newTranslateX);
         KeyValue kvY = new KeyValue(gamePane.translateYProperty(), newTranslateY);
-        KeyFrame kf = new KeyFrame(Duration.millis(1000), kvX, kvY);
+        KeyFrame kf = new KeyFrame(animationDuration, kvX, kvY);
 
         // Add the keyframe to the timeline and play the animation
         timeline.getKeyFrames().add(kf);

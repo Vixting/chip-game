@@ -64,12 +64,12 @@ public class Ice extends Tile {
 
                 if (player.hasKey(door.getRequiredKeyColor())) {
                     targetTile.onStep(actor, levelRenderer, incomingDirection);
+                    onStep(actor, levelRenderer, incomingDirection);
                 } else {
                     handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
                 }
                 return;
             }
-
 
             if (targetTile.isWalkable()) {
                 handleTileOccupancy(targetTile, actor, newX, newY, levelRenderer, incomingDirection);

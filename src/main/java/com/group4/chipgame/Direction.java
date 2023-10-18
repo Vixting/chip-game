@@ -28,7 +28,7 @@ public enum Direction {
         if (dx < 0) return LEFT;
         if (dy > 0) return DOWN;
         if (dy < 0) return UP;
-        return NONE; // or you can throw an exception if it's an invalid delta
+        return NONE;
     }
 
     public Direction getOpposite() {

@@ -1,8 +1,7 @@
 package com.group4.chipgame.collectibles;
 
-import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.actors.Actor;
-import javafx.geometry.Point2D;
+import com.group4.chipgame.actors.Player;
 
 public class Collectible extends Actor {
 
@@ -12,8 +11,8 @@ public class Collectible extends Actor {
 
     @Override
     public void onCollect(Actor actor) {
-
+        if (actor instanceof Player) {
+            this.setVisible(false);
+        }
     }
-
-
 }
