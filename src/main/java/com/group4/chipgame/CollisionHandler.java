@@ -41,8 +41,8 @@ public class CollisionHandler {
     }
 
     public void handleTileInteraction(Actor actor, double dx, double dy, LevelRenderer levelRenderer) {
-        int newX = (int) (actor.currentPosition.getX() + dx);
-        int newY = (int) (actor.currentPosition.getY() + dy);
+        int newX = (int) (actor.getPosition().getX() + dx);
+        int newY = (int) (actor.getPosition().getY() + dy);
 
         Optional<Tile> nextTile = levelRenderer.getTileAtGridPosition(newX, newY);
         System.out.println(nextTile);
@@ -52,8 +52,8 @@ public class CollisionHandler {
     }
 
     private void handlePlayerBlockInteraction(Player player, MovableBlock block, double dx, double dy, LevelRenderer levelRenderer) {
-        double blockNewX = block.currentPosition.getX() + dx;
-        double blockNewY = block.currentPosition.getY() + dy;
+        double blockNewX = block.getPosition().getX() + dx;
+        double blockNewY = block.getPosition().getY() + dy;
         Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
 
         System.out.println(block);
@@ -65,11 +65,11 @@ public class CollisionHandler {
                 System.out.println(tile.getOccupiedBy());
 
                 levelRenderer.removeActor(block);
-                levelRenderer.updateTile((int) blockNewX, (int) blockNewY, new Dirt());
+                levelRenderer.updateTile((int) blockNewX, (int) blockNewY, new Dirt()); // Replace the Water tile with a Dirt tile.
 
             } else if (blockTargetTile.get().isWalkable() && blockTargetTile.get().isOccupied()) {
                 block.move(dx, dy, levelRenderer, this);
-                player.performMove(player.currentPosition.getX() + dx, player.currentPosition.getY() + dy, levelRenderer, Direction.fromDelta(dx, dy));
+                player.performMove(player.getPosition().getX() + dx, player.getPosition().getY() + dy, levelRenderer, Direction.fromDelta(dx, dy));
             }
         }
     }

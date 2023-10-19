@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public class LevelLoader {
+    private static final String BUTTON_PREFIX = "B_";
+    private static final String TRAP_PREFIX = "T_";
     private JSONObject loadJsonFromResource(String path) throws IOException {
         try (InputStream resourceStream = Main.class.getResourceAsStream(path)) {
             if (resourceStream == null) {
@@ -54,18 +56,23 @@ public class LevelLoader {
     public Tile[][] loadTiles(String levelFilePath) throws IOException {
         JSONObject levelData = loadJsonFromResource(levelFilePath);
         JSONArray tilesArray = levelData.getJSONArray("tiles");
-
         int width = tilesArray.getJSONArray(0).length();
         int height = tilesArray.length();
 
         Tile[][] levelTiles = new Tile[height][width];
-        Map<String, Button> buttonMap = new HashMap<>();
+        Map<String, Button> buttonMap = createButtons(tilesArray, levelTiles, height, width);
+        createTraps(tilesArray, levelTiles, buttonMap, height, width);
 
+        return levelTiles;
+    }
+
+    private Map<String, Button> createButtons(JSONArray tilesArray, Tile[][] levelTiles, int height, int width) {
+        Map<String, Button> buttonMap = new HashMap<>();
         for (int y = 0; y < height; y++) {
             JSONArray row = tilesArray.getJSONArray(y);
             for (int x = 0; x < width; x++) {
                 String tileType = row.getString(x);
-                if (tileType.startsWith("B_")) {
+                if (tileType.startsWith(BUTTON_PREFIX)) {
                     Button button = new Button();
                     levelTiles[y][x] = button;
                     buttonMap.put(tileType, button);
@@ -74,22 +81,27 @@ public class LevelLoader {
                 }
             }
         }
+        return buttonMap;
+    }
 
+    private void createTraps(JSONArray tilesArray, Tile[][] levelTiles, Map<String, Button> buttonMap, int height, int width) {
         for (int y = 0; y < height; y++) {
             JSONArray row = tilesArray.getJSONArray(y);
             for (int x = 0; x < width; x++) {
                 String tileType = row.getString(x);
-                if (tileType.startsWith("T_")) {
-                    String buttonKey = "B" + tileType.substring(1);
-                    Button linkedButton = buttonMap.get(buttonKey);
-                    if (linkedButton != null) {
-                        levelTiles[y][x] = new Trap(linkedButton);
+                if (tileType.startsWith(TRAP_PREFIX)) {
+                    String[] trapNumbers = tileType.split("_");
+                    for (String trapNumber : trapNumbers) {
+                        if (trapNumber.equals(TRAP_PREFIX.replace("_", ""))) continue; // skip the "T" part
+                        String buttonKey = BUTTON_PREFIX + trapNumber;
+                        Button linkedButton = buttonMap.get(buttonKey);
+                        if (linkedButton != null) {
+                            levelTiles[y][x] = new Trap(linkedButton);
+                        }
                     }
                 }
             }
         }
-
-        return levelTiles;
     }
 
     public List<Actor> loadActors(String levelFilePath, LevelRenderer levelRenderer) throws IOException {
@@ -97,7 +109,6 @@ public class LevelLoader {
         JSONArray actorsArray = levelData.getJSONArray("actors");
 
         List<Actor> actors = new ArrayList<>();
-
         Tile[][] levelTiles = levelRenderer.getTiles();
 
         for (int i = 0; i < actorsArray.length(); i++) {
@@ -109,7 +120,6 @@ public class LevelLoader {
             Actor actor = actorCreators.getOrDefault(type, (a, b) -> null).apply(x, y);
             if (actor != null) {
                 actors.add(actor);
-
                 if (levelTiles[y][x] != null) {
                     levelTiles[y][x].setOccupiedBy(actor);
                     System.out.println("Setting tile (" + x + ", " + y + ") as occupied by " + type + ".");

@@ -36,8 +36,8 @@ public class Ice extends Tile {
         PauseTransition pause = new PauseTransition(Duration.millis(500));
         pause.setOnFinished(event -> {
             Direction slideDirection = determineSlideDirection(incomingDirection);
-            double newX = actor.currentPosition.getX() + slideDirection.getDx();
-            double newY = actor.currentPosition.getY() + slideDirection.getDy();
+            double newX = actor.getPosition().getX() + slideDirection.getDx();
+            double newY = actor.getPosition().getY() + slideDirection.getDy();
             handleActorOnIce(actor, newX, newY, levelRenderer, slideDirection);
         });
 
@@ -105,13 +105,13 @@ public class Ice extends Tile {
     }
 
     private boolean handleMovableBlockInteraction(Actor actor, Actor block, Direction direction, LevelRenderer levelRenderer) {
-        double blockNewX = block.currentPosition.getX() + direction.getDx();
-        double blockNewY = block.currentPosition.getY() + direction.getDy();
+        double blockNewX = block.getPosition().getX() + direction.getDx();
+        double blockNewY = block.getPosition().getY() + direction.getDy();
         Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
 
         if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && blockTargetTile.get().isOccupied()) {
             block.performMove(blockNewX, blockNewY, levelRenderer, direction);
-            actor.performMove(actor.currentPosition.getX() + direction.getDx(), actor.currentPosition.getY() + direction.getDy(), levelRenderer, direction);
+            actor.performMove(actor.getPosition().getX() + direction.getDx(), actor.getPosition().getY() + direction.getDy(), levelRenderer, direction);
             return true;
         }
         return false;
@@ -119,8 +119,8 @@ public class Ice extends Tile {
 
     private void handleReverseSlide(Actor actor, LevelRenderer levelRenderer, Direction reverseDirection) {
         Direction effectiveReverseDirection = determineSlideDirection(reverseDirection);
-        double reverseX = actor.currentPosition.getX() + effectiveReverseDirection.getDx();
-        double reverseY = actor.currentPosition.getY() + effectiveReverseDirection.getDy();
+        double reverseX = actor.getPosition().getX() + effectiveReverseDirection.getDx();
+        double reverseY = actor.getPosition().getY() + effectiveReverseDirection.getDy();
 
         Optional<Tile> reverseTileOptional = levelRenderer.getTileAtGridPosition((int) reverseX, (int) reverseY);
         if (reverseTileOptional.isPresent() && reverseTileOptional.get().isWalkable() && reverseTileOptional.get().isOccupied()) {

@@ -12,7 +12,9 @@ public class Dirt extends Tile {
     @Override
     public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
         super.onStep(actor, levelRenderer, incomingDirection);
-        levelRenderer.updateTile(this.gridX, this.gridY, new Path());
+        Path path = new Path();
+        path.setOccupiedBy(actor);
+        levelRenderer.updateTile(this.gridX, this.gridY,path);
 
     }
 }

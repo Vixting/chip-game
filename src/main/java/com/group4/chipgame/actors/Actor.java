@@ -1,4 +1,5 @@
 package com.group4.chipgame.actors;
+
 import com.group4.chipgame.Direction;
 import com.group4.chipgame.CollisionHandler;
 import com.group4.chipgame.LevelRenderer;
@@ -13,13 +14,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 public abstract class Actor extends ImageView {
-    public Point2D currentPosition;  // Current position of the actor on the grid
-    protected Point2D targetPosition;   // Target position for the actor's movement
+    protected Point2D currentPosition;
+    protected Point2D targetPosition;
 
     public Actor(String imagePath, double x, double y) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)), Main.ACTOR_SIZE, Main.ACTOR_SIZE, true, true);
         setImage(image);
-        this.setSmooth(true);
+        setSmooth(true);
 
         this.currentPosition = new Point2D(x, y);
         this.targetPosition = new Point2D(x, y);
@@ -28,6 +29,8 @@ public abstract class Actor extends ImageView {
     public Point2D getPosition() {
         return currentPosition;
     }
+
+
 
 // Method to move the actor by a specified amount (dx, dy) on the grid
 public void move(double dx, double dy, LevelRenderer levelRenderer, CollisionHandler collisionHandler) {
@@ -47,6 +50,15 @@ public void move(double dx, double dy, LevelRenderer levelRenderer, CollisionHan
     if (optionalTargetTile.isPresent()) {
         Tile targetTile = optionalTargetTile.get();
         System.out.println("Tile at (" + newX + ", " + newY + ") isWalkable: " + targetTile.isWalkable() + ", occupiedBy: " + targetTile.getOccupiedBy());
+
+        if (this instanceof Player && targetTile instanceof Trap currentTrap && targetTile.getOccupiedBy() != null) {
+            if (currentTrap.linkedButton.isActive()){
+                collisionHandler.handleActorOnActorCollision(this, targetTile.getOccupiedBy(), dx, dy, levelRenderer);
+            } else {
+                return;
+            }
+        }
+
         if (targetTile.isWalkable() && targetTile.getOccupiedBy() == null) {
             performMove(newX, newY, levelRenderer, direction);
         } else if (targetTile.getOccupiedBy() != null) {
