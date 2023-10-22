@@ -11,12 +11,14 @@
     ["W", "W", "W", "P", "P", "P", "P", "W", "W", "W"],
     ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W"]
   ],
+  "collectibles" : [
+    {"type": "Key", "x": 6, "y": 5}
+  ],
 
   "actors": [
     {"type": "Player", "x": 4, "y": 4},
     {"type": "MovableBlock", "x": 4, "y": 3},
     {"type": "MovableBlock", "x": 6, "y": 7},
-    {"type": "MovableBlock", "x": 6, "y": 3},
-    {"type": "Key", "x": 6, "y": 5}
+    {"type": "MovableBlock", "x": 6, "y": 3}
   ]
 }
