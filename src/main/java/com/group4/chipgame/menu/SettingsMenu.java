@@ -8,10 +8,12 @@ import javafx.stage.Stage;
 public class SettingsMenu extends BaseMenu {
 
     public StackPane createSettingsMenu(Stage primaryStage, Main mainApp) {
-        VBox settingsBox = createMenuBox(5, "-fx-background-color: rgba(102, 102, 102, 0.8);");
+        VBox settingsBox = createMenuBox(5, "-fx-background-color: rgba(102, 102, 102, 2);");
 
-        addButton("Option 1", settingsBox, null, primaryStage, mainApp, () -> {});
-        addButton("Option 2", settingsBox, null, primaryStage, mainApp, () -> {});
+        addButton("Option 1", settingsBox, primaryStage, mainApp, () -> {});
+        addButton("Option 2", settingsBox, primaryStage, mainApp, () -> {});
+        addButton("Option 3", settingsBox, primaryStage, mainApp, () -> {});
+        addButton("Option 4", settingsBox, primaryStage, mainApp, () -> {});
 
         StackPane settingsRootPane = createMenuRootPane(settingsBox);
         settingsRootPane.setMaxSize(400, 300);

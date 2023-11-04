@@ -15,6 +15,7 @@ public class Player extends Actor {
 
     public Player(double x, double y) {
         super(PLAYER_IMAGE_PATH, x, y);
+        this.moveInterval = 1;
     }
 
     public void addKey(Key key) {

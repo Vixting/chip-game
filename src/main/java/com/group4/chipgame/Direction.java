@@ -31,6 +31,16 @@ public enum Direction {
         return NONE;
     }
 
+    public static double[] toDelta(Direction direction) {
+        return switch (direction) {
+            case UP -> new double[]{0, -1};
+            case DOWN -> new double[]{0, 1};
+            case LEFT -> new double[]{-1, 0};
+            case RIGHT -> new double[]{1, 0};
+            default -> new double[]{0, 0};
+        };
+    }
+
     public Direction getOpposite() {
         return switch (this) {
             case UP -> DOWN;

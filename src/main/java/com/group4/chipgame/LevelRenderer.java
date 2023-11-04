@@ -3,65 +3,56 @@ package com.group4.chipgame;
 import com.group4.chipgame.collectibles.Collectible;
 import com.group4.chipgame.tiles.Tile;
 import com.group4.chipgame.actors.Actor;
-
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Point2D;
-import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class LevelRenderer {
 
-    // Constants for offset calculations
     private static final double OFFSET_X = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
     private static final double OFFSET_Y = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
 
-    // Panes for rendering the game components
     private final Pane gamePane;
     private final Pane tilesPane;
     private final Pane actorsPane;
     private final Pane collectiblesPane;
-
-    // 2D array to store tiles
     private Tile[][] tiles;
 
     public LevelRenderer() {
-        this.collectiblesPane = new Pane();
-        this.gamePane = new Pane();
-        this.tilesPane = new Pane();
-        this.actorsPane = new Pane();
-        this.gamePane.getChildren().addAll(tilesPane, actorsPane, collectiblesPane);
+        tilesPane = new Pane();
+        actorsPane = new Pane();
+        collectiblesPane = new Pane();
+        gamePane = new Pane(tilesPane, actorsPane, collectiblesPane);
     }
 
     public List<Collectible> getCollectibles() {
-        return collectiblesPane.getChildren().stream()
-                .filter(node -> node instanceof Collectible)
-                .map(node -> (Collectible) node)
-                .collect(Collectors.toList());
+        return castToList(collectiblesPane);
+    }
+
+    public List<Actor> getActors() {
+        return castToList(actorsPane);
     }
 
     public void renderCollectibles(List<Collectible> collectibles) {
-        Optional.ofNullable(collectibles).ifPresent(collectiblesList -> collectiblesList.forEach(this::positionAndAddCollectible));
+        renderNodes(collectiblesPane, collectibles);
     }
 
-    private void positionAndAddCollectible(Collectible collectible) {
-        Point2D collectiblePosition = collectible.getPosition();
-        if (collectiblePosition != null) {
-            double collectibleLayoutX = collectiblePosition.getX() * Main.TILE_SIZE + OFFSET_X;
-            double collectibleLayoutY = collectiblePosition.getY() * Main.TILE_SIZE + OFFSET_Y;
-            collectible.setLayoutX(collectibleLayoutX);
-            collectible.setLayoutY(collectibleLayoutY);
-            collectiblesPane.getChildren().add(collectible);
+    public void renderActors(List<Actor> actors) {
+        renderNodes(actorsPane, actors);
+    }
+
+    public void renderTiles(Tile[][] tiles) {
+        this.tiles = tiles;
+        tilesPane.getChildren().clear();
+        for (int y = 0; y < tiles.length; y++) {
+            for (int x = 0; x < tiles[y].length; x++) {
+                Tile tile = tiles[y][x];
+                renderTile(tile, x, y);
+            }
         }
-    }
-
-    public void removeCollectible(Collectible collectible) {
-        Platform.runLater(() -> collectiblesPane.getChildren().remove(collectible));
     }
 
     public Pane getGamePane() {
@@ -72,52 +63,74 @@ public class LevelRenderer {
         return tiles;
     }
 
-    public List<Actor> getActors() {
-        return actorsPane.getChildren().stream()
-                .filter(node -> node instanceof Actor)
-                .map(node -> (Actor) node)
-                .collect(Collectors.toList());
-    }
-
-    public void renderTiles(Tile[][] tiles) {
-        this.tiles = tiles;
-        for (int y = 0; y < tiles.length; y++) {
-            for (int x = 0; x < tiles[y].length; x++) {
-                Tile tile = tiles[y][x];
-                if (tile != null) {
-                    tile.setGridPosition(x, y);
-                    tile.bindSize();
-                    tile.setLayoutX(x * Main.TILE_SIZE);
-                    tile.setLayoutY(y * Main.TILE_SIZE);
-                    tilesPane.getChildren().add(tile);
-                } else {
-                    System.out.println("Warning: Tile at position (" + x + ", " + y + ") is null.");
-                }
-            }
-        }
-    }
-
-    public void renderActors(List<Actor> actors) {
-        Optional.ofNullable(actors).ifPresent(actorsList -> actorsList.forEach(this::positionAndAddActor));
-    }
-
     public void clear() {
         tilesPane.getChildren().clear();
         actorsPane.getChildren().clear();
     }
 
-    public void removeActor(Actor actor) {
-        if (actor == null || actor.getPosition() == null) return;
+    public void remove(Actor actor) {
+        modifyPaneLater(() -> actorsPane.getChildren().remove(actor));
+    }
 
-        Point2D actorPosition = actor.getPosition();
-        int x = (int) actorPosition.getX();
-        int y = (int) actorPosition.getY();
+    public void remove(Collectible collectible) {
+        modifyPaneLater(() -> collectiblesPane.getChildren().remove(collectible));
+    }
 
-        if (isOutOfBounds(x, y)) return;
+    private void modifyPaneLater(Runnable action) {
+        Platform.runLater(action);
+    }
 
-        getTileAtGridPosition(x, y).ifPresent(tile -> tile.setOccupiedBy(null));
+    private <T> List<T> castToList(Pane pane) {
+        return (List<T>) pane.getChildren();
+    }
 
-        Platform.runLater(() -> actorsPane.getChildren().remove(actor));
+    private <T> void renderNodes(Pane pane, List<T> nodes) {
+        Optional.ofNullable(nodes).ifPresent(list -> list.forEach(node -> positionAndAddNode(pane, node)));
+    }
+
+    private void renderTile(Tile tile, int x, int y) {
+        if (tile == null) return;
+
+        tile.setGridPosition(x, y);
+        tile.bindSize();
+        tile.setLayoutX(x * Main.TILE_SIZE);
+        tile.setLayoutY(y * Main.TILE_SIZE);
+        tilesPane.getChildren().add(tile);
+    }
+
+    private <T> void positionAndAddNode(Pane pane, T node) {
+        if (node == null) return;
+
+        if (node instanceof Collectible) {
+            position((Collectible) node);
+        } else if (node instanceof Actor) {
+            position((Actor) node);
+        }
+
+        pane.getChildren().add((javafx.scene.Node) node);
+    }
+
+    private void position(Collectible collectible) {
+        position(collectible, collectible.getPosition());
+    }
+
+    private void position(Actor actor) {
+        position(actor, actor.getPosition());
+    }
+
+    private void position(javafx.scene.Node node, Point2D position) {
+        if (position == null) return;
+
+        node.setLayoutX(position.getX() * Main.TILE_SIZE + OFFSET_X);
+        node.setLayoutY(position.getY() * Main.TILE_SIZE + OFFSET_Y);
+    }
+
+    public Optional<Tile> getTileAtGridPosition(int x, int y) {
+        return isOutOfBounds(x, y) ? Optional.empty() : Optional.ofNullable(tiles[y][x]);
+    }
+
+    private boolean isOutOfBounds(int x, int y) {
+        return x < 0 || x >= tiles[0].length || y < 0 || y >= tiles.length;
     }
 
     public void updateTile(int x, int y, Tile newTile) {
@@ -125,62 +138,9 @@ public class LevelRenderer {
 
         newTile.setGridPosition(x, y);
         tiles[y][x] = newTile;
-
-        System.out.printf("Tile at (%d, %d) updated to %s%n", x, y, newTile.getClass().getSimpleName());
-
         newTile.bindSize();
         newTile.setLayoutX(x * Main.TILE_SIZE);
         newTile.setLayoutY(y * Main.TILE_SIZE);
         tilesPane.getChildren().set(y * tiles[0].length + x, newTile);
-    }
-
-    private boolean isOutOfBounds(int x, int y) {
-        return x < 0 || x >= tiles[0].length || y < 0 || y >= tiles.length;
-    }
-
-    public Optional<Tile> getTileAtGridPosition(int x, int y) {
-        if (isOutOfBounds(x, y)) return Optional.empty();
-        return Optional.of(tiles[y][x]);
-    }
-
-    private void positionAndAddActor(Actor actor) {
-        Point2D actorPosition = actor.getPosition();
-        if (actorPosition != null) {
-            double actorLayoutX = actorPosition.getX() * Main.TILE_SIZE + OFFSET_X;
-            double actorLayoutY = actorPosition.getY() * Main.TILE_SIZE + OFFSET_Y;
-            actor.setLayoutX(actorLayoutX);
-            actor.setLayoutY(actorLayoutY);
-            actorsPane.getChildren().add(actor);
-        }
-    }
-
-    public void initializeBindings(Scene scene) {
-        DoubleBinding scaleBinding = calculateScaleBinding(scene);
-        gamePane.scaleXProperty().bind(scaleBinding);
-        gamePane.scaleYProperty().bind(scaleBinding);
-        gamePane.translateXProperty().bind(Bindings.createDoubleBinding(() ->
-                        calculateTranslateValue(scene.getWidth(), tiles[0].length),
-                scene.widthProperty(), scaleBinding));
-        gamePane.translateYProperty().bind(Bindings.createDoubleBinding(() ->
-                        calculateTranslateValue(scene.getHeight(), tiles.length),
-                scene.heightProperty(), scaleBinding));
-    }
-
-    private DoubleBinding calculateScaleBinding(Scene scene) {
-        final double HORIZONTAL_TILE_COUNT = tiles[0].length;
-        final double VERTICAL_TILE_COUNT = tiles.length;
-        final double ORIGINAL_GAME_WIDTH = Main.TILE_SIZE * HORIZONTAL_TILE_COUNT;
-        final double ORIGINAL_GAME_HEIGHT = Main.TILE_SIZE * VERTICAL_TILE_COUNT;
-
-        return Bindings.createDoubleBinding(() -> {
-            double scaleX = scene.getWidth() / ORIGINAL_GAME_WIDTH;
-            double scaleY = scene.getHeight() / ORIGINAL_GAME_HEIGHT;
-            return Math.min(scaleX, scaleY);
-        }, scene.widthProperty(), scene.heightProperty());
-    }
-
-    private double calculateTranslateValue(double sceneDimension, int tileCount) {
-        double scaleValue = sceneDimension / (Main.TILE_SIZE * tileCount);
-        return (sceneDimension - (Main.TILE_SIZE * tileCount) * scaleValue) / 2;
     }
 }

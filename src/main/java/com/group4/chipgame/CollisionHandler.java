@@ -36,9 +36,9 @@ public class CollisionHandler {
 
     public void handleActorOnCollectibleCollision(Actor actor, Collectible collectible, LevelRenderer levelRenderer) {
         if (actor instanceof Player && collectible instanceof Key) {
-            actor.onCollect(collectible);
+            ((Player) actor).onCollect(collectible);
             collectible.onCollect(actor);
-            levelRenderer.removeCollectible(collectible);
+            levelRenderer.remove(collectible);
         }
     }
 
@@ -58,7 +58,7 @@ public class CollisionHandler {
         levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY)
                 .ifPresentOrElse(tile -> {
                     if (tile instanceof Water) {
-                        levelRenderer.removeActor(block);
+                        levelRenderer.remove(block);
                         levelRenderer.updateTile((int) blockNewX, (int) blockNewY, new Dirt());
                     } else if (tile.isWalkable() && tile.isOccupied()) {
                         block.move(dx, dy, levelRenderer, this);
