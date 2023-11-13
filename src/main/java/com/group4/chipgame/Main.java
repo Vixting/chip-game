@@ -1,137 +1,142 @@
 package com.group4.chipgame;
 
 import com.group4.chipgame.actors.Actor;
-import com.group4.chipgame.actors.Player;
+import com.group4.chipgame.collectibles.Collectible;
+import com.group4.chipgame.menu.MainMenu;
+import com.group4.chipgame.menu.SettingsMenu;
 import com.group4.chipgame.tiles.Tile;
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main extends Application {
     public static final int TILE_SIZE = 100;
     public static final int ACTOR_SIZE = (int) (TILE_SIZE / 1.5);
+    public static final String MAIN_MENU_TITLE = "Chip Game Main Menu";
+    public static final String GAME_TITLE = "Chip Game";
+    public static final String BACKGROUND_COLOR = "-fx-background-color: black;";
+
+    private StackPane settingsMenu;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
-        // Load tiles and actors from a level file
-        LevelLoader levelLoader = new LevelLoader();
-        Tile[][] tiles = levelLoader.loadTiles("/levels/island.json");
-        List<Actor> actors = levelLoader.loadActors("/levels/island.json");
+    public void start(Stage primaryStage) {
+        initMainMenu(primaryStage);
+    }
 
+    private void initMainMenu(Stage primaryStage) {
+        StackPane menuBox = createMainMenu(primaryStage);
+        initScene(menuBox, primaryStage, 400, 400, MAIN_MENU_TITLE);
+    }
+
+    private StackPane createMainMenu(Stage primaryStage) {
+        MainMenu mainMenu = new MainMenu();
+        StackPane menuBox = mainMenu.createMainMenu(primaryStage, this);
+        SettingsMenu settings = new SettingsMenu();
+        settingsMenu = settings.createSettingsMenu(primaryStage, this);
+        settingsMenu.setVisible(false);
+        menuBox.getChildren().add(settingsMenu);
+        return menuBox;
+    }
+
+    private void initScene(StackPane root, Stage stage, int width, int height, String title) {
+        Scene scene = new Scene(root, width, height);
+        scene.setOnKeyPressed(this::handleKeyPress);
+        stage.setScene(scene);
+        stage.setTitle(title);
+        stage.show();
+    }
+
+    private void handleKeyPress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            toggleSettingsMenu();
+        }
+    }
+
+    public void startLevel(String levelPath, Stage primaryStage) throws IOException {
+        LevelData levelData = loadLevel(levelPath);
+        StackPane gamePane = initGamePane(levelData);
+        initScene(gamePane, primaryStage, levelData.gridWidth * TILE_SIZE, levelData.gridHeight * TILE_SIZE, GAME_TITLE);
+        initGameLoop(levelData);
+    }
+
+    private LevelData loadLevel(String levelPath) throws IOException {
+        LevelLoader levelLoader = new LevelLoader();
+        Tile[][] tiles = levelLoader.loadTiles(levelPath);
         int gridWidth = tiles[0].length;
         int gridHeight = tiles.length;
-
-        // Create a level renderer to render game components
         LevelRenderer levelRenderer = new LevelRenderer();
         levelRenderer.renderTiles(tiles);
+        List<Actor> actors = levelLoader.loadActors(levelPath, levelRenderer);
         levelRenderer.renderActors(actors);
+        List<Collectible> collectibles = levelLoader.loadCollectibles(levelPath, levelRenderer);
+        levelRenderer.renderCollectibles(collectibles);
+        return new LevelData(gridWidth, gridHeight, actors, collectibles, levelRenderer);
+    }
 
-        // Create a scene with the game rendering components
-        StackPane rootPane = new StackPane(levelRenderer.getGamePane());
-        Scene scene = new Scene(rootPane, gridWidth * TILE_SIZE, gridHeight * TILE_SIZE);
+    private StackPane initGamePane(LevelData levelData) {
+        StackPane rootPane = new StackPane(levelData.levelRenderer.getGamePane());
+        rootPane.getChildren().add(settingsMenu);
+        rootPane.setStyle(BACKGROUND_COLOR);
+        return rootPane;
+    }
 
-        // Set up the primary stage
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(true);
-        primaryStage.setTitle("Chip Game");
-        rootPane.setStyle("-fx-background-color: black;");
-        primaryStage.show();
+    private void initGameLoop(LevelData levelData) {
+        Scene currentScene = levelData.levelRenderer.getGamePane().getScene();
 
-        // Set up input handling with pressedKeys set
-        Set<KeyCode> pressedKeys = new HashSet<>();
-        scene.setOnKeyPressed(event -> pressedKeys.add(event.getCode()));
-        scene.setOnKeyReleased(event -> pressedKeys.remove(event.getCode()));
 
-        // Create a camera to follow the player actor
-        Camera camera = new Camera(
-                levelRenderer.getGamePane(),
-                gridWidth * TILE_SIZE,
-                gridHeight * TILE_SIZE
-        );
-
-        // Create a collision handler to manage collisions
+        Camera camera = new Camera(levelData.levelRenderer.getGamePane(), levelData.gridWidth * TILE_SIZE, levelData.gridHeight * TILE_SIZE);
         CollisionHandler collisionHandler = new CollisionHandler();
-        levelRenderer.initializeBindings(scene);
-        primaryStage.setMaximized(true);
+        GameLoop gameLoop = new GameLoop(levelData.actors, levelData.levelRenderer, collisionHandler, camera);
+        final long[] lastInputTime = {0};
+        long inputDelay = 200;
+        int maxQueueSize = 5;
 
-        // Start the game loop with input handling and collision checking
-        startGameLoop(actors, pressedKeys, levelRenderer, tiles, collisionHandler, camera);
-    }
+        currentScene.setOnKeyPressed(event -> {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastInputTime[0] > inputDelay) {
+                lastInputTime[0] = currentTime;
 
-    private void startGameLoop(List<Actor> actors, Set<KeyCode> pressedKeys, LevelRenderer levelRenderer, Tile[][] tiles, CollisionHandler collisionHandler, Camera camera) {
-        // Find the player actor to attach the camera
-        for (Actor actor : actors) {
-            if (actor instanceof Player) {
-                camera.setTarget(actor);
-                long[] lastMoveTime = {0};
-                final long MOVE_INTERVAL = 250_000_000;
-
-                // Create an AnimationTimer for game logic and player movement
-                AnimationTimer gameLoop = new AnimationTimer() {
-                    @Override
-                    public void handle(long now) {
-                        if (now - lastMoveTime[0] < MOVE_INTERVAL) {
-                            return;
-                        }
-
-                        // Handle player movement based on pressed keys
-                        if (pressedKeys.contains(KeyCode.UP)) {
-                            actor.move(0, -1, levelRenderer);
-                            checkCollisions(actor, actors, tiles, collisionHandler, 0, -1, levelRenderer);
-                            pressedKeys.remove(KeyCode.UP);
-                        } else if (pressedKeys.contains(KeyCode.DOWN)) {
-                            actor.move(0, 1, levelRenderer);
-                            checkCollisions(actor, actors, tiles, collisionHandler, 0, 1, levelRenderer);
-                            pressedKeys.remove(KeyCode.DOWN);
-                        } else if (pressedKeys.contains(KeyCode.LEFT)) {
-                            actor.move(-1, 0, levelRenderer);
-                            checkCollisions(actor, actors, tiles, collisionHandler, -1, 0, levelRenderer);
-                            pressedKeys.remove(KeyCode.LEFT);
-                        } else if (pressedKeys.contains(KeyCode.RIGHT)) {
-                            actor.move(1, 0, levelRenderer);
-                            checkCollisions(actor, actors, tiles, collisionHandler, 1, 0, levelRenderer);
-                            pressedKeys.remove(KeyCode.RIGHT);
-                        } else {
-                            return;
-                        }
-
-                        // Check for collisions between the player and other game components
-                        lastMoveTime[0] = now;
+                KeyCode key = event.getCode();
+                double[] delta = GameLoop.KEY_TO_DELTA.getOrDefault(key, null);
+                if (delta != null) {
+                    Direction direction = Direction.fromDelta(delta[0], delta[1]);
+                    if (gameLoop.getMoveQueue().size() < maxQueueSize) {
+                        gameLoop.getMoveQueue().add(direction);
                     }
-                };
-
-                gameLoop.start();
-                break;
-            }
-        }
-    }
-
-    private void checkCollisions(Actor actor, List<Actor> actors, Tile[][] tiles, CollisionHandler collisionHandler, double dx, double dy, LevelRenderer levelRenderer) {
-        for (Actor otherActor : actors) {
-            if (otherActor != actor && collisionHandler.actorsCollide(actor, otherActor)) {
-                collisionHandler.handleActorOnActorCollision(actor, otherActor, dx, dy, levelRenderer);
-            }
-        }
-
-        // Check for collisions between the player actor and tiles
-        for (Tile[] tileRow : tiles) {
-            for (Tile tile : tileRow) {
-                if (collisionHandler.actorTileCollide(actor, tile)) {
-                    collisionHandler.handleActorOnTileCollision(actor, tile);
                 }
             }
+        });
+
+        gameLoop.start();
+    }
+
+    private void toggleSettingsMenu() {
+        settingsMenu.setVisible(!settingsMenu.isVisible());
+    }
+
+    private static class LevelData {
+        int gridWidth;
+        int gridHeight;
+        List<Actor> actors;
+        List<Collectible> collectibles;
+        LevelRenderer levelRenderer;
+
+        LevelData(int gridWidth, int gridHeight, List<Actor> actors, List<Collectible> collectibles, LevelRenderer levelRenderer) {
+            this.gridWidth = gridWidth;
+            this.gridHeight = gridHeight;
+            this.actors = actors;
+            this.collectibles = collectibles;
+            this.levelRenderer = levelRenderer;
         }
     }
 }

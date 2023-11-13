@@ -2,18 +2,23 @@
   "tiles": [
     ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W"],
     ["W", "W", "W", "P", "P", "P", "P", "W", "W", "W"],
-    ["W", "W", "P", "P", "P", "P", "P", "P", "W", "W"],
-    ["W", "P", "P", "P", "P", "P", "P", "P", "P", "W"],
-    ["W", "P", "I", "P", "P", "P", "P", "P", "P", "W"],
-    ["W", "P", "I", "P", "P", "P", "P", "P", "P", "W"],
-    ["W", "P", "P", "P", "P", "P", "P", "P", "P", "W"],
-    ["W", "W", "P", "P", "P", "P", "P", "P", "W", "W"],
+    ["W", "W", "P", "P", "G", "W", "P", "P", "W", "W"],
+    ["W", "P", "T_1", "B_1", "P", "S", "S", "P", "P", "W"],
+    ["W", "P", "P", "P", "P", "P", "I", "P", "P", "W"],
+    ["W", "P", "I_TL", "I_TR", "I", "I", "I", "P", "P", "W"],
+    ["W", "P", "I_BL", "I_BR", "I", "I", "I", "P", "P", "W"],
+    ["W", "W", "T_2", "B_2", "D", "P", "P", "P", "W", "W"],
     ["W", "W", "W", "P", "P", "P", "P", "W", "W", "W"],
     ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W"]
   ],
+  "collectibles" : [
+    {"type": "Key", "x": 6, "y": 5}
+  ],
+
   "actors": [
     {"type": "Player", "x": 4, "y": 4},
-    {"type": "MovableBlock", "x": 5, "y": 5},
-    {"type": "MovableBlock", "x": 6, "y": 5}
+    {"type": "MovableBlock", "x": 4, "y": 3},
+    {"type": "MovableBlock", "x": 6, "y": 7},
+    {"type": "MovableBlock", "x": 6, "y": 3}
   ]
 }

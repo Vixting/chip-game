@@ -2,8 +2,10 @@
   "tiles": [
     ["P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"]
   ],
+  "collectibles": [
+    {"type": "Key", "x": 0, "y": 0}
+  ],
   "actors": [
-    {"type": "Player", "x": 0, "y": 0},
-    {"type": "Creeper", "x": 5, "y": 5}
+    {"type": "Player", "x": 0, "y": 0}
   ]
 }
