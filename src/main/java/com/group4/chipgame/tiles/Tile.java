@@ -22,16 +22,23 @@ public abstract class Tile extends ImageView {
         setImage(image);
         setSmooth(true);
         this.isWalkable = isWalkable;
+        bindSize();
     }
 
     public void setGridPosition(int x, int y) {
         gridX = x;
         gridY = y;
+        updatePosition();
     }
 
-    public void bindSize() {
-        setFitWidth(Main.TILE_SIZE);
-        setFitHeight(Main.TILE_SIZE);
+    private void bindSize() {
+        fitWidthProperty().bind(Main.TILE_SIZE.asObject());
+        fitHeightProperty().bind(Main.TILE_SIZE.asObject());
+    }
+
+    private void updatePosition() {
+        setLayoutX(gridX * Main.TILE_SIZE.get());
+        setLayoutY(gridY * Main.TILE_SIZE.get());
     }
 
     public void setOccupiedBy(Entity actor) {
@@ -47,3 +54,4 @@ public abstract class Tile extends ImageView {
         // To be implemented by subclasses
     }
 }
+

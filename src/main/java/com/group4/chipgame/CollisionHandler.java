@@ -17,7 +17,6 @@ public class CollisionHandler {
         if (actor1 instanceof MovableBlock && actor2 instanceof Player || actor1 instanceof Player && actor2 instanceof MovableBlock) {
             Player player = actor1 instanceof Player ? (Player) actor1 : (Player) actor2;
             MovableBlock block = actor1 instanceof MovableBlock ? (MovableBlock) actor1 : (MovableBlock) actor2;
-            handlePlayerBlockInteraction(player, block, dx, dy, levelRenderer);
         }
     }
 
@@ -35,12 +34,13 @@ public class CollisionHandler {
     }
 
     public void handleActorOnCollectibleCollision(Actor actor, Collectible collectible, LevelRenderer levelRenderer) {
-        if (actor instanceof Player && collectible instanceof Key) {
-            ((Player) actor).onCollect(collectible);
-            collectible.onCollect(actor);
-            levelRenderer.remove(collectible);
+        if (actor instanceof Player player && collectible instanceof Key key) {
+
+            player.onCollect(key); // Player collects the key
+            levelRenderer.remove(collectible); // Remove the key from the game
         }
     }
+
 
     public void handleTileInteraction(Actor actor, double dx, double dy, LevelRenderer levelRenderer) {
         int newX = (int) (actor.getPosition().getX() + dx);
@@ -51,19 +51,5 @@ public class CollisionHandler {
                 .ifPresent(tile -> tile.onStep(actor, levelRenderer, null));
     }
 
-    private void handlePlayerBlockInteraction(Player player, MovableBlock block, double dx, double dy, LevelRenderer levelRenderer) {
-        double blockNewX = block.getPosition().getX() + dx;
-        double blockNewY = block.getPosition().getY() + dy;
 
-        levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY)
-                .ifPresentOrElse(tile -> {
-                    if (tile instanceof Water) {
-                        levelRenderer.remove(block);
-                        levelRenderer.updateTile((int) blockNewX, (int) blockNewY, new Dirt());
-                    } else if (tile.isWalkable() && tile.isOccupied()) {
-                        block.move(dx, dy, levelRenderer, this);
-                        player.performMove(player.getPosition().getX() + dx, player.getPosition().getY() + dy, levelRenderer, Direction.fromDelta(dx, dy));
-                    }
-                }, () -> System.out.println("No target tile for block"));
-    }
 }

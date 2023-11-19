@@ -94,14 +94,14 @@ public class Ice extends Tile {
             Entity actorOnTile = targetTile.getOccupiedBy();
             if (actor instanceof Player) {
                 if (actorOnTile instanceof Collectible) {
-                    ((Player) actor).onCollect(actorOnTile);
-                    levelRenderer.remove((Collectible) actorOnTile);
                     onStep(actor, levelRenderer, incomingDirection);
                 } else if (actorOnTile instanceof MovableBlock) {
                     boolean blockMoved = handleMovableBlockInteraction(actor, (Actor) actorOnTile, incomingDirection, levelRenderer);
                     if (!blockMoved) {
                         handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
                     }
+                } else {
+                    onStep(actor, levelRenderer, incomingDirection);
                 }
             } else {
                 handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());

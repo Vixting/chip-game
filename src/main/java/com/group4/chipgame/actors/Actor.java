@@ -16,15 +16,28 @@ import java.util.Optional;
 
 public abstract class Actor extends ImageView implements Entity {
     protected Point2D currentPosition;
-    protected Point2D targetPosition;
     protected long moveInterval;
     protected boolean isMoving;
 
     public Actor(String imagePath, double x, double y) {
-        setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)), Main.ACTOR_SIZE, Main.ACTOR_SIZE, true, true));
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+        setImage(image);
         setSmooth(true);
-        currentPosition = targetPosition = new Point2D(x, y);
+        fitWidthProperty().bind(Main.ACTOR_SIZE);
+        fitHeightProperty().bind(Main.ACTOR_SIZE);
+
+        currentPosition = new Point2D(x, y);
+        updatePosition();
+
+        Main.ACTOR_SIZE.addListener((obs, oldVal, newVal) -> updatePosition());
     }
+
+    private void updatePosition() {
+        double offset = (Main.TILE_SIZE.get() - fitWidthProperty().get()) / 2.0;
+        setLayoutX(currentPosition.getX() * Main.TILE_SIZE.get() + offset);
+        setLayoutY(currentPosition.getY() * Main.TILE_SIZE.get() + offset);
+    }
+
 
     public Point2D getPosition() {
         return currentPosition;
@@ -34,25 +47,11 @@ public abstract class Actor extends ImageView implements Entity {
         return ticksElapsed % moveInterval == 0;
     }
 
-
-    public void move(double dx, double dy, LevelRenderer levelRenderer, CollisionHandler collisionHandler) {
+    public void move(double dx, double dy, LevelRenderer levelRenderer) {
         if (!isMoving) {
             Direction direction = Direction.fromDelta(dx, dy);
             double newX = currentPosition.getX() + dx;
             double newY = currentPosition.getY() + dy;
-
-            if (this instanceof Player) {
-                Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
-
-                if (targetTileOpt.isPresent()) {
-                    Tile targetTile = targetTileOpt.get();
-                    Entity occupiedBy = targetTile.getOccupiedBy();
-
-                    if (occupiedBy instanceof MovableBlock block) {
-                        block.push(dx, dy, levelRenderer, collisionHandler);
-                    }
-                }
-            }
 
             if (canMove(dx, dy, levelRenderer)) {
                 performMove(newX, newY, levelRenderer, direction);
@@ -73,13 +72,11 @@ public abstract class Actor extends ImageView implements Entity {
         return targetTile.isWalkable() && (occupiedBy == null || (this instanceof Player && occupiedBy instanceof Collectible));
     }
 
-
-
     public void performMove(double newX, double newY, LevelRenderer levelRenderer, Direction direction) {
         isMoving = true;
 
-        double offset = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
-        Timeline timeline = createTimeline(newX * Main.TILE_SIZE + offset, newY * Main.TILE_SIZE + offset);
+        double offset = (Main.TILE_SIZE.get() - Main.ACTOR_SIZE.get()) / 2.0;
+        Timeline timeline = createTimeline(newX * Main.TILE_SIZE.get() + offset, newY * Main.TILE_SIZE.get() + offset);
 
         Optional<Tile> currentTile = levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY());
         currentTile.ifPresent(tile -> tile.setOccupiedBy(null)); // Mark old tile as unoccupied
@@ -103,3 +100,4 @@ public abstract class Actor extends ImageView implements Entity {
         return timeline;
     }
 }
+

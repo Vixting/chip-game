@@ -6,6 +6,7 @@ import com.group4.chipgame.menu.MainMenu;
 import com.group4.chipgame.menu.SettingsMenu;
 import com.group4.chipgame.tiles.Tile;
 import javafx.application.Application;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -16,8 +17,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class Main extends Application {
-    public static final int TILE_SIZE = 100;
-    public static final int ACTOR_SIZE = (int) (TILE_SIZE / 1.5);
+    public static SimpleIntegerProperty TILE_SIZE = new SimpleIntegerProperty(50);
+    public static SimpleIntegerProperty ACTOR_SIZE = new SimpleIntegerProperty((int) (TILE_SIZE.get() / 1.5));
     public static final String MAIN_MENU_TITLE = "Chip Game Main Menu";
     public static final String GAME_TITLE = "Chip Game";
     public static final String BACKGROUND_COLOR = "-fx-background-color: black;";
@@ -31,6 +32,14 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         initMainMenu(primaryStage);
+        primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> updateSizes(primaryStage));
+        primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> updateSizes(primaryStage));
+    }
+
+    private void updateSizes(Stage stage) {
+        int newTileSize = Math.min((int) stage.getWidth() / 10, (int) stage.getHeight() / 10);
+        TILE_SIZE.set(newTileSize);
+        ACTOR_SIZE.set((int) (newTileSize / 1.5));
     }
 
     private void initMainMenu(Stage primaryStage) {
@@ -65,8 +74,9 @@ public class Main extends Application {
     public void startLevel(String levelPath, Stage primaryStage) throws IOException {
         LevelData levelData = loadLevel(levelPath);
         StackPane gamePane = initGamePane(levelData);
-        initScene(gamePane, primaryStage, levelData.gridWidth * TILE_SIZE, levelData.gridHeight * TILE_SIZE, GAME_TITLE);
+        initScene(gamePane, primaryStage, levelData.gridWidth * TILE_SIZE.get() * 10, levelData.gridHeight * TILE_SIZE.get() * 10, GAME_TITLE);
         initGameLoop(levelData);
+        primaryStage.setMaximized(true);
     }
 
     private LevelData loadLevel(String levelPath) throws IOException {
@@ -94,9 +104,8 @@ public class Main extends Application {
         Scene currentScene = levelData.levelRenderer.getGamePane().getScene();
 
 
-        Camera camera = new Camera(levelData.levelRenderer.getGamePane(), levelData.gridWidth * TILE_SIZE, levelData.gridHeight * TILE_SIZE);
-        CollisionHandler collisionHandler = new CollisionHandler();
-        GameLoop gameLoop = new GameLoop(levelData.actors, levelData.levelRenderer, collisionHandler, camera);
+        Camera camera = new Camera(levelData.levelRenderer.getGamePane(), levelData.gridWidth * TILE_SIZE.get(), levelData.gridHeight * TILE_SIZE.get());
+        GameLoop gameLoop = new GameLoop(levelData.actors, levelData.levelRenderer, camera);
         final long[] lastInputTime = {0};
         long inputDelay = 200;
         int maxQueueSize = 5;

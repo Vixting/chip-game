@@ -1,6 +1,5 @@
 package com.group4.chipgame.actors;
 
-import com.group4.chipgame.CollisionHandler;
 import com.group4.chipgame.Direction;
 import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.tiles.Dirt;
@@ -13,7 +12,7 @@ public class MovableBlock extends Actor {
         this.moveInterval = 3;
     }
 
-    public void push(double dx, double dy, LevelRenderer levelRenderer, CollisionHandler collisionHandler) {
+    public void push(double dx, double dy, LevelRenderer levelRenderer) {
         double newX = currentPosition.getX() + dx;
         double newY = currentPosition.getY() + dy;
 

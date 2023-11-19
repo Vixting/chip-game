@@ -12,14 +12,12 @@ public class GameLoop extends AnimationTimer {
     private final Queue<Direction> moveQueue = new LinkedList<>();
 
     private final LevelRenderer levelRenderer;
-    private final CollisionHandler collisionHandler;
     private final Camera camera;
     private long ticksElapsed = 0;
 
-    public GameLoop(List<Actor> actors, LevelRenderer levelRenderer, CollisionHandler collisionHandler, Camera camera) {
+    public GameLoop(List<Actor> actors, LevelRenderer levelRenderer, Camera camera) {
         this.actors = actors;
         this.levelRenderer = levelRenderer;
-        this.collisionHandler = collisionHandler;
         this.camera = camera;
     }
 
@@ -44,7 +42,7 @@ public class GameLoop extends AnimationTimer {
                     if (!moveQueue.isEmpty()) {
                         Direction direction = moveQueue.poll();
                         double[] delta = Direction.toDelta(direction);
-                        actor.move(delta[0], delta[1], levelRenderer, collisionHandler);
+                        actor.move(delta[0], delta[1], levelRenderer);
                     }
                 }
 

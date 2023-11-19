@@ -44,45 +44,57 @@ public class Camera {
 
     public void setTarget(Actor target) {
         this.target = target;
-        new AnimationTimer() {
+        AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 adjustCamera();
             }
-        }.start();
+        };
+        timer.start();
     }
 
     void adjustCamera() {
-        if (target == null) return;
+        if (target == null) {
+            return;
+        }
 
         double scaleX = gamePane.getScaleX();
         double scaleY = gamePane.getScaleY();
+
         double targetCenterX = target.getLayoutX() + target.getFitWidth() / 2.0;
         double targetCenterY = target.getLayoutY() + target.getFitHeight() / 2.0;
+
         double newTranslateX = (viewPort.getWidth() / 2.0 - targetCenterX) * scaleX;
         double newTranslateY = (viewPort.getHeight() / 2.0 - targetCenterY) * scaleY;
+
         double minX = 0;
         double minY = 0;
         double maxX = (viewPort.getWidth() - viewPort.getWidth() / scaleX);
         double maxY = (viewPort.getHeight() - viewPort.getHeight() / scaleY);
+
         newTranslateX = -clampTranslate(-newTranslateX, minX, maxX);
         newTranslateY = -clampTranslate(-newTranslateY, minY, maxY);
 
-        double distance = Math.hypot(gamePane.getTranslateX() - newTranslateX, gamePane.getTranslateY() - newTranslateY);
-        double speedFactor = 500;
-        double scaledDuration = Math.max(speedFactor / (distance + 1), 50);
+        Duration animationDuration = Duration.millis(300);
 
-        Duration animationDuration = Duration.millis(scaledDuration);
         gamePane.translateXProperty().unbind();
         gamePane.translateYProperty().unbind();
 
-        Timeline timeline = new Timeline(new KeyFrame(animationDuration, new KeyValue(gamePane.translateXProperty(), newTranslateX), new KeyValue(gamePane.translateYProperty(), newTranslateY)));
+        Timeline timeline = new Timeline();
+        KeyValue kvX = new KeyValue(gamePane.translateXProperty(), newTranslateX);
+        KeyValue kvY = new KeyValue(gamePane.translateYProperty(), newTranslateY);
+        KeyFrame kf = new KeyFrame(animationDuration, kvX, kvY);
+        timeline.getKeyFrames().add(kf);
         timeline.play();
     }
 
     private double clampTranslate(double value, double paneSize, double viewportSize) {
         double scale = gamePane.getScaleX();
         double minTranslate = paneSize * scale - viewportSize;
-        return minTranslate < 0 ? Math.min(0, Math.max(value, minTranslate)) : value;
+        if (minTranslate < 0) {
+            return Math.min(0, Math.max(value, minTranslate));
+        } else {
+            return value;
+        }
     }
 }
