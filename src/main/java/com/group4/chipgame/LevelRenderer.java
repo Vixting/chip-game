@@ -12,9 +12,6 @@ import java.util.Optional;
 
 public class LevelRenderer {
 
-    private static final double OFFSET_X = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
-    private static final double OFFSET_Y = (Main.TILE_SIZE - Main.ACTOR_SIZE) / 2.0;
-
     private final Pane gamePane;
     private final Pane tilesPane;
     private final Pane actorsPane;
@@ -26,6 +23,25 @@ public class LevelRenderer {
         actorsPane = new Pane();
         collectiblesPane = new Pane();
         gamePane = new Pane(tilesPane, actorsPane, collectiblesPane);
+
+        Main.TILE_SIZE.addListener((obs, oldVal, newVal) -> updateSizes());
+        Main.ACTOR_SIZE.addListener((obs, oldVal, newVal) -> updateSizes());
+    }
+
+    private void updateSizes() {
+        if (tiles != null) {
+            renderTiles(tiles);
+        }
+        renderNodes(actorsPane, getActors());
+        renderNodes(collectiblesPane, getCollectibles());
+
+        System.out.println("UPDATE");
+        if (tiles != null && tiles.length > 0 && tiles[0].length > 0) {
+            System.out.println(Main.TILE_SIZE.get() * tiles[0].length);
+            gamePane.setLayoutX(Main.TILE_SIZE.get() * tiles[0].length);
+            gamePane.setLayoutY(Main.TILE_SIZE.get() * tiles.length);
+
+        }
     }
 
     public List<Collectible> getCollectibles() {
@@ -92,14 +108,13 @@ public class LevelRenderer {
         if (tile == null) return;
 
         tile.setGridPosition(x, y);
-        tile.bindSize();
-        tile.setLayoutX(x * Main.TILE_SIZE);
-        tile.setLayoutY(y * Main.TILE_SIZE);
+        tile.setLayoutX(x * Main.TILE_SIZE.get());
+        tile.setLayoutY(y * Main.TILE_SIZE.get());
         tilesPane.getChildren().add(tile);
     }
 
     private <T> void positionAndAddNode(Pane pane, T node) {
-        if (node == null) return;
+        if (node == null || pane.getChildren().contains(node)) return;
 
         if (node instanceof Collectible) {
             position((Collectible) node);
@@ -120,9 +135,10 @@ public class LevelRenderer {
 
     private void position(javafx.scene.Node node, Point2D position) {
         if (position == null) return;
-
-        node.setLayoutX(position.getX() * Main.TILE_SIZE + OFFSET_X);
-        node.setLayoutY(position.getY() * Main.TILE_SIZE + OFFSET_Y);
+        double offsetX = (Main.TILE_SIZE.get() - Main.ACTOR_SIZE.get()) / 2.0;
+        double offsetY = (Main.TILE_SIZE.get() - Main.ACTOR_SIZE.get()) / 2.0;
+        node.setLayoutX(position.getX() * Main.TILE_SIZE.get() + offsetX);
+        node.setLayoutY(position.getY() * Main.TILE_SIZE.get() + offsetY);
     }
 
     public Optional<Tile> getTileAtGridPosition(int x, int y) {
@@ -138,9 +154,8 @@ public class LevelRenderer {
 
         newTile.setGridPosition(x, y);
         tiles[y][x] = newTile;
-        newTile.bindSize();
-        newTile.setLayoutX(x * Main.TILE_SIZE);
-        newTile.setLayoutY(y * Main.TILE_SIZE);
+        newTile.setLayoutX(x * Main.TILE_SIZE.get());
+        newTile.setLayoutY(y * Main.TILE_SIZE.get());
         tilesPane.getChildren().set(y * tiles[0].length + x, newTile);
     }
 }
