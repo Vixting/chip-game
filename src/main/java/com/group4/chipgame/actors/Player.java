@@ -5,6 +5,7 @@ import com.group4.chipgame.Entity;
 import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.collectibles.Collectible;
 import com.group4.chipgame.collectibles.Key;
+import com.group4.chipgame.tiles.LockedDoor;
 import com.group4.chipgame.tiles.Tile;
 import javafx.scene.layout.Pane;
 
@@ -50,6 +51,8 @@ public class Player extends Actor {
 
                 if (occupiedBy instanceof MovableBlock block) {
                     block.push(dx, dy, levelRenderer);
+                } else if (targetTile instanceof LockedDoor door) {
+                    door.onStep(this, levelRenderer, direction);
                 }
             }
 
@@ -60,7 +63,7 @@ public class Player extends Actor {
         }
     }
 
-    private void checkForCollectibles(double x, double y, LevelRenderer levelRenderer) {
+    public void checkForCollectibles(double x, double y, LevelRenderer levelRenderer) {
         System.out.println("Checking for collectibles!");
         Optional<Tile> tileOpt = levelRenderer.getTileAtGridPosition((int) x, (int) y);
         tileOpt.ifPresent(tile -> {
@@ -71,6 +74,7 @@ public class Player extends Actor {
                 onCollect(collectible);
                 collectible.onCollect(this);
                 levelRenderer.remove(collectible);
+                tile.setOccupiedBy(null);
             }
         });
     }
