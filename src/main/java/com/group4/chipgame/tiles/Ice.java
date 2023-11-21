@@ -47,6 +47,11 @@ public class Ice extends Tile {
         Direction slideDirection = determineSlideDirection(incomingDirection);
         double newX = actor.getPosition().getX() + slideDirection.getDx();
         double newY = actor.getPosition().getY() + slideDirection.getDy();
+
+        if (actor instanceof Player) {
+            ((Player) actor).checkForCollectibles(newX, newY, levelRenderer);
+        }
+
         handleActorOnIce(actor, newX, newY, levelRenderer, slideDirection);
     }
 
