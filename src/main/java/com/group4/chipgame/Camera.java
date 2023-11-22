@@ -35,6 +35,9 @@ public class Camera {
         addWindowSizeListeners();
     }
 
+    /**
+     * Adds listeners to the game pane's width and height properties for updating the viewport dimensions.
+     */
     private void addPaneSizeListeners() {
         gamePane.widthProperty().addListener((observable, oldValue, newValue) ->
                 updateViewportWidth(newValue.doubleValue()));
@@ -42,16 +45,29 @@ public class Camera {
                 updateViewportHeight(newValue.doubleValue()));
     }
 
+    /**
+     * Updates the viewport width based on the new width.
+     *
+     * @param newWidth The new width of the viewport.
+     */
     private void updateViewportWidth(double newWidth) {
         viewPort = new Rectangle2D(viewPort.getMinX(), viewPort.getMinY(), newWidth, viewPort.getHeight());
         adjustCamera();
     }
 
+    /**
+     * Updates the viewport height based on the new height.
+     *
+     * @param newHeight The new height of the viewport.
+     */
     private void updateViewportHeight(double newHeight) {
         viewPort = new Rectangle2D(viewPort.getMinX(), viewPort.getMinY(), viewPort.getWidth(), newHeight);
         adjustCamera();
     }
 
+    /**
+     * Adds listeners to the game pane's scene property for adjusting the camera when the scene changes.
+     */
     private void addWindowSizeListeners() {
         gamePane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (oldScene == null && newScene != null) {
@@ -61,6 +77,13 @@ public class Camera {
         });
     }
 
+    /**
+     * Calculates the dynamic duration of a camera transition based on the target position.
+     *
+     * @param newTranslateX The new x-coordinate for the camera.
+     * @param newTranslateY The new y-coordinate for the camera.
+     * @return The calculated dynamic duration.
+     */
     private Duration calculateDynamicDuration(double newTranslateX, double newTranslateY) {
         double currentX = gamePane.getTranslateX();
         double currentY = gamePane.getTranslateY();
@@ -100,6 +123,12 @@ public class Camera {
         animateCameraTransition(newTranslateX, newTranslateY);
     }
 
+    /**
+     * Animates the camera transition to the specified coordinates.
+     *
+     * @param newTranslateX The new x-coordinate for the camera.
+     * @param newTranslateY The new y-coordinate for the camera.
+     */
     private void animateCameraTransition(double newTranslateX, double newTranslateY) {
         Duration animationDuration = calculateDynamicDuration(newTranslateX, newTranslateY);
 
@@ -115,18 +144,35 @@ public class Camera {
         currentTimeline.play();
     }
 
+    /**
+     * Calculates the new x-coordinate for the camera based on the target actor's position.
+     *
+     * @return The calculated x-coordinate.
+     */
     private double calculateTranslateX() {
         double targetCenterX = target.getLayoutX() + target.getFitWidth() / 2.0;
         double newTranslateX = viewPort.getWidth() / 2.0 - targetCenterX;
         return -clampTranslate(-newTranslateX, gamePane.getScaleX());
     }
 
+    /**
+     * Calculates the new y-coordinate for the camera based on the target actor's position.
+     *
+     * @return The calculated y-coordinate.
+     */
     private double calculateTranslateY() {
         double targetCenterY = target.getLayoutY() + target.getFitHeight() / 2.0;
         double newTranslateY = viewPort.getHeight() / 2.0 - targetCenterY;
         return -clampTranslate(-newTranslateY, gamePane.getScaleY());
     }
 
+    /**
+     * Clamps the translation value within the specified range.
+     *
+     * @param value The value to clamp.
+     * @param scale The scale factor for the game pane.
+     * @return The clamped translation value.
+     */
     private double clampTranslate(double value, double scale) {
         double minTranslate = gamePane.getWidth() * scale - viewPort.getWidth();
         return minTranslate < 0 ? Math.min(0, Math.max(value, minTranslate)) : value;

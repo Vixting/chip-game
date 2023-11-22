@@ -1,3 +1,8 @@
+/**
+ * The abstract class representing a tile in the Chip's Challenge game.
+ * This class extends ImageView and provides common functionality for tiles.
+ * Subclasses of Tile define specific behaviors for different types of tiles.
+ */
 package com.group4.chipgame.tiles;
 
 import com.group4.chipgame.Direction;
@@ -10,24 +15,38 @@ import javafx.scene.image.ImageView;
 
 import java.util.Objects;
 
-/**
- * The Tile class represents a basic building block for the Chip's Challenge game grid.
- * It is an abstract class extended by specific tile types, providing common functionality such as image rendering,
- * size binding, position updates, and occupancy status.
- */
 public abstract class Tile extends ImageView {
 
+    /**
+     * Indicates whether this tile is walkable or not.
+     */
     private final boolean isWalkable;
+
+    /**
+     * Indicates if the tile is currently occupied by an entity.
+     */
     private boolean occupied;
+
+    /**
+     * The entity currently occupying the tile.
+     */
     private Entity occupiedBy;
+
+    /**
+     * The x-coordinate of the tile in the grid.
+     */
     protected int gridX;
+
+    /**
+     * The y-coordinate of the tile in the grid.
+     */
     protected int gridY;
 
     /**
-     * Constructs a Tile with the specified image path and walkable status.
+     * Constructs a Tile object with the specified image path and walkability.
      *
-     * @param imagePath  The path to the image representing the tile.
-     * @param isWalkable True if the tile is walkable, false otherwise.
+     * @param imagePath   The path to the image representing the tile.
+     * @param isWalkable  Indicates whether the tile is walkable.
      */
     public Tile(String imagePath, boolean isWalkable) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
@@ -38,10 +57,10 @@ public abstract class Tile extends ImageView {
     }
 
     /**
-     * Sets the grid position of the tile and updates its visual position.
+     * Sets the grid position of the tile.
      *
-     * @param x The X-coordinate of the grid position.
-     * @param y The Y-coordinate of the grid position.
+     * @param x The x-coordinate in the grid.
+     * @param y The y-coordinate in the grid.
      */
     public void setGridPosition(int x, int y) {
         gridX = x;
@@ -49,11 +68,17 @@ public abstract class Tile extends ImageView {
         updatePosition();
     }
 
+    /**
+     * Binds the size of the tile to the TILE_SIZE property in the Main class.
+     */
     private void bindSize() {
         fitWidthProperty().bind(Main.TILE_SIZE.asObject());
         fitHeightProperty().bind(Main.TILE_SIZE.asObject());
     }
 
+    /**
+     * Updates the position of the tile based on its grid coordinates.
+     */
     private void updatePosition() {
         setLayoutX(gridX * Main.TILE_SIZE.get());
         setLayoutY(gridY * Main.TILE_SIZE.get());
@@ -70,7 +95,7 @@ public abstract class Tile extends ImageView {
     }
 
     /**
-     * Gets the entity that occupies the tile.
+     * Gets the entity currently occupying the tile.
      *
      * @return The entity occupying the tile.
      */
@@ -88,23 +113,23 @@ public abstract class Tile extends ImageView {
     }
 
     /**
-     * Checks if the tile is occupied.
+     * Checks if the tile is currently occupied.
      *
      * @return True if the tile is occupied, false otherwise.
      */
     public boolean isOccupied() {
-        return occupied;
+        return !occupied;
     }
 
     /**
-     * Handles the event when an actor steps on the tile.
+     * Method called when an actor steps on the tile.
+     * To be implemented by subclasses.
      *
-     * @param actor             The actor stepping on the tile.
-     * @param levelRenderer     The renderer for the game level.
-     * @param incomingDirection The direction from which the actor is coming.
+     * @param actor              The actor stepping on the tile.
+     * @param levelRenderer      The level renderer object.
+     * @param incomingDirection  The direction from which the actor is coming.
      */
     public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
         // To be implemented by subclasses
     }
 }
-
