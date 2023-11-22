@@ -7,6 +7,9 @@ import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
 import javafx.scene.paint.Color;
 
+/**
+ * The EffectManager class provides methods for applying visual effects to JavaFX nodes, such as shadow and lighting effects.
+ */
 public class EffectManager {
 
     // Default values for shadow effect
@@ -22,10 +25,24 @@ public class EffectManager {
     private static final double DEFAULT_SPECULAR_EXPONENT = 20.0;
     private static final double DEFAULT_DIFFUSE_CONSTANT = 0.8;
 
+    /**
+     * Applies a default shadow effect to the specified JavaFX node.
+     *
+     * @param node The JavaFX node to which the shadow effect should be applied.
+     */
     public static void applyShadowEffect(Node node) {
         applyShadowEffect(node, DEFAULT_SHADOW_RADIUS, DEFAULT_SHADOW_OFFSET_X, DEFAULT_SHADOW_OFFSET_Y, DEFAULT_SHADOW_COLOR);
     }
 
+    /**
+     * Applies a customized shadow effect to the specified JavaFX node.
+     *
+     * @param node    The JavaFX node to which the shadow effect should be applied.
+     * @param radius  The radius of the shadow.
+     * @param offsetX The X offset of the shadow.
+     * @param offsetY The Y offset of the shadow.
+     * @param color   The color of the shadow.
+     */
     public static void applyShadowEffect(Node node, double radius, double offsetX, double offsetY, Color color) {
         if (node == null) {
             return;
@@ -42,10 +59,25 @@ public class EffectManager {
         node.setEffect(dropShadow);
     }
 
+    /**
+     * Applies a default lighting effect to the specified JavaFX node using a specified light source.
+     *
+     * @param node  The JavaFX node to which the lighting effect should be applied.
+     * @param light The light source to be used in the lighting effect.
+     */
     public static void applyLightingEffect(Node node, Light light) {
         applyLightingEffect(node, light, DEFAULT_SURFACE_SCALE, DEFAULT_SPECULAR_CONSTANT, DEFAULT_SPECULAR_EXPONENT);
     }
 
+    /**
+     * Applies a customized lighting effect to the specified JavaFX node using a specified light source and parameters.
+     *
+     * @param node             The JavaFX node to which the lighting effect should be applied.
+     * @param light            The light source to be used in the lighting effect.
+     * @param surfaceScale     The surface scale factor for the lighting effect.
+     * @param specularConstant The specular constant for the lighting effect.
+     * @param specularExponent The specular exponent for the lighting effect.
+     */
     public static void applyLightingEffect(Node node, Light light, double surfaceScale, double specularConstant, double specularExponent) {
         if (node == null) {
             return;
@@ -61,7 +93,11 @@ public class EffectManager {
         node.setEffect(lighting);
     }
 
-
+    /**
+     * Creates and returns a default distant light source.
+     *
+     * @return The default distant light source.
+     */
     public static Light createDefaultLight() {
         Light.Distant light = new Light.Distant();
         light.setAzimuth(45.0);

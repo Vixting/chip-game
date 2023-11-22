@@ -15,40 +15,78 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
+/**
+ * The main class for the Chip Game application. Extends JavaFX Application class.
+ */
 public class Main extends Application {
+
+    // Constants for default sizes and titles
     public static SimpleIntegerProperty TILE_SIZE = new SimpleIntegerProperty(50);
     public static SimpleIntegerProperty ACTOR_SIZE = new SimpleIntegerProperty((int) (TILE_SIZE.get() / 1.5));
     public static final String MAIN_MENU_TITLE = "Chip Game Main Menu";
     public static final String GAME_TITLE = "Chip Game";
     public static final String BACKGROUND_COLOR = "-fx-background-color: black;";
 
+    // Settings menu
     private StackPane settingsMenu;
 
+    /**
+     * The entry point of the application.
+     *
+     * @param args The command-line arguments passed to the application.
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * JavaFX application start method.
+     *
+     * @param primaryStage The primary stage for the application.
+     */
     @Override
     public void start(Stage primaryStage) {
+        // Initialize the main menu
         initMainMenu(primaryStage);
+
+        // Add listeners to the width and height properties of the primaryStage
+        // These listeners will be notified when the width or height of the primaryStage changes
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> updateSizes(primaryStage));
         primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> updateSizes(primaryStage));
     }
 
+    /**
+     * Update sizes of tiles and actors based on the size of the primaryStage.
+     *
+     * @param stage The primary stage for the application.
+     */
     private void updateSizes(Stage stage) {
-        int newTileSize = Math.min((int) stage.getWidth() , (int) stage.getHeight() - 100) / 10;
+        int newTileSize = Math.min((int) stage.getWidth(), (int) stage.getHeight() - 100) / 10;
         TILE_SIZE.set(newTileSize);
         ACTOR_SIZE.set((int) (newTileSize / 1.5));
     }
 
+    /**
+     * Initialize the main menu.
+     *
+     * @param primaryStage The primary stage for the application.
+     */
     private void initMainMenu(Stage primaryStage) {
+        // Create the main menu and set it on the stage
         StackPane menuBox = createMainMenu(primaryStage);
         initScene(menuBox, primaryStage, 400, 400, MAIN_MENU_TITLE);
     }
 
+    /**
+     * Create the main menu.
+     *
+     * @param primaryStage The primary stage for the application.
+     * @return The main menu as a StackPane.
+     */
     private StackPane createMainMenu(Stage primaryStage) {
+        // Create main menu and settings menu
         MainMenu mainMenu = new MainMenu();
         StackPane menuBox = mainMenu.createMainMenu(primaryStage, this);
         SettingsMenu settings = new SettingsMenu();
@@ -58,11 +96,25 @@ public class Main extends Application {
         return menuBox;
     }
 
+    /**
+     * Show the main menu.
+     *
+     * @param primaryStage The primary stage for the application.
+     */
     public void showMainMenu(Stage primaryStage) {
         StackPane menuBox = createMainMenu(primaryStage);
         initScene(menuBox, primaryStage, 400, 400, MAIN_MENU_TITLE);
     }
 
+    /**
+     * Initialize the scene with the specified parameters.
+     *
+     * @param root   The root of the scene.
+     * @param stage  The stage to set the scene on.
+     * @param width  The width of the scene.
+     * @param height The height of the scene.
+     * @param title  The title of the scene.
+     */
     private void initScene(StackPane root, Stage stage, int width, int height, String title) {
         Scene scene = new Scene(root, width, height);
         scene.setOnKeyPressed(this::handleKeyPress);
@@ -71,18 +123,36 @@ public class Main extends Application {
         stage.show();
     }
 
+    /**
+     * Handle key presses.
+     *
+     * @param event The KeyEvent representing the key press.
+     */
     private void handleKeyPress(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
+            // Toggle the visibility of the settings menu when ESC is pressed
             toggleSettingsMenu();
         }
     }
 
+    /**
+     * Start a game level.
+     *
+     * @param levelPath     The path to the level file.
+     * @param primaryStage  The primary stage for the application.
+     * @throws IOException If an I/O error occurs while loading the level.
+     */
     public void startLevel(String levelPath, Stage primaryStage) throws IOException {
+        // Load level data from the specified path
         LevelData levelData = loadLevel(levelPath);
+
+        // Initialize the game pane and set it on the stage
         StackPane gamePane = initGamePane(levelData);
 
+        // Maximize the stage temporarily to get its size
         primaryStage.setMaximized(true);
 
+        // Run on the JavaFX application thread to ensure correct size calculations
         Platform.runLater(() -> {
             double stageWidth = primaryStage.getWidth();
             double stageHeight = primaryStage.getHeight();
@@ -95,12 +165,22 @@ public class Main extends Application {
             sceneWidth = Math.max(sceneWidth, minSceneWidth);
             sceneHeight = Math.max(sceneHeight, minSceneHeight);
 
+            // Initialize the scene with the calculated size
             initScene(gamePane, primaryStage, (int) sceneWidth, (int) sceneHeight, GAME_TITLE);
+
+            // Initialize the game loop and set the stage to not be maximized
             initGameLoop(levelData);
             primaryStage.setMaximized(false);
         });
     }
 
+    /**
+     * Load level data from the specified level path.
+     *
+     * @param levelPath The path to the level file.
+     * @return The loaded level data.
+     * @throws IOException If an I/O error occurs while loading the level.
+     */
     private LevelData loadLevel(String levelPath) throws IOException {
         LevelLoader levelLoader = new LevelLoader();
         Tile[][] tiles = levelLoader.loadTiles(levelPath);
@@ -115,6 +195,12 @@ public class Main extends Application {
         return new LevelData(gridWidth, gridHeight, actors, collectibles, levelRenderer);
     }
 
+    /**
+     * Initialize the game pane with the specified level data.
+     *
+     * @param levelData The level data.
+     * @return The initialized game pane.
+     */
     private StackPane initGamePane(LevelData levelData) {
         StackPane rootPane = new StackPane(levelData.levelRenderer.getGamePane());
         rootPane.getChildren().add(settingsMenu);
@@ -122,10 +208,15 @@ public class Main extends Application {
         return rootPane;
     }
 
+    /**
+     * Initialize the game loop with the specified level data.
+     *
+     * @param levelData The level data.
+     */
     private void initGameLoop(LevelData levelData) {
         Scene currentScene = levelData.levelRenderer.getGamePane().getScene();
 
-
+        // Initialize the camera, game loop, and handle input
         Camera camera = new Camera(levelData.levelRenderer.getGamePane(), levelData.gridWidth * TILE_SIZE.get(), levelData.gridHeight * TILE_SIZE.get());
         GameLoop gameLoop = new GameLoop(levelData.actors, levelData.levelRenderer, camera);
         camera.adjustCamera();
@@ -133,6 +224,7 @@ public class Main extends Application {
         long inputDelay = 200;
         int maxQueueSize = 5;
 
+        // Handle key presses and add them to the move queue
         currentScene.setOnKeyPressed(event -> {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastInputTime[0] > inputDelay) {
@@ -149,13 +241,20 @@ public class Main extends Application {
             }
         });
 
+        // Start the game loop
         gameLoop.start();
     }
 
+    /**
+     * Toggle the visibility of the settings menu.
+     */
     private void toggleSettingsMenu() {
         settingsMenu.setVisible(!settingsMenu.isVisible());
     }
 
+    /**
+     * Data structure to hold level data.
+     */
     private static class LevelData {
         int gridWidth;
         int gridHeight;
@@ -163,6 +262,15 @@ public class Main extends Application {
         List<Collectible> collectibles;
         LevelRenderer levelRenderer;
 
+        /**
+         * Constructor for LevelData.
+         *
+         * @param gridWidth     The width of the grid.
+         * @param gridHeight    The height of the grid.
+         * @param actors        The list of actors in the level.
+         * @param collectibles  The list of collectibles in the level.
+         * @param levelRenderer The renderer for the level.
+         */
         LevelData(int gridWidth, int gridHeight, List<Actor> actors, List<Collectible> collectibles, LevelRenderer levelRenderer) {
             this.gridWidth = gridWidth;
             this.gridHeight = gridHeight;

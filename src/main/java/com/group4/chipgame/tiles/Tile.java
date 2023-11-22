@@ -10,13 +10,25 @@ import javafx.scene.image.ImageView;
 
 import java.util.Objects;
 
+/**
+ * The Tile class represents a basic building block for the Chip's Challenge game grid.
+ * It is an abstract class extended by specific tile types, providing common functionality such as image rendering,
+ * size binding, position updates, and occupancy status.
+ */
 public abstract class Tile extends ImageView {
+
     private final boolean isWalkable;
     private boolean occupied;
     private Entity occupiedBy;
     protected int gridX;
     protected int gridY;
 
+    /**
+     * Constructs a Tile with the specified image path and walkable status.
+     *
+     * @param imagePath  The path to the image representing the tile.
+     * @param isWalkable True if the tile is walkable, false otherwise.
+     */
     public Tile(String imagePath, boolean isWalkable) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         setImage(image);
@@ -25,6 +37,12 @@ public abstract class Tile extends ImageView {
         bindSize();
     }
 
+    /**
+     * Sets the grid position of the tile and updates its visual position.
+     *
+     * @param x The X-coordinate of the grid position.
+     * @param y The Y-coordinate of the grid position.
+     */
     public void setGridPosition(int x, int y) {
         gridX = x;
         gridY = y;
@@ -41,15 +59,50 @@ public abstract class Tile extends ImageView {
         setLayoutY(gridY * Main.TILE_SIZE.get());
     }
 
+    /**
+     * Sets the entity that occupies the tile.
+     *
+     * @param actor The entity occupying the tile.
+     */
     public void setOccupiedBy(Entity actor) {
         occupiedBy = actor;
         occupied = actor != null;
     }
 
-    public Entity getOccupiedBy() { return occupiedBy; }
-    public boolean isWalkable() { return isWalkable; }
-    public boolean isOccupied() { return !occupied; }
+    /**
+     * Gets the entity that occupies the tile.
+     *
+     * @return The entity occupying the tile.
+     */
+    public Entity getOccupiedBy() {
+        return occupiedBy;
+    }
 
+    /**
+     * Checks if the tile is walkable.
+     *
+     * @return True if the tile is walkable, false otherwise.
+     */
+    public boolean isWalkable() {
+        return isWalkable;
+    }
+
+    /**
+     * Checks if the tile is occupied.
+     *
+     * @return True if the tile is occupied, false otherwise.
+     */
+    public boolean isOccupied() {
+        return occupied;
+    }
+
+    /**
+     * Handles the event when an actor steps on the tile.
+     *
+     * @param actor             The actor stepping on the tile.
+     * @param levelRenderer     The renderer for the game level.
+     * @param incomingDirection The direction from which the actor is coming.
+     */
     public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
         // To be implemented by subclasses
     }

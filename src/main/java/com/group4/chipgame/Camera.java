@@ -9,13 +9,24 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
+/**
+ * The Camera class manages the view and focus of the game, allowing for smooth camera transitions.
+ */
 public class Camera {
+
     private final Pane gamePane;
     private Rectangle2D viewPort;
     private Actor target;
     private Timeline currentTimeline;
     private AnimationTimer cameraTimer;
 
+    /**
+     * Constructs a Camera with the specified game pane and view dimensions.
+     *
+     * @param gamePane   The game pane to manage.
+     * @param viewWidth  The width of the view.
+     * @param viewHeight The height of the view.
+     */
     public Camera(Pane gamePane, double viewWidth, double viewHeight) {
         this.gamePane = gamePane;
         this.viewPort = new Rectangle2D(0, 0, viewWidth, viewHeight);
@@ -57,6 +68,11 @@ public class Camera {
         return Duration.millis(Math.min(300 + distance * 0.4, 1000));
     }
 
+    /**
+     * Sets the target actor for the camera to follow.
+     *
+     * @param target The actor to follow.
+     */
     public void setTarget(Actor target) {
         this.target = target;
         if (cameraTimer != null) {
@@ -71,6 +87,9 @@ public class Camera {
         cameraTimer.start();
     }
 
+    /**
+     * Adjusts the camera position based on the target actor's position.
+     */
     void adjustCamera() {
         if (target == null) {
             return;
@@ -113,4 +132,3 @@ public class Camera {
         return minTranslate < 0 ? Math.min(0, Math.max(value, minTranslate)) : value;
     }
 }
-
