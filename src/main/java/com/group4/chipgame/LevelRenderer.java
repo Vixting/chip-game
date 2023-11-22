@@ -29,7 +29,7 @@ public class LevelRenderer {
         Main.ACTOR_SIZE.addListener((obs, oldVal, newVal) -> updateSizes());
     }
 
-    private void updateSizes() {
+    public void updateSizes() {
         if (tiles != null) {
             renderTiles(tiles);
         }
