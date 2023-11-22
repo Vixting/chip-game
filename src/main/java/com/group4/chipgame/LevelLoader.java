@@ -31,13 +31,11 @@ public class LevelLoader {
         put("G", (x, y) -> new Wall());
         put("D", (x, y) -> new LockedDoor(Key.KeyColor.BLUE));
         put("S", (x, y) -> new Dirt());
-
-        put("I", (x, y) -> new Ice(Direction.Corner.NONE ));
+        put("I", (x, y) -> new Ice(Direction.Corner.NONE));
         put("I_BL", (x, y) -> new Ice(Direction.Corner.BOTTOM_LEFT));
         put("I_BR", (x, y) -> new Ice(Direction.Corner.BOTTOM_RIGHT));
         put("I_TL", (x, y) -> new Ice(Direction.Corner.TOP_LEFT));
         put("I_TR", (x, y) -> new Ice(Direction.Corner.TOP_RIGHT));
-
         put("Button", (x, y) -> new Button());
     }};
 
@@ -45,7 +43,6 @@ public class LevelLoader {
         put("Player", Player::new);
         put("Creeper", Creeper::new);
         put("MovableBlock", MovableBlock::new);
-
     }};
 
     private final Map<String, BiFunction<Integer, Integer, Collectible>> collectibleCreators = new HashMap<>() {{
@@ -72,7 +69,6 @@ public class LevelLoader {
         Tile[][] levelTiles = new Tile[height][width];
         Map<String, Button> buttonMap = createButtons(tilesArray, levelTiles);
         createTraps(tilesArray, levelTiles, buttonMap);
-
         return levelTiles;
     }
 
@@ -113,7 +109,6 @@ public class LevelLoader {
             String type = data.getString("type");
             int x = data.getInt("x");
             int y = data.getInt("y");
-
             T entity = Optional.ofNullable(creators.get(type)).orElse((a, b) -> null).apply(x, y);
             if (entity != null) {
                 entities.add(entity);

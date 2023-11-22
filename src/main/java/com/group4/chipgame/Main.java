@@ -57,6 +57,11 @@ public class Main extends Application {
         return menuBox;
     }
 
+    public void showMainMenu(Stage primaryStage) {
+        StackPane menuBox = createMainMenu(primaryStage);
+        initScene(menuBox, primaryStage, 400, 400, MAIN_MENU_TITLE);
+    }
+
     private void initScene(StackPane root, Stage stage, int width, int height, String title) {
         Scene scene = new Scene(root, width, height);
         scene.setOnKeyPressed(this::handleKeyPress);
@@ -74,7 +79,7 @@ public class Main extends Application {
     public void startLevel(String levelPath, Stage primaryStage) throws IOException {
         LevelData levelData = loadLevel(levelPath);
         StackPane gamePane = initGamePane(levelData);
-        initScene(gamePane, primaryStage, levelData.gridWidth * TILE_SIZE.get() * 10, levelData.gridHeight * TILE_SIZE.get() * 10, GAME_TITLE);
+        initScene(gamePane, primaryStage, levelData.gridWidth * TILE_SIZE.get() * 25, levelData.gridHeight * TILE_SIZE.get() * 25, GAME_TITLE);
         initGameLoop(levelData);
         primaryStage.setMaximized(true);
     }
