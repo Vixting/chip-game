@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,28 +29,25 @@ public class LevelRenderer {
         Main.ACTOR_SIZE.addListener((obs, oldVal, newVal) -> updateSizes());
     }
 
-    private void updateSizes() {
+    public void updateSizes() {
         if (tiles != null) {
             renderTiles(tiles);
         }
         renderNodes(actorsPane, getActors());
         renderNodes(collectiblesPane, getCollectibles());
 
-        System.out.println("UPDATE");
         if (tiles != null && tiles.length > 0 && tiles[0].length > 0) {
-            System.out.println(Main.TILE_SIZE.get() * tiles[0].length);
             gamePane.setLayoutX(Main.TILE_SIZE.get() * tiles[0].length);
             gamePane.setLayoutY(Main.TILE_SIZE.get() * tiles.length);
-
         }
     }
 
     public List<Collectible> getCollectibles() {
-        return castToList(collectiblesPane);
+        return castToList(collectiblesPane, Collectible.class);
     }
 
     public List<Actor> getActors() {
-        return castToList(actorsPane);
+        return castToList(actorsPane, Actor.class);
     }
 
     public void renderCollectibles(List<Collectible> collectibles) {
@@ -66,7 +64,9 @@ public class LevelRenderer {
         for (int y = 0; y < tiles.length; y++) {
             for (int x = 0; x < tiles[y].length; x++) {
                 Tile tile = tiles[y][x];
-                renderTile(tile, x, y);
+                if (tile != null) {
+                    renderTile(tile, x, y);
+                }
             }
         }
     }
@@ -82,6 +82,7 @@ public class LevelRenderer {
     public void clear() {
         tilesPane.getChildren().clear();
         actorsPane.getChildren().clear();
+        collectiblesPane.getChildren().clear();
     }
 
     public void remove(Actor actor) {
@@ -96,17 +97,25 @@ public class LevelRenderer {
         Platform.runLater(action);
     }
 
-    private <T> List<T> castToList(Pane pane) {
-        return (List<T>) pane.getChildren();
+    private <T> List<T> castToList(Pane pane, Class<T> clazz) {
+        List<T> list = new ArrayList<>();
+        pane.getChildren().forEach(node -> {
+            if (clazz.isInstance(node)) {
+                list.add(clazz.cast(node));
+            }
+        });
+        return list;
     }
 
     private <T> void renderNodes(Pane pane, List<T> nodes) {
-        Optional.ofNullable(nodes).ifPresent(list -> list.forEach(node -> positionAndAddNode(pane, node)));
+        Optional.ofNullable(nodes).ifPresent(list -> list.forEach(node -> {
+            if (node != null && !pane.getChildren().contains(node)) {
+                positionAndAddNode(pane, node);
+            }
+        }));
     }
 
     private void renderTile(Tile tile, int x, int y) {
-        if (tile == null) return;
-
         tile.setGridPosition(x, y);
         tile.setLayoutX(x * Main.TILE_SIZE.get());
         tile.setLayoutY(y * Main.TILE_SIZE.get());
@@ -114,23 +123,22 @@ public class LevelRenderer {
     }
 
     private <T> void positionAndAddNode(Pane pane, T node) {
-        if (node == null || pane.getChildren().contains(node)) return;
-
         if (node instanceof Collectible) {
             position((Collectible) node);
         } else if (node instanceof Actor) {
             position((Actor) node);
         }
-
         pane.getChildren().add((javafx.scene.Node) node);
-    }
-
-    private void position(Collectible collectible) {
-        position(collectible, collectible.getPosition());
     }
 
     private void position(Actor actor) {
         position(actor, actor.getPosition());
+        EffectManager.applyShadowEffect(actor);
+    }
+
+    private void position(Collectible collectible) {
+        position(collectible, collectible.getPosition());
+        EffectManager.applyShadowEffect(collectible);
     }
 
     private void position(javafx.scene.Node node, Point2D position) {

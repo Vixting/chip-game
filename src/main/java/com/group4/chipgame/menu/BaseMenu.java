@@ -1,36 +1,53 @@
 package com.group4.chipgame.menu;
 
 import com.group4.chipgame.Main;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public abstract class BaseMenu {
 
-    protected void addButton(String label, VBox menuBox, Stage primaryStage, Main mainApp, Runnable action) {
-        Button button = createButton(label, menuBox.widthProperty(), menuBox.heightProperty());
-        button.setOnAction(e -> action.run());
+    private static final String BUTTON_STYLE = "-fx-background-color: linear-gradient(to bottom, #444, #555); -fx-text-fill: #EEE; -fx-font-size: 20px; -fx-background-radius: 15;";
+    private static final String BUTTON_HOVER_STYLE = "-fx-background-color: linear-gradient(to bottom, #666, #777);";
+    private static final DropShadow BUTTON_SHADOW = new DropShadow(20, javafx.scene.paint.Color.GREY);
+
+    protected static void addButton(String label, VBox menuBox, Stage primaryStage, Main mainApp, Runnable action) {
+        Button button = createButton(label, menuBox.widthProperty(), menuBox.heightProperty(), action);
         menuBox.getChildren().add(button);
     }
 
-    protected static Button createButton(String label, javafx.beans.property.ReadOnlyDoubleProperty parentWidth, javafx.beans.property.ReadOnlyDoubleProperty parentHeight) {
+    protected static Button createButton(String label, javafx.beans.property.ReadOnlyDoubleProperty parentWidth, javafx.beans.property.ReadOnlyDoubleProperty parentHeight, Runnable action) {
         Button button = new Button(label);
-        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 12; -fx-background-radius: 12;");
-        button.setPadding(new Insets(15, 30, 15, 30));
+        button.setStyle(BUTTON_STYLE);
+        button.setEffect(BUTTON_SHADOW);
 
         button.prefWidthProperty().bind(parentWidth.multiply(0.6));
         button.prefHeightProperty().bind(parentHeight.multiply(0.15));
 
-        button.styleProperty().bind(
-                button.heightProperty().asString()
-                        .concat("px; -fx-background-color: #4CAF50; -fx-text-fill: white;")
-                        .concat("-fx-font-size: ")
-                        .concat(button.heightProperty().divide(3).asString())
-                        .concat("px;")
-        );
+        button.setOnAction(e -> action.run());
+
+        ScaleTransition stEnter = new ScaleTransition(Duration.millis(200), button);
+        stEnter.setToX(1.1);
+        stEnter.setToY(1.1);
+
+        ScaleTransition stExit = new ScaleTransition(Duration.millis(200), button);
+        stExit.setToX(1.0);
+        stExit.setToY(1.0);
+
+        button.setOnMouseEntered(e -> {
+            button.setStyle(BUTTON_STYLE + BUTTON_HOVER_STYLE);
+            stEnter.play();
+        });
+        button.setOnMouseExited(e -> {
+            button.setStyle(BUTTON_STYLE);
+            stExit.play();
+        });
 
         return button;
     }
@@ -49,5 +66,12 @@ public abstract class BaseMenu {
         menuBox.setAlignment(Pos.CENTER);
         menuBox.setPadding(new Insets(30, 30, 30, 30));
         return menuBox;
+    }
+
+    protected static Button createBackButton(Stage primaryStage, Main mainApp) {
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-background-color: #666; -fx-text-fill: white; -fx-font-size: 16px;");
+        backButton.setOnAction(e -> mainApp.showMainMenu(primaryStage));
+        return backButton;
     }
 }
