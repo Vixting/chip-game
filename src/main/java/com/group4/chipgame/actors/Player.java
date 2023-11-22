@@ -105,10 +105,13 @@ public class Player extends Actor {
      * @param levelRenderer The renderer for the level.
      */
     public void checkForCollectibles(double x, double y, LevelRenderer levelRenderer) {
+        System.out.println("Checking for collectibles!");
         Optional<Tile> tileOpt = levelRenderer.getTileAtGridPosition((int) x, (int) y);
         tileOpt.ifPresent(tile -> {
             Entity entity = tile.getOccupiedBy();
+            System.out.println("Entity: " + entity);
             if (entity instanceof Collectible collectible) {
+                System.out.println("Player collected a collectible!");
                 onCollect(collectible);
                 collectible.onCollect(this);
                 levelRenderer.remove(collectible);
