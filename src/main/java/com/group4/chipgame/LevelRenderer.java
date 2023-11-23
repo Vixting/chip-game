@@ -133,12 +133,10 @@ public class LevelRenderer {
 
     private void position(Actor actor) {
         position(actor, actor.getPosition());
-        EffectManager.applyShadowEffect(actor);
     }
 
     private void position(Collectible collectible) {
         position(collectible, collectible.getPosition());
-        EffectManager.applyShadowEffect(collectible);
     }
 
     private void position(javafx.scene.Node node, Point2D position) {

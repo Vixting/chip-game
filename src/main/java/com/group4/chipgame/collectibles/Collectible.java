@@ -1,5 +1,6 @@
 package com.group4.chipgame.collectibles;
 
+import com.group4.chipgame.EffectManager;
 import com.group4.chipgame.Entity;
 import com.group4.chipgame.Main;
 import com.group4.chipgame.actors.Actor;
@@ -30,6 +31,7 @@ public class Collectible extends ImageView implements Entity {
         double offset = (Main.TILE_SIZE.get() - Main.ACTOR_SIZE.get()) / 2.0;
         setLayoutX(currentPosition.getX() * Main.TILE_SIZE.get() + offset);
         setLayoutY(currentPosition.getY() * Main.TILE_SIZE.get() + offset);
+        EffectManager.applyDynamicShadowEffect(this);
     }
 
     @Override

@@ -8,4 +8,7 @@ public class Trap extends Tile {
         super("/images/chipgame/tiles/trap.png", true);
         this.linkedButton = linkedButton;
     }
+    public boolean isActive() {
+        return linkedButton != null && !linkedButton.isActive();
+    }
 }

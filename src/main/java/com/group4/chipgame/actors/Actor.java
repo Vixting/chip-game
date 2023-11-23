@@ -3,6 +3,7 @@ package com.group4.chipgame.actors;
 import com.group4.chipgame.*;
 import com.group4.chipgame.collectibles.Collectible;
 import com.group4.chipgame.tiles.Tile;
+import com.group4.chipgame.tiles.Trap;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -36,6 +37,7 @@ public abstract class Actor extends ImageView implements Entity {
         double offset = (Main.TILE_SIZE.get() - fitWidthProperty().get()) / 2.0;
         setLayoutX(currentPosition.getX() * Main.TILE_SIZE.get() + offset);
         setLayoutY(currentPosition.getY() * Main.TILE_SIZE.get() + offset);
+        EffectManager.applyDynamicShadowEffect(this);
     }
 
 
@@ -65,6 +67,11 @@ public abstract class Actor extends ImageView implements Entity {
         Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
 
         if (targetTileOpt.isEmpty()) return false;
+
+        Optional<Tile> currentTileOpt = levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY());
+        if (currentTileOpt.isPresent() && currentTileOpt.get() instanceof Trap currentTrap && currentTrap.isActive()) {
+            return false;
+        }
 
         Tile targetTile = targetTileOpt.get();
         Entity occupiedBy = targetTile.getOccupiedBy();
@@ -100,4 +107,3 @@ public abstract class Actor extends ImageView implements Entity {
         return timeline;
     }
 }
-

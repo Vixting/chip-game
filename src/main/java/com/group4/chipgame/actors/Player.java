@@ -44,17 +44,14 @@ public class Player extends Actor {
             double newY = currentPosition.getY() + dy;
 
             Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
-
-            if (targetTileOpt.isPresent()) {
-                Tile targetTile = targetTileOpt.get();
+            targetTileOpt.ifPresent(targetTile -> {
                 Entity occupiedBy = targetTile.getOccupiedBy();
-
                 if (occupiedBy instanceof MovableBlock block) {
                     block.push(dx, dy, levelRenderer);
                 } else if (targetTile instanceof LockedDoor door) {
                     door.onStep(this, levelRenderer, direction);
                 }
-            }
+            });
 
             if (canMove(dx, dy, levelRenderer)) {
                 checkForCollectibles(newX, newY, levelRenderer);
@@ -64,13 +61,10 @@ public class Player extends Actor {
     }
 
     public void checkForCollectibles(double x, double y, LevelRenderer levelRenderer) {
-        System.out.println("Checking for collectibles!");
         Optional<Tile> tileOpt = levelRenderer.getTileAtGridPosition((int) x, (int) y);
         tileOpt.ifPresent(tile -> {
             Entity entity = tile.getOccupiedBy();
-            System.out.println("Entity: " + entity);
             if (entity instanceof Collectible collectible) {
-                System.out.println("Player collected a collectible!");
                 onCollect(collectible);
                 collectible.onCollect(this);
                 levelRenderer.remove(collectible);
@@ -79,21 +73,18 @@ public class Player extends Actor {
         });
     }
 
-
-    public void kill(Pane gamePane) {
+    private void kill(Pane gamePane) {
         isAlive = false;
         gamePane.getChildren().remove(this);
-        System.out.println("Player has been killed and removed from the game!");
     }
 
-    public boolean isAlive() {
+    private boolean isAlive() {
         return isAlive;
     }
 
-    public void onCollect(Entity actor) {
-        if (actor instanceof Key key) {
+    private void onCollect(Entity collectible) {
+        if (collectible instanceof Key key) {
             addKey(key);
-            System.out.println("Player collected a " + key.getColor() + " key!");
         }
     }
 }
