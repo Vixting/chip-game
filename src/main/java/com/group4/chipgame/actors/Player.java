@@ -6,11 +6,9 @@ import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.collectibles.Collectible;
 import com.group4.chipgame.collectibles.Key;
 import com.group4.chipgame.tiles.LockedDoor;
-import com.group4.chipgame.tiles.Tile;
 import javafx.scene.layout.Pane;
 
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class Player extends Actor {
@@ -38,39 +36,41 @@ public class Player extends Actor {
 
     @Override
     public void move(double dx, double dy, LevelRenderer levelRenderer) {
-        if (!isMoving) {
-            Direction direction = Direction.fromDelta(dx, dy);
-            double newX = currentPosition.getX() + dx;
-            double newY = currentPosition.getY() + dy;
+        if (isMoving) return;
 
-            Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
-            targetTileOpt.ifPresent(targetTile -> {
-                Entity occupiedBy = targetTile.getOccupiedBy();
-                if (occupiedBy instanceof MovableBlock block) {
-                    block.push(dx, dy, levelRenderer);
-                } else if (targetTile instanceof LockedDoor door) {
-                    door.onStep(this, levelRenderer, direction);
-                }
-            });
+        Direction direction = Direction.fromDelta(dx, dy);
+        double newX = currentPosition.getX() + dx;
+        double newY = currentPosition.getY() + dy;
 
-            if (canMove(dx, dy, levelRenderer)) {
-                checkForCollectibles(newX, newY, levelRenderer);
-                performMove(newX, newY, levelRenderer, direction);
-            }
+        processTileInteraction(newX, newY, dx, dy, levelRenderer, direction);
+
+        if (canMove(dx, dy, levelRenderer)) {
+            checkForCollectibles(newX, newY, levelRenderer);
+            performMove(newX, newY, levelRenderer, direction);
         }
     }
 
+    private void processTileInteraction(double newX, double newY, double dx, double dy, LevelRenderer levelRenderer, Direction direction) {
+        levelRenderer.getTileAtGridPosition((int) newX, (int) newY)
+                .ifPresent(tile -> {
+                    if (tile.getOccupiedBy() instanceof MovableBlock block) {
+                        block.push(dx, dy, levelRenderer);
+                    } else if (tile instanceof LockedDoor door) {
+                        door.onStep(this, levelRenderer, direction);
+                    }
+                });
+    }
+
     public void checkForCollectibles(double x, double y, LevelRenderer levelRenderer) {
-        Optional<Tile> tileOpt = levelRenderer.getTileAtGridPosition((int) x, (int) y);
-        tileOpt.ifPresent(tile -> {
-            Entity entity = tile.getOccupiedBy();
-            if (entity instanceof Collectible collectible) {
-                onCollect(collectible);
-                collectible.onCollect(this);
-                levelRenderer.remove(collectible);
-                tile.setOccupiedBy(null);
-            }
-        });
+        levelRenderer.getTileAtGridPosition((int) x, (int) y)
+                .ifPresent(tile -> {
+                    if (tile.getOccupiedBy() instanceof Collectible collectible) {
+                        collectible.onCollect(this);
+                        levelRenderer.remove(collectible);
+                        tile.setOccupiedBy(null);
+                        onCollect(collectible);
+                    }
+                });
     }
 
     private void kill(Pane gamePane) {

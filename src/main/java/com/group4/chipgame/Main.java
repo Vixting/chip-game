@@ -15,7 +15,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
 public class Main extends Application {
     public static SimpleIntegerProperty TILE_SIZE = new SimpleIntegerProperty(50);
@@ -124,7 +124,6 @@ public class Main extends Application {
 
     private void initGameLoop(LevelData levelData) {
         Scene currentScene = levelData.levelRenderer.getGamePane().getScene();
-
 
         Camera camera = new Camera(levelData.levelRenderer.getGamePane(), levelData.gridWidth * TILE_SIZE.get(), levelData.gridHeight * TILE_SIZE.get());
         GameLoop gameLoop = new GameLoop(levelData.actors, levelData.levelRenderer, camera);

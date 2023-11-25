@@ -49,6 +49,11 @@ public abstract class BaseMenu {
             stExit.play();
         });
 
+        stExit.setOnFinished(e -> {
+            button.setScaleX(1.0);
+            button.setScaleY(1.0);
+        });
+
         return button;
     }
 

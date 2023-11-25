@@ -21,25 +21,30 @@ public abstract class Actor extends ImageView implements Entity {
     protected boolean isMoving;
 
     public Actor(String imagePath, double x, double y) {
+        initializeImage(imagePath);
+        currentPosition = new Point2D(x, y);
+        updatePosition();
+        Main.ACTOR_SIZE.addListener((obs, oldVal, newVal) -> updatePosition());
+    }
+
+    private void initializeImage(String imagePath) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         setImage(image);
         setSmooth(true);
         fitWidthProperty().bind(Main.ACTOR_SIZE);
         fitHeightProperty().bind(Main.ACTOR_SIZE);
-
-        currentPosition = new Point2D(x, y);
-        updatePosition();
-
-        Main.ACTOR_SIZE.addListener((obs, oldVal, newVal) -> updatePosition());
     }
 
     private void updatePosition() {
-        double offset = (Main.TILE_SIZE.get() - fitWidthProperty().get()) / 2.0;
+        double offset = calculateOffset();
         setLayoutX(currentPosition.getX() * Main.TILE_SIZE.get() + offset);
         setLayoutY(currentPosition.getY() * Main.TILE_SIZE.get() + offset);
         EffectManager.applyDynamicShadowEffect(this);
     }
 
+    private double calculateOffset() {
+        return (Main.TILE_SIZE.get() - fitWidthProperty().get()) / 2.0;
+    }
 
     public Point2D getPosition() {
         return currentPosition;
@@ -50,22 +55,24 @@ public abstract class Actor extends ImageView implements Entity {
     }
 
     public void move(double dx, double dy, LevelRenderer levelRenderer) {
-        if (!isMoving) {
-            Direction direction = Direction.fromDelta(dx, dy);
-            double newX = currentPosition.getX() + dx;
-            double newY = currentPosition.getY() + dy;
+        if (isMoving) return;
 
-            if (canMove(dx, dy, levelRenderer)) {
-                performMove(newX, newY, levelRenderer, direction);
-            }
+        Direction direction = Direction.fromDelta(dx, dy);
+        double newX = currentPosition.getX() + dx;
+        double newY = currentPosition.getY() + dy;
+
+        if (canMove(dx, dy, levelRenderer)) {
+            performMove(newX, newY, levelRenderer, direction);
         }
     }
 
     boolean canMove(double dx, double dy, LevelRenderer levelRenderer) {
-        double newX = currentPosition.getX() + dx;
-        double newY = currentPosition.getY() + dy;
-        Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
+        Point2D newPosition = currentPosition.add(dx, dy);
+        return isMoveValid(newPosition, levelRenderer);
+    }
 
+    private boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
+        Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newPosition.getX(), (int) newPosition.getY());
         if (targetTileOpt.isEmpty()) return false;
 
         Optional<Tile> currentTileOpt = levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY());
@@ -81,29 +88,33 @@ public abstract class Actor extends ImageView implements Entity {
 
     public void performMove(double newX, double newY, LevelRenderer levelRenderer, Direction direction) {
         isMoving = true;
+        Timeline timeline = createTimeline(newX, newY);
 
-        double offset = (Main.TILE_SIZE.get() - Main.ACTOR_SIZE.get()) / 2.0;
-        Timeline timeline = createTimeline(newX * Main.TILE_SIZE.get() + offset, newY * Main.TILE_SIZE.get() + offset);
-
-        Optional<Tile> currentTile = levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY());
-        currentTile.ifPresent(tile -> tile.setOccupiedBy(null)); // Mark old tile as unoccupied
-
-        currentPosition = new Point2D(newX, newY);
-        Optional<Tile> targetTile = levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
-        targetTile.ifPresent(tile -> tile.setOccupiedBy(this)); // Mark new tile as occupied
-        targetTile.ifPresent(tile -> tile.onStep(this, levelRenderer, direction));
+        updateTileOccupancy(levelRenderer, newX, newY, direction);
 
         isMoving = false;
         timeline.play();
     }
 
-    private Timeline createTimeline(double targetX, double targetY) {
-        KeyValue kvX = new KeyValue(this.layoutXProperty(), targetX);
-        KeyValue kvY = new KeyValue(this.layoutYProperty(), targetY);
+    private void updateTileOccupancy(LevelRenderer levelRenderer, double newX, double newY, Direction direction) {
+        levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY())
+                .ifPresent(tile -> tile.setOccupiedBy(null));
+
+        currentPosition = new Point2D(newX, newY);
+
+        levelRenderer.getTileAtGridPosition((int) newX, (int) newY)
+                .ifPresent(tile -> {
+                    tile.setOccupiedBy(this);
+                    tile.onStep(this, levelRenderer, direction);
+                });
+    }
+
+    private Timeline createTimeline(double newX, double newY) {
+        double offset = calculateOffset();
+        KeyValue kvX = new KeyValue(this.layoutXProperty(), newX * Main.TILE_SIZE.get() + offset);
+        KeyValue kvY = new KeyValue(this.layoutYProperty(), newY * Main.TILE_SIZE.get() + offset);
         KeyFrame kf = new KeyFrame(Duration.millis(300), kvX, kvY);
 
-        Timeline timeline = new Timeline();
-        timeline.getKeyFrames().add(kf);
-        return timeline;
+        return new Timeline(kf);
     }
 }
