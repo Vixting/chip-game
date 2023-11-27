@@ -23,18 +23,11 @@ public abstract class Enemy extends Actor {
             return false;
         }
 
-        Tile targetTile = targetTileOpt.get();
+        Tile targetTile = targetTileOpt.orElseThrow(() -> new IllegalStateException("Target tile not found"));
         if (targetTile.getOccupiedBy() instanceof Player) {
             ((Player) targetTile.getOccupiedBy()).kill(levelRenderer);
             targetTile.setOccupiedBy(null);
         }
-        return targetTile.isWalkable() && !(targetTile.getOccupiedBy() instanceof Actor);
-    }
-
-    @Override
-    public void move(double dx, double dy, LevelRenderer levelRenderer) {
-        if (canMove(dx, dy, levelRenderer)) {
-            super.move(dx, dy, levelRenderer);
-        }
+        return targetTile.isWalkable();
     }
 }

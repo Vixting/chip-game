@@ -61,17 +61,16 @@ public abstract class Actor extends ImageView implements Entity {
         double newX = currentPosition.getX() + dx;
         double newY = currentPosition.getY() + dy;
 
-        if (canMove(dx, dy, levelRenderer)) {
-            performMove(newX, newY, levelRenderer, direction);
-        }
+        performMove(newX, newY, levelRenderer, direction);
+
     }
 
-    boolean canMove(double dx, double dy, LevelRenderer levelRenderer) {
+    protected boolean canMove(double dx, double dy, LevelRenderer levelRenderer) {
         Point2D newPosition = currentPosition.add(dx, dy);
         return isMoveValid(newPosition, levelRenderer);
     }
 
-    boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
+    protected boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
         Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newPosition.getX(), (int) newPosition.getY());
         if (targetTileOpt.isEmpty()) return false;
 
@@ -83,7 +82,7 @@ public abstract class Actor extends ImageView implements Entity {
         Tile targetTile = targetTileOpt.get();
         Entity occupiedBy = targetTile.getOccupiedBy();
 
-        return targetTile.isWalkable() && (occupiedBy == null || (this instanceof Player && occupiedBy instanceof Collectible));
+        return targetTile.isWalkable() && (occupiedBy == null || (this instanceof Player && occupiedBy instanceof Collectible ) || (this instanceof Enemy && occupiedBy instanceof Player));
     }
 
     public void performMove(double newX, double newY, LevelRenderer levelRenderer, Direction direction) {
