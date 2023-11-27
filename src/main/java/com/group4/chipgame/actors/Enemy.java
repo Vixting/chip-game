@@ -19,7 +19,7 @@ public abstract class Enemy extends Actor {
         Point2D newPosition = currentPosition.add(dx, dy);
         Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newPosition.getX(), (int) newPosition.getY());
 
-        if (targetTileOpt.isEmpty()) {
+        if (!isMoveValid(newPosition, levelRenderer)) {
             return false;
         }
 
