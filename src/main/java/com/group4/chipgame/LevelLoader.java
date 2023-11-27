@@ -43,7 +43,7 @@ public class LevelLoader {
 
     private final Map<String, BiFunction<Integer, Integer, Actor>> actorCreators = new HashMap<>() {{
         put("Player", Player::new);
-        put("Creeper", Creeper::new);
+        put("PinkBall", (x, y) -> new PinkBall(x, y, Direction.RIGHT));
         put("MovableBlock", MovableBlock::new);
 
     }};

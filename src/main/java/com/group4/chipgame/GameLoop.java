@@ -1,6 +1,7 @@
 package com.group4.chipgame;
 
 import com.group4.chipgame.actors.Actor;
+import com.group4.chipgame.actors.Enemy;
 import com.group4.chipgame.actors.Player;
 import javafx.animation.AnimationTimer;
 import javafx.scene.input.KeyCode;
@@ -39,11 +40,14 @@ public class GameLoop extends AnimationTimer {
             if (actor.shouldMove(ticksElapsed)) {
                 if (actor instanceof Player) {
                     camera.setTarget(actor);
-                    if (!moveQueue.isEmpty()) {
+                    if (!moveQueue.isEmpty() && ((Player) actor).isAlive()) {
                         Direction direction = moveQueue.poll();
+                        assert direction != null;
                         double[] delta = Direction.toDelta(direction);
                         actor.move(delta[0], delta[1], levelRenderer);
                     }
+                } else if (actor instanceof Enemy enemy) {
+                    enemy.makeMoveDecision(levelRenderer);
                 }
 
             }

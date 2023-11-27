@@ -6,7 +6,6 @@ import com.group4.chipgame.LevelRenderer;
 import com.group4.chipgame.collectibles.Collectible;
 import com.group4.chipgame.collectibles.Key;
 import com.group4.chipgame.tiles.LockedDoor;
-import javafx.scene.layout.Pane;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -73,12 +72,13 @@ public class Player extends Actor {
                 });
     }
 
-    private void kill(Pane gamePane) {
+    public void kill(LevelRenderer levelRenderer) {
         isAlive = false;
-        gamePane.getChildren().remove(this);
+        levelRenderer.remove(this);
+        levelRenderer.getGamePane().getChildren().remove(this);
     }
 
-    private boolean isAlive() {
+    public boolean isAlive() {
         return isAlive;
     }
 
