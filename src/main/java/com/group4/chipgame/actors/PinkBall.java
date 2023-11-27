@@ -18,10 +18,12 @@ public class PinkBall extends Enemy {
         double dx = currentDirection.getDx();
         double dy = currentDirection.getDy();
 
-        if (!canMove(dx, dy, levelRenderer)) {
+        if (canMove(dx, dy, levelRenderer)) {
+            double[] delta = Direction.toDelta(currentDirection);
+            super.move(delta[0], delta[1], levelRenderer);
+        } else {
             currentDirection = currentDirection.getOpposite();
+
         }
-        double[] delta = Direction.toDelta(currentDirection);
-        super.move(delta[0], delta[1], levelRenderer);
     }
 }
