@@ -40,7 +40,8 @@ public class MainMenu extends BaseMenu {
                 createButton("Continue", () -> {}),
                 createButton("Levels", () -> populateLevelMenu(menuBox, primaryStage, mainApp)),
                 createButton("Settings", () -> {}),
-                createButton("Profile", () -> {})
+                createButton("Profile", () -> {}),
+                createButton("Highscores", () -> populateHighscoreMenu(menuBox, primaryStage, mainApp))
         );
 
         return createMenuRootPane(menuBox);
@@ -92,5 +93,15 @@ public class MainMenu extends BaseMenu {
     private static void populateLevelMenu(VBox menuBox, Stage primaryStage, Main mainApp) {
         menuBox.getChildren().clear();
         LevelMenu.populateLevelMenu(menuBox, primaryStage, mainApp);
+    }
+
+    /**
+     * Show a dialog or perform an action related to highscores.
+     *
+     * @param primaryStage The primary stage of the application.
+     */
+    private void populateHighscoreMenu(VBox menuBox, Stage primaryStage, Main mainApp) {
+        menuBox.getChildren().clear();
+        HighscoreMenu.populateHighscoreMenu(menuBox, primaryStage, mainApp);
     }
 }
