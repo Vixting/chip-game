@@ -6,6 +6,8 @@ import com.group4.chipgame.entities.actors.collectibles.Collectible;
 import com.group4.chipgame.entities.actors.collectibles.Key;
 import com.group4.chipgame.entities.actors.tiles.ChipSocket;
 import com.group4.chipgame.entities.actors.tiles.LockedDoor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -99,5 +101,30 @@ public class Player extends Actor {
             levelRenderer.remove(key);
             addKey(key);
         }
+    }
+
+    public JSONObject serialize() {
+        JSONObject json = new JSONObject();
+        json.put("type", "Player");
+        json.put("x", currentPosition.getX());
+        json.put("y", currentPosition.getY());
+        json.put("isAlive", isAlive);
+        json.put("chipsCount", chipsCount);
+
+        JSONArray keysArray = new JSONArray();
+        for (Key.KeyColor keyColor : collectedKeys) {
+            keysArray.put(keyColor.name());
+        }
+        json.put("collectedKeys", keysArray);
+
+        return json;
+    }
+
+    public void setChipsCount(int chipsCount) {
+        this.chipsCount = chipsCount;
+    }
+
+    public void setAlive(boolean isAlive) {
+        this.isAlive = isAlive;
     }
 }

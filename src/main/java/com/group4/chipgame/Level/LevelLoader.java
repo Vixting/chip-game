@@ -30,8 +30,12 @@ public class LevelLoader {
         put("W", (x, y) -> new Water());
         put("G", (x, y) -> new Wall());
         put("E", (x, y) -> new Exit());
-        put("D", (x, y) -> new LockedDoor(Key.KeyColor.BLUE));
         put("S", (x, y) -> new Dirt());
+
+        put("RD", (x, y) -> new LockedDoor(Key.KeyColor.RED));
+        put("GD", (x, y) -> new LockedDoor(Key.KeyColor.GREEN));
+        put("YD", (x, y) -> new LockedDoor(Key.KeyColor.YELLOW));
+        put("BD", (x, y) -> new LockedDoor(Key.KeyColor.BLUE));
 
         put("I", (x, y) -> new Ice(Direction.Corner.NONE));
         put("I_BL", (x, y) -> new Ice(Direction.Corner.BOTTOM_LEFT));
@@ -53,7 +57,11 @@ public class LevelLoader {
     }};
 
     private final Map<String, BiFunction<Integer, Integer, Collectible>> collectibleCreators = new HashMap<>() {{
-        put("Key", (x, y) -> new Key(Key.KeyColor.BLUE, x, y));
+        put("redKey", (x, y) -> new Key(Key.KeyColor.RED, x, y));
+        put("blueKey", (x, y) -> new Key(Key.KeyColor.BLUE, x, y));
+        put("greenKey", (x, y) -> new Key(Key.KeyColor.GREEN, x, y));
+        put("yellowKey", (x, y) -> new Key(Key.KeyColor.YELLOW, x, y));
+
         put("Chip", Chip::new);
     }};
 

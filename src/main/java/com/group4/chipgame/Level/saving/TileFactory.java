@@ -25,6 +25,7 @@ public class TileFactory {
             case "Trap" -> createTrap(tileJson);
             case "Wall" -> new Wall();
             case "Water" -> new Water();
+            case "ChipSocket" -> createChipSocket(tileJson); // Add case for ChipSocket
             default -> null;
         };
     }
@@ -32,6 +33,11 @@ public class TileFactory {
     private static LockedDoor createLockedDoor(JSONObject tileJson) {
         Key.KeyColor keyColor = Key.KeyColor.valueOf(tileJson.getString("requiredKeyColor"));
         return new LockedDoor(keyColor);
+    }
+
+    private static ChipSocket createChipSocket(JSONObject tileJson) {
+        int requiredChips = tileJson.optInt("requiredChips", 0);
+        return new ChipSocket(requiredChips);
     }
 
     private static Button createButton(JSONObject tileJson) {

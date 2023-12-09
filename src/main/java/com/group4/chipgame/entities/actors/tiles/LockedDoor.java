@@ -29,21 +29,17 @@ public class LockedDoor extends Tile {
 
     private static String getImagePathForColor(Key.KeyColor color) {
         return switch (color) {
-            case RED -> "/images/chipgame/tiles/doors/door_red.jpg";
-            case GREEN -> "/images/chipgame/tiles/doors/door_green.jpg";
-            case YELLOW -> "/images/chipgame/tiles/doors/door_yellow.jpg";
-            case BLUE -> "/images/chipgame/tiles/doors/door.jpg";
-            default -> "images/chipgame/tiles/doors/door.jpg";
+            case RED -> "/images/chipgame/tiles/doors/redDoor.png";
+            case GREEN -> "/images/chipgame/tiles/doors/greenDoor.png";
+            case YELLOW -> "/images/chipgame/tiles/doors/yellowDoor.png";
+            case BLUE -> "/images/chipgame/tiles/doors/blueDoor.png";
+            default -> "images/chipgame/tiles/doors/door.png";
         };
     }
 
-    public boolean correctKey(Key key) {
-        return key.getColor() == requiredKeyColor;
-    }
 
     @Override
     public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
-        System.out.println("Locked door!");
         if (actor instanceof Player player) {
             if (player.hasKey(requiredKeyColor)) {
                 levelRenderer.updateTile(this.gridX, this.gridY, new Path());

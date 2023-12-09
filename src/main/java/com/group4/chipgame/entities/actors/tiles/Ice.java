@@ -24,11 +24,11 @@ public class Ice extends Tile {
 
     private static String getImagePathForCorner(Direction.Corner corner) {
         return switch (corner) {
-            case NONE -> "/images/chipgame/tiles/ice/ice.jpg";
-            case BOTTOM_LEFT -> "/images/chipgame/tiles/ice/ice_bottom_left.jpg";
-            case BOTTOM_RIGHT -> "/images/chipgame/tiles/ice/ice_bottom_right.jpg";
-            case TOP_LEFT -> "/images/chipgame/tiles/ice/ice_top_left.jpg";
-            case TOP_RIGHT -> "/images/chipgame/tiles/ice/ice_top_right.jpg";
+            case NONE -> "/images/chipgame/tiles/ice/ice.png";
+            case BOTTOM_LEFT -> "/images/chipgame/tiles/ice/ice_bottom_left.png";
+            case BOTTOM_RIGHT -> "/images/chipgame/tiles/ice/ice_bottom_right.png";
+            case TOP_LEFT -> "/images/chipgame/tiles/ice/ice_top_left.png";
+            case TOP_RIGHT -> "/images/chipgame/tiles/ice/ice_top_right.png";
         };
     }
 
@@ -85,11 +85,29 @@ public class Ice extends Tile {
         }
 
         if (targetTile.isWalkable()) {
-            handleTileOccupancy(targetTile, actor, newX, newY, levelRenderer, incomingDirection);
+            Entity actorOnTile = targetTile.getOccupiedBy();
+            if (actorOnTile instanceof Player && actor instanceof MovableBlock) {
+                ((Player) actorOnTile).kill(levelRenderer);
+
+                continueSlide(actor, levelRenderer, incomingDirection);
+            } else {
+                handleTileOccupancy(targetTile, actor, newX, newY, levelRenderer, incomingDirection);
+            }
         } else {
             handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
         }
     }
+
+    private void continueSlide(Actor actor, LevelRenderer levelRenderer, Direction direction) {
+        double nextX = actor.getPosition().getX() + direction.getDx();
+        double nextY = actor.getPosition().getY() + direction.getDy();
+
+        Optional<Tile> nextTileOpt = levelRenderer.getTileAtGridPosition((int) nextX, (int) nextY);
+        if (nextTileOpt.isPresent() && nextTileOpt.get().isWalkable() && !nextTileOpt.get().isOccupied()) {
+            actor.performMove(nextX, nextY, levelRenderer, direction);
+        }
+    }
+
 
     private void handlePlayerDoorInteraction(Player player, LockedDoor door, LevelRenderer levelRenderer, Direction incomingDirection) {
         if (player.hasKey(door.getRequiredKeyColor())) {

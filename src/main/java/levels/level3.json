@@ -1,11 +1,27 @@
 {
+  "timer": 120,
   "tiles": [
-    ["P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"]
+    ["P", "W", "G", "E", "P", "S", "I", "P", "P", "P", "P"],
+    ["CS_1", "P", "P", "P", "P", "P", "I_BL", "I_BR", "I_TL", "I_TR", "P"],
+    ["RD", "P", "P", "P", "P", "P", "P", "P", "P", "P", "P"],
+    ["P", "T_1", "B_1", "P", "P", "P", "P", "P", "P", "P", "P"],
+    ["P", "P", "P", "P", "P", "P", "P", "P", "P", "P", "P"],
+    ["P", "GD", "BD", "YD", "RD", "E", "P", "P", "P", "P", "P"],
+    ["P", "P", "P", "YD", "P", "P", "P", "P", "P", "P", "P"],
+    ["P", "T_2", "B_2", "P", "P", "P", "P", "P", "P", "P", "P"],
+    ["P", "P", "P", "P", "P", "P", "P", "P", "I", "I", "G"],
+    ["P", "P", "P", "P", "P", "P", "P", "P", "P", "P", "P"]
   ],
-  "collectibles": [
-    {"type": "Key", "x": 0, "y": 0}
+  "collectibles" : [
+    {"type": "redKey", "x": 1, "y": 3},
+    {"type": "blueKey", "x": 2, "y": 3},
+    {"type": "greenKey", "x": 3, "y": 3},
+    {"type": "yellowKey", "x": 4, "y": 3},
+    {"type": "Chip", "x": 5, "y": 3}
   ],
   "actors": [
-    {"type": "Player", "x": 0, "y": 0}
+    {"type": "Player", "x": 5, "y": 7},
+    {"type": "MovableBlock", "x": 5, "y": 8}
+
   ]
 }

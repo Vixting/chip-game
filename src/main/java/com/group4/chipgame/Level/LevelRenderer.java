@@ -194,10 +194,17 @@ public class LevelRenderer {
     public void updateTile(int x, int y, Tile newTile) {
         if (isOutOfBounds(x, y) || newTile == null) return;
 
+        Tile oldTile = tiles[y][x];
+        if (oldTile.getOccupiedBy() != null) {
+            newTile.setOccupiedBy(oldTile.getOccupiedBy());
+            oldTile.setOccupiedBy(null);
+        }
+
         newTile.setGridPosition(x, y);
         tiles[y][x] = newTile;
         newTile.setLayoutX(x * Main.TILE_SIZE.get());
         newTile.setLayoutY(y * Main.TILE_SIZE.get());
         tilesPane.getChildren().set(y * tiles[0].length + x, newTile);
     }
+
 }
