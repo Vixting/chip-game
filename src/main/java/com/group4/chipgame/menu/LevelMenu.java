@@ -44,23 +44,28 @@ public class LevelMenu extends BaseMenu {
     }
 
     private static List<File> loadLevelFiles() throws IOException {
-        Enumeration<URL> levelFiles = LevelMenu.class.getClassLoader().getResources("levels");
+        String levelsPath = "src/main/java/levels";
+
+        File dir = new File(levelsPath);
         List<File> allFiles = new ArrayList<>();
-        while (levelFiles.hasMoreElements()) {
-            URL levelURL = levelFiles.nextElement();
-            File dir = new File(levelURL.getFile());
+
+        if (dir.exists() && dir.isDirectory()) {
             File[] directoryListing = dir.listFiles();
             if (directoryListing != null) {
                 allFiles.addAll(Arrays.asList(directoryListing));
             }
+        } else {
+            throw new IOException("Levels directory not found or not a directory: " + levelsPath);
         }
+
         return allFiles;
     }
 
     private static void addButtonForLevel(VBox menuBox, String levelDisplayName, String fileName, Stage primaryStage, Main mainApp) {
         Button levelButton = createButton(levelDisplayName, menuBox.widthProperty(), menuBox.heightProperty(), () -> {
             try {
-                mainApp.startLevel("/levels/" + fileName, primaryStage);
+                String filePath = "src/main/java/levels/" + fileName;
+                mainApp.startLevel(filePath, primaryStage);
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

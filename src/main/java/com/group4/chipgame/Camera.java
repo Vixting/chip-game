@@ -1,6 +1,6 @@
 package com.group4.chipgame;
 
-import com.group4.chipgame.actors.Actor;
+import com.group4.chipgame.entities.actors.Actor;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -71,15 +71,25 @@ public class Camera {
         cameraTimer.start();
     }
 
+    public void updateViewportSize() {
+        double width = gamePane.getWidth();
+        double height = gamePane.getHeight();
+        viewPort = new Rectangle2D(viewPort.getMinX(), viewPort.getMinY(), width, height);
+    }
+
     void adjustCamera() {
         if (target == null) {
+            System.out.println("No target set for camera");
             return;
         }
+
+        updateViewportSize();
 
         double newTranslateX = calculateTranslateX();
         double newTranslateY = calculateTranslateY();
         animateCameraTransition(newTranslateX, newTranslateY);
     }
+
 
     private void animateCameraTransition(double newTranslateX, double newTranslateY) {
         Duration animationDuration = calculateDynamicDuration(newTranslateX, newTranslateY);

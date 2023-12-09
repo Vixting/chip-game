@@ -23,15 +23,32 @@ public class MainMenu extends BaseMenu {
         menuBox.setAlignment(Pos.CENTER);
 
         menuBox.getChildren().addAll(
-                createButton("Continue", () -> {}),
+                createButton("Load Game", () -> openSaveLoadMenu(primaryStage, mainApp)),
                 createButton("Levels", () -> populateLevelMenu(menuBox, primaryStage, mainApp)),
-                createButton("Settings", () -> {}),
-                createButton("Profile", () -> {})
+                createButton("Profiles", () -> openProfileMenu(primaryStage, mainApp)),
+                createButton("High Scores", () -> openHighScoreMenu(primaryStage, mainApp))
         );
 
         return createMenuRootPane(menuBox);
     }
 
+    private void openProfileMenu(Stage primaryStage, Main mainApp) {
+        ProfileMenu profileMenu = new ProfileMenu(mainApp.getProfileManager(), mainApp, primaryStage);
+        VBox profileMenuPane = profileMenu.createProfileMenu();
+        primaryStage.getScene().setRoot(profileMenuPane);
+    }
+
+    private void openHighScoreMenu(Stage primaryStage, Main mainApp) {
+        HighScoreMenu highScoreMenu = new HighScoreMenu(mainApp, primaryStage, mainApp.getProfileManager());
+        VBox highScoreMenuPane = highScoreMenu.createHighScoreMenu();
+        primaryStage.getScene().setRoot(highScoreMenuPane);
+    }
+
+    private void openSaveLoadMenu(Stage primaryStage, Main mainApp) {
+        SaveLoadMenu saveLoadMenu = new SaveLoadMenu(mainApp, primaryStage, mainApp.getProfileManager());
+        VBox saveLoadMenuPane = saveLoadMenu.createSaveLoadMenu();
+        primaryStage.getScene().setRoot(saveLoadMenuPane);
+    }
     private Button createButton(String text, Runnable action) {
         Button button = new Button(text);
         button.setStyle(BUTTON_STYLE);

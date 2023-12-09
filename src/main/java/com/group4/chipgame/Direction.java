@@ -15,12 +15,42 @@ public enum Direction {
         this.dy = dy;
     }
 
-    public enum Corner {
-        NONE,          // No corner
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT,
-        TOP_LEFT,
-        TOP_RIGHT
+    public Direction turnLeft() {
+        return switch (this) {
+            case UP -> LEFT;
+            case LEFT -> DOWN;
+            case DOWN -> RIGHT;
+            case RIGHT -> UP;
+            default -> NONE;
+        };
+    }
+
+    public Direction turnRight() {
+        return switch (this) {
+            case UP -> RIGHT;
+            case RIGHT -> DOWN;
+            case DOWN -> LEFT;
+            case LEFT -> UP;
+            default -> NONE;
+        };
+    }
+
+    public Direction getOpposite() {
+        return switch (this) {
+            case UP -> DOWN;
+            case DOWN -> UP;
+            case LEFT -> RIGHT;
+            case RIGHT -> LEFT;
+            default -> NONE;
+        };
+    }
+
+    public double getDx() {
+        return dx;
+    }
+
+    public double getDy() {
+        return dy;
     }
 
     public static Direction fromDelta(double dx, double dy) {
@@ -41,21 +71,11 @@ public enum Direction {
         };
     }
 
-    public Direction getOpposite() {
-        return switch (this) {
-            case UP -> DOWN;
-            case DOWN -> UP;
-            case LEFT -> RIGHT;
-            case RIGHT -> LEFT;
-            default -> NONE;
-        };
-    }
-
-    public double getDx() {
-        return dx;
-    }
-
-    public double getDy() {
-        return dy;
+    public enum Corner {
+        NONE,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        TOP_LEFT,
+        TOP_RIGHT
     }
 }
