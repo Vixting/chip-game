@@ -42,6 +42,7 @@ public class LevelLoader {
         put("G", (x, y) -> new Wall());
         put("D", (x, y) -> new LockedDoor(Key.KeyColor.BLUE));
         put("S", (x, y) -> new Dirt());
+        put("E", (x, y) -> new Exit());
 
         put("I", (x, y) -> new Ice(Direction.Corner.NONE));
         put("I_BL", (x, y) -> new Ice(Direction.Corner.BOTTOM_LEFT));
