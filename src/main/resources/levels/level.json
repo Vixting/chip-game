@@ -33,5 +33,13 @@
   ],
   "actors": [
     {"type": "Player", "x": 10, "y": 10}
+  ],
+
+  "highscore": [
+   {"type": "PlayerName", "score": 10}
+  ],
+
+  "parameters": [
+   {"type": "Timer", "time": 60}
   ]
 }

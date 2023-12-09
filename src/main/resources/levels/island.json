@@ -20,5 +20,13 @@
     {"type": "MovableBlock", "x": 4, "y": 3},
     {"type": "MovableBlock", "x": 6, "y": 7},
     {"type": "MovableBlock", "x": 6, "y": 3}
+  ],
+
+  "highscore": [
+    {"type": "PlayerName", "score": 10}
+  ],
+
+  "parameters": [
+    {"type": "Timer", "time": 60}
   ]
 }
