@@ -5,6 +5,7 @@ import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -16,6 +17,7 @@ public abstract class BaseMenu {
     private static final String BUTTON_STYLE = "-fx-background-color: linear-gradient(to bottom, #444, #555); -fx-text-fill: #EEE; -fx-font-size: 20px; -fx-background-radius: 15;";
     private static final String BUTTON_HOVER_STYLE = "-fx-background-color: linear-gradient(to bottom, #666, #777);";
     private static final DropShadow BUTTON_SHADOW = new DropShadow(20, javafx.scene.paint.Color.GREY);
+    private static final String LABEL_STYLE = "-fx-font-size: 16px; -fx-text-fill: #EEE; -fx-padding: 5;";
 
     protected static void addButton(String label, VBox menuBox, Stage primaryStage, Main mainApp, Runnable action) {
         Button button = createButton(label, menuBox.widthProperty(), menuBox.heightProperty(), action);
@@ -26,6 +28,7 @@ public abstract class BaseMenu {
         Button button = new Button(label);
         button.setStyle(BUTTON_STYLE);
         button.setEffect(BUTTON_SHADOW);
+        button.setPrefWidth(100);
 
         button.prefWidthProperty().bind(parentWidth.multiply(0.6));
         button.prefHeightProperty().bind(parentHeight.multiply(0.15));
@@ -55,6 +58,17 @@ public abstract class BaseMenu {
         });
 
         return button;
+    }
+
+    protected static Label createLabel(String text) {
+        Label label = new Label(text);
+        label.setStyle(LABEL_STYLE);
+        return label;
+    }
+
+    protected static void addLabel(String text, VBox menuBox) {
+        Label label = createLabel(text);
+        menuBox.getChildren().add(label);
     }
 
     protected StackPane createMenuRootPane(VBox menuBox) {
