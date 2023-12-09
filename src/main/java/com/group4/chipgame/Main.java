@@ -14,6 +14,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.util.Duration;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -143,11 +149,24 @@ public class Main extends Application {
      * @throws IOException If an I/O error occurs while loading the level.
      */
     public void startLevel(String levelPath, Stage primaryStage) throws IOException {
-        // Load level data from the specified path
         LevelData levelData = loadLevel(levelPath);
+        HUDRenderer hudRenderer = levelData.hudRenderer;
 
-        // Initialize the game pane and set it on the stage
         StackPane gamePane = initGamePane(levelData);
+        gamePane.getChildren().addAll(hudRenderer.getHUDPane());
+
+        KeyFrame keyFrame = new KeyFrame(Duration.millis(16), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // Score needs to be handled
+                hudRenderer.updateScore(0);
+            }
+        });
+
+        Timeline gameLoop = new Timeline(keyFrame);
+        gameLoop.setCycleCount(Timeline.INDEFINITE);
+        gameLoop.play();
+        hudRenderer.startTimer();
 
         // Maximize the stage temporarily to get its size
         primaryStage.setMaximized(true);
@@ -192,7 +211,8 @@ public class Main extends Application {
         levelRenderer.renderActors(actors);
         List<Collectible> collectibles = levelLoader.loadCollectibles(levelPath, levelRenderer);
         levelRenderer.renderCollectibles(collectibles);
-        return new LevelData(gridWidth, gridHeight, actors, collectibles, levelRenderer);
+        HUDRenderer hudRenderer = new HUDRenderer();
+        return new LevelData(gridWidth, gridHeight, actors, collectibles, levelRenderer, hudRenderer);
     }
 
     /**
@@ -262,6 +282,8 @@ public class Main extends Application {
         List<Collectible> collectibles;
         LevelRenderer levelRenderer;
 
+        HUDRenderer hudRenderer;
+
         /**
          * Constructor for LevelData.
          *
@@ -271,12 +293,13 @@ public class Main extends Application {
          * @param collectibles  The list of collectibles in the level.
          * @param levelRenderer The renderer for the level.
          */
-        LevelData(int gridWidth, int gridHeight, List<Actor> actors, List<Collectible> collectibles, LevelRenderer levelRenderer) {
+        LevelData(int gridWidth, int gridHeight, List<Actor> actors, List<Collectible> collectibles, LevelRenderer levelRenderer, HUDRenderer hudRenderer) {
             this.gridWidth = gridWidth;
             this.gridHeight = gridHeight;
             this.actors = actors;
             this.collectibles = collectibles;
             this.levelRenderer = levelRenderer;
+            this.hudRenderer = hudRenderer;
         }
     }
 }
