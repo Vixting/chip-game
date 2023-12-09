@@ -23,7 +23,16 @@
   ],
 
   "highscore": [
-    {"type": "PlayerName", "score": 10}
+    {"type": "PlayerName1", "score": 10},
+    {"type": "PlayerName2", "score": 20},
+    {"type": "PlayerName3", "score": 30},
+    {"type": "PlayerName4", "score": 40},
+    {"type": "PlayerName5", "score": 50},
+    {"type": "PlayerName6", "score": 60},
+    {"type": "PlayerName7", "score": 70},
+    {"type": "PlayerName8", "score": 80},
+    {"type": "PlayerName9", "score": 90},
+    {"type": "PlayerName10", "score": 100}
   ],
 
   "parameters": [
