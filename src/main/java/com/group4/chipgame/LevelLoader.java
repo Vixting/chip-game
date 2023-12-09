@@ -45,6 +45,7 @@ public class LevelLoader {
         put("Player", Player::new);
         put("PinkBall", (x, y) -> new PinkBall(x, y, Direction.RIGHT));
         put("MovableBlock", MovableBlock::new);
+        put("Bug", (x, y) -> new Bug(x, y, Direction.UP));
 
     }};
 
