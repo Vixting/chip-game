@@ -14,7 +14,7 @@ public class Bug extends Enemy{
     public Bug(double x, double y, Direction initialDirection) {
         super(IMAGE_PATH, x, y);
         this.currentDirection = initialDirection;
-        this.moveInterval = 100;
+        this.moveInterval = 50;
     }
 
     @Override
@@ -25,32 +25,28 @@ public class Bug extends Enemy{
         Optional<Tile> currentTileOptLeft = getTileLeftOfBug(levelRenderer);
         Optional<Tile> currentTileOptRight = getTileRightOfBug(levelRenderer);
 
-        if(currentTileOptLeft.isPresent()){
+        if(currentTileOptLeft.isPresent() && currentTileOptRight.isPresent()){
             Tile tile = currentTileOptLeft.get();
             Entity occupiedBy = tile.getOccupiedBy();
 
             Tile tileRight = currentTileOptRight.get();
+            Entity occupiedByRight = tile.getOccupiedBy();
 
-
-            if(tile.isWalkable()){
+            if(tile.isWalkable() && occupiedBy == null){
                 turnLeft();
                 double[] delta = Direction.toDelta(currentDirection);
                 super.move(delta[0], delta[1], levelRenderer);
-                System.out.println("LEFT");
             }else if (canMove(dx,dy,levelRenderer)){
                 double[] delta = Direction.toDelta(currentDirection);
                 super.move(delta[0], delta[1], levelRenderer);
-                System.out.println("FORWARD");
-            }else if (tileRight.isWalkable()){
+            }else if (tileRight.isWalkable() && occupiedByRight == null){
                 turnRight();
                 double[] delta = Direction.toDelta(currentDirection);
                 super.move(delta[0], delta[1], levelRenderer);
-                System.out.println("RIGHT");
             }
         }
     }
     void turnRight() {
-        // Update the bug's direction to the right based on the south-oriented perspective
         switch (currentDirection) {
             case DOWN:
                 currentDirection = Direction.LEFT;
@@ -67,7 +63,6 @@ public class Bug extends Enemy{
         }
     }
     void turnLeft() {
-        // Update the bug's direction to the left based on the south-oriented perspective
         switch (currentDirection) {
             case DOWN:
                 currentDirection = Direction.RIGHT;
@@ -110,16 +105,16 @@ public class Bug extends Enemy{
 
         switch (currentDirection) {
             case UP:
-                nextX++;  // When facing UP, moving right means incrementing the Y-coordinate
+                nextX++;
                 break;
             case DOWN:
-                nextX--;  // When facing DOWN, moving right means decrementing the Y-coordinate
+                nextX--;
                 break;
             case LEFT:
-                nextY--;  // When facing LEFT, moving right means decrementing the X-coordinate
+                nextY--;
                 break;
             case RIGHT:
-                nextY++;  // When facing RIGHT, moving right means incrementing the X-coordinate
+                nextY++;
                 break;
         }
         return levelRenderer.getTileAtGridPosition(nextX, nextY);
