@@ -34,4 +34,16 @@ public class ChipSocket extends Tile {
         json.put("requiredChips", this.requiredChips);
         return json;
     }
+
+    public int getRequiredChips() {
+        return requiredChips;
+    }
+
+    public double getGridX() {
+        return gridX;
+    }
+
+    public double getGridY() {
+        return gridY;
+    }
 }
