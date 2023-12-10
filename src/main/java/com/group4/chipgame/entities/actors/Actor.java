@@ -21,10 +21,8 @@ public abstract class Actor extends ImageView implements Entity {
     protected Point2D currentPosition;
     protected long moveInterval;
     protected boolean isMoving;
-    private final String imagePath;
 
     public Actor(String imagePath, double x, double y) {
-        this.imagePath = imagePath;
         initializeImage(imagePath);
         currentPosition = new Point2D(x, y);
         updatePosition();
