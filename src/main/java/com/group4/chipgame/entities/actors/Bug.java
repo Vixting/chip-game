@@ -12,7 +12,7 @@ import org.json.JSONObject;
 public class Bug extends Enemy {
     private final boolean followLeftEdge;
     private Direction currentDirection;
-    private static final String BUG_IMAGE_PATH = "/images/chipgame/actors/bug.jpg";
+    private static final String BUG_IMAGE_PATH = "/images/chipgame/actors/bug.png";
     private static final int MOVE_INTERVAL = 100;
 
     /**

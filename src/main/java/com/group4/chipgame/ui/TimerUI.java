@@ -47,10 +47,6 @@ public class TimerUI extends BaseUI {
         });
     }
 
-    public void decreaseTime() {
-        this.timeRemaining--;
-    }
-
     private void updateLabelColor(int time) {
         double fraction = (double) time / maxTime;
         currentColor = interpolateColor(fraction);
