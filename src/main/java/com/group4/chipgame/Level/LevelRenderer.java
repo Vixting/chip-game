@@ -374,6 +374,6 @@ public class LevelRenderer {
         tiles[y][x] = newTile;
         newTile.setLayoutX(x * Main.TILE_SIZE.get());
         newTile.setLayoutY(y * Main.TILE_SIZE.get());
-        tilesPane.getChildren().set(y * tiles[0].length + x, newTile);
+        tilesPane.getChildren().add(newTile);
     }
 }
