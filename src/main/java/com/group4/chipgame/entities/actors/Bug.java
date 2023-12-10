@@ -25,7 +25,7 @@ public class Bug extends Enemy {
     public Bug(double x, double y, boolean followLeftEdge) {
         super(BUG_IMAGE_PATH, x, y);
         this.followLeftEdge = followLeftEdge;
-        this.moveInterval = MOVE_INTERVAL;
+        this.setMoveInterval(MOVE_INTERVAL);
         this.currentDirection = Direction.LEFT;
     }
 

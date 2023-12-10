@@ -23,7 +23,7 @@ public class Frog extends Enemy {
      */
     public Frog(double x, double y) {
         super(FROG_IMAGE_PATH, x, y);
-        this.moveInterval = MOVE_INTERVAL;
+        this.setMoveInterval(MOVE_INTERVAL);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class Frog extends Enemy {
      * @param levelRenderer The renderer for the game level.
      */
     public void moveOneStep(double dx, double dy, LevelRenderer levelRenderer) {
-        if (isMoving) {
+        if (isMoving()) {
             return;
         }
 

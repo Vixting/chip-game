@@ -23,8 +23,9 @@ import java.util.Optional;
  */
 public abstract class Actor extends ImageView implements Entity {
     private Point2D currentPosition;
-    protected long moveInterval;
-    protected boolean isMoving;
+    private long moveInterval;
+    private boolean isMoving;
+    private static final double BASE_SPEED = 0.003;
 
     /**
      * Gets the current position of the actor.
@@ -121,7 +122,9 @@ public abstract class Actor extends ImageView implements Entity {
      * @param levelRenderer The renderer for the game level.
      */
     public void move(double dx, double dy, LevelRenderer levelRenderer) {
-        if (isMoving) return;
+        if (isMoving) {
+            return;
+        }
 
         Direction direction = Direction.fromDelta(dx, dy);
         double newX = currentPosition.getX() + dx;
@@ -160,10 +163,16 @@ public abstract class Actor extends ImageView implements Entity {
      * @return True if the move is valid, false otherwise.
      */
     protected boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
-        Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newPosition.getX(), (int) newPosition.getY());
-        if (targetTileOpt.isEmpty()) return false;
+        Optional<Tile> targetTileOpt =
+                        levelRenderer.getTileAtGridPosition((int) newPosition.getX(),
+                        (int) newPosition.getY());
+        if (targetTileOpt.isEmpty()) {
+            return false;
+        }
 
-        Optional<Tile> currentTileOpt = levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY());
+        Optional<Tile> currentTileOpt =
+                        levelRenderer.getTileAtGridPosition((int) currentPosition.getX(),
+                        (int) currentPosition.getY());
         if (currentTileOpt.isPresent() && currentTileOpt.get() instanceof Trap currentTrap && currentTrap.isActive()) {
             return false;
         }
@@ -171,7 +180,12 @@ public abstract class Actor extends ImageView implements Entity {
         Tile targetTile = targetTileOpt.get();
         Entity occupiedBy = targetTile.getOccupiedBy();
 
-        return targetTile.isWalkable() && (occupiedBy == null || (this instanceof Player && occupiedBy instanceof Collectible ) || (this instanceof Enemy && occupiedBy instanceof Player));
+        return targetTile.isWalkable()
+                && (occupiedBy == null
+                || (this instanceof Player
+                && occupiedBy instanceof Collectible)
+                || (this instanceof Enemy
+                && occupiedBy instanceof Player));
     }
 
     /**
@@ -224,13 +238,16 @@ public abstract class Actor extends ImageView implements Entity {
         double offset = calculateOffset();
 
         double distance = currentPosition.distance(newX, newY);
-        double baseSpeed = 0.003;
-        double durationMillis = distance / baseSpeed;
+        double durationMillis = distance / BASE_SPEED;
 
         KeyValue kvX = new KeyValue(this.layoutXProperty(), newX * Main.TILE_SIZE.get() + offset);
         KeyValue kvY = new KeyValue(this.layoutYProperty(), newY * Main.TILE_SIZE.get() + offset);
         KeyFrame kf = new KeyFrame(Duration.millis(durationMillis), kvX, kvY);
 
         return new Timeline(kf);
+    }
+
+    protected void setMoveInterval(int i) {
+        this.moveInterval = i;
     }
 }
