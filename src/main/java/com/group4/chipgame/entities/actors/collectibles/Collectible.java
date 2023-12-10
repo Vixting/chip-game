@@ -16,7 +16,7 @@ import java.util.Objects;
  * Represents a collectible entity in the game.
  */
 public class Collectible extends ImageView implements Entity {
-    protected Point2D currentPosition;
+    private final Point2D currentPosition;
 
     /**
      * Creates a collectible entity with a specified image and position.

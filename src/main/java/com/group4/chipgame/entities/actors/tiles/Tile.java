@@ -17,10 +17,8 @@ public abstract class Tile extends ImageView {
     private Entity occupiedBy;
     protected int gridX;
     protected int gridY;
-    private final String imagePath;
 
     public Tile(String imagePath, boolean isWalkable) {
-        this.imagePath = imagePath; // Store the image path
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         setImage(image);
         setSmooth(true);
