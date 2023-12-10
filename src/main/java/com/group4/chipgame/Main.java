@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class Main extends Application {
     public static final SimpleIntegerProperty TILE_SIZE = new SimpleIntegerProperty(50);
@@ -34,13 +33,20 @@ public class Main extends Application {
     public static final String MAIN_MENU_TITLE = "Chip Game Main Menu";
     public static final String GAME_TITLE = "Chip Game";
     public static final String BACKGROUND_COLOR = "-fx-background-color: black;";
+    private static final int MIN_WINDOW_SIZE = 300;
+    private static final String LEVELS_BASE_DIR = "src/main/java/levels";
+    private static final String SAVES_DIR = "src/main/java/saves";
+    private static final long INPUT_DELAY = 200;
+    private static final int MAX_QUEUE_SIZE = 5;
+
     private GameLoop gameLoop;
     private Stage primaryStage;
     private StackPane settingsMenu;
     private ProfileManager profileManager;
     private LevelData currentLevelData;
     private TimerUI timerUI;
-    private String currentLevelPath = "src/main/java/levels/level1.json";
+    private String currentLevelPath = LEVELS_BASE_DIR + "/level1.json";
+
 
     public static void main(String[] args) {
         launch(args);
@@ -98,7 +104,7 @@ public class Main extends Application {
 
     public void saveGame(String saveName) throws IOException {
         String profileName = profileManager.getCurrentProfile().getName();
-        String saveFilePath = "src/main/java/saves/" + profileName + "_" + saveName + ".json";
+        String saveFilePath = SAVES_DIR + "/" + profileName + "_" + saveName + ".json";
         System.out.println(saveFilePath);
         currentLevelData.setTimer(timerUI.getTimeRemaining());
         LevelStateManager.saveLevel(currentLevelData, saveFilePath);
@@ -249,7 +255,7 @@ public class Main extends Application {
 
         long inputDelay = 200;
         int maxQueueSize = 5;
-        MovementHandler movementHandler = new MovementHandler(gameLoop, profileManager, this, inputDelay, maxQueueSize);
+        KeybindHandler movementHandler = new KeybindHandler(gameLoop, profileManager, this, inputDelay, maxQueueSize);
         levelData.levelRenderer.getGamePane().getScene().setOnKeyPressed(event -> movementHandler.handleKeyPress(event.getCode()));
 
         gameLoop.start();
@@ -269,13 +275,10 @@ public class Main extends Application {
     }
 
     private String getNextLevelPath() {
-        String baseDir = "src/main/java/levels";
         String currentLevel = currentLevelPath.substring(currentLevelPath.lastIndexOf('/') + 1);
-        System.out.println(currentLevel);
         int currentLevelNumber = Integer.parseInt(currentLevel.replaceAll("[^0-9]", ""));
         String nextLevel = "/level" + (currentLevelNumber + 1) + ".json";
-        Path nextLevelPath = Paths.get(baseDir + nextLevel);
-        System.out.println(nextLevelPath);
+        Path nextLevelPath = Paths.get(LEVELS_BASE_DIR + nextLevel);
         if (Files.exists(nextLevelPath)) {
             return nextLevelPath.toString();
         } else {
@@ -283,7 +286,24 @@ public class Main extends Application {
         }
     }
 
-    void toggleSettingsMenu() {
-        settingsMenu.setVisible(!settingsMenu.isVisible());
+    public enum SceneType {
+        MAIN_MENU, SETTINGS, GAME
     }
+
+    public void switchScene(SceneType sceneType) {
+        switch (sceneType) {
+            case MAIN_MENU -> showMainMenu(primaryStage);
+            case SETTINGS -> settingsMenu.setVisible(true);
+            case GAME -> settingsMenu.setVisible(false);
+        }
+    }
+
+    void toggleSettingsMenu() {
+        if (settingsMenu.isVisible()) {
+            switchScene(SceneType.GAME);
+        } else {
+            switchScene(SceneType.SETTINGS);
+        }
+    }
+
 }

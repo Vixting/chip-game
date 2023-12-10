@@ -46,7 +46,7 @@ public class ChipSocket extends Tile {
      * @param levelRenderer The renderer for the level.
      */
     private void openSocket(LevelRenderer levelRenderer) {
-        levelRenderer.updateTile(this.gridX, this.gridY, new Path());
+        levelRenderer.updateTile((int) this.getGridX(), (int) this.getGridY(), new Path());
     }
 
     /**
@@ -68,23 +68,5 @@ public class ChipSocket extends Tile {
      */
     public int getRequiredChips() {
         return requiredChips;
-    }
-
-    /**
-     * Gets the X-coordinate of this ChipSocket in the grid.
-     *
-     * @return The X-coordinate.
-     */
-    public double getGridX() {
-        return gridX;
-    }
-
-    /**
-     * Gets the Y-coordinate of this ChipSocket in the grid.
-     *
-     * @return The Y-coordinate.
-     */
-    public double getGridY() {
-        return gridY;
     }
 }

@@ -77,7 +77,7 @@ public class LockedDoor extends Tile {
     public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
         if (actor instanceof Player player) {
             if (player.hasKey(requiredKeyColor)) {
-                levelRenderer.updateTile(this.gridX, this.gridY, new Path());
+                levelRenderer.updateTile(this.getGridX(), this.getGridY(), new Path());
             }
         }
     }

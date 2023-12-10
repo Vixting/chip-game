@@ -17,11 +17,31 @@ import org.json.JSONObject;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Represents an abstract actor in the ChipGame.
+ * An actor is an entity that can move and interact with tiles and other actors.
+ */
 public abstract class Actor extends ImageView implements Entity {
-    protected Point2D currentPosition;
+    private Point2D currentPosition;
     protected long moveInterval;
     protected boolean isMoving;
 
+    /**
+     * Gets the current position of the actor.
+     *
+     * @return The current position as a Point2D object.
+     */
+    public Point2D getCurrentPosition() {
+        return currentPosition;
+    }
+
+    /**
+     * Constructs an Actor with the specified image, initial position, and move interval.
+     *
+     * @param imagePath The path to the image representing the actor.
+     * @param x         The initial x-coordinate of the actor.
+     * @param y         The initial y-coordinate of the actor.
+     */
     public Actor(String imagePath, double x, double y) {
         initializeImage(imagePath);
         currentPosition = new Point2D(x, y);
@@ -29,6 +49,11 @@ public abstract class Actor extends ImageView implements Entity {
         Main.ACTOR_SIZE.addListener((obs, oldVal, newVal) -> updatePosition());
     }
 
+    /**
+     * Initializes the image of the actor.
+     *
+     * @param imagePath The path to the image file for this actor.
+     */
     private void initializeImage(String imagePath) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         setImage(image);
@@ -37,6 +62,11 @@ public abstract class Actor extends ImageView implements Entity {
         fitHeightProperty().bind(Main.ACTOR_SIZE);
     }
 
+    /**
+     * Serializes the state of the actor to a JSON object.
+     *
+     * @return A JSONObject representing the current state of the actor.
+     */
     public JSONObject serialize() {
         JSONObject object = new JSONObject();
         object.put("type", this.getClass().getSimpleName());
@@ -45,6 +75,9 @@ public abstract class Actor extends ImageView implements Entity {
         return object;
     }
 
+    /**
+     * Updates the position of the actor on the screen based on its current grid position.
+     */
     private void updatePosition() {
         double offset = calculateOffset();
         setLayoutX(currentPosition.getX() * Main.TILE_SIZE.get() + offset);
@@ -52,18 +85,41 @@ public abstract class Actor extends ImageView implements Entity {
         EffectManager.applyDynamicShadowEffect(this);
     }
 
+    /**
+     * Calculates the offset required to center the actor within a tile.
+     *
+     * @return The calculated offset value.
+     */
     private double calculateOffset() {
         return (Main.TILE_SIZE.get() - fitWidthProperty().get()) / 2.0;
     }
 
+    /**
+     * Gets the current position of the actor.
+     *
+     * @return The current position as a Point2D object.
+     */
     public Point2D getPosition() {
         return currentPosition;
     }
 
+    /**
+     * Determines whether the actor should move based on the elapsed game ticks.
+     *
+     * @param ticksElapsed The number of game ticks that have elapsed.
+     * @return True if the actor should move, false otherwise.
+     */
     public boolean shouldMove(long ticksElapsed) {
         return ticksElapsed % this.moveInterval == 0;
     }
 
+    /**
+     * Moves the actor by a specified delta in x and y direction.
+     *
+     * @param dx The change in the x-coordinate.
+     * @param dy The change in the y-coordinate.
+     * @param levelRenderer The renderer for the game level.
+     */
     public void move(double dx, double dy, LevelRenderer levelRenderer) {
         if (isMoving) return;
 
@@ -74,15 +130,35 @@ public abstract class Actor extends ImageView implements Entity {
         performMove(newX, newY, levelRenderer, direction);
     }
 
+    /**
+     * Checks if the actor is currently moving.
+     *
+     * @return True if the actor is moving, false otherwise.
+     */
     public boolean isMoving() {
         return isMoving;
     }
 
+    /**
+     * Checks if the actor can move by a specified delta in x and y direction.
+     *
+     * @param dx The change in the x-coordinate.
+     * @param dy The change in the y-coordinate.
+     * @param levelRenderer The renderer for the game level.
+     * @return True if the move is valid, false otherwise.
+     */
     protected boolean canMove(double dx, double dy, LevelRenderer levelRenderer) {
         Point2D newPosition = currentPosition.add(dx, dy);
         return isMoveValid(newPosition, levelRenderer);
     }
 
+    /**
+     * Validates if a move to a new position is valid.
+     *
+     * @param newPosition The new position to validate.
+     * @param levelRenderer The renderer for the game level.
+     * @return True if the move is valid, false otherwise.
+     */
     protected boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
         Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newPosition.getX(), (int) newPosition.getY());
         if (targetTileOpt.isEmpty()) return false;
@@ -98,6 +174,14 @@ public abstract class Actor extends ImageView implements Entity {
         return targetTile.isWalkable() && (occupiedBy == null || (this instanceof Player && occupiedBy instanceof Collectible ) || (this instanceof Enemy && occupiedBy instanceof Player));
     }
 
+    /**
+     * Performs the move action for the actor to a new position.
+     *
+     * @param newX The new x-coordinate.
+     * @param newY The new y-coordinate.
+     * @param levelRenderer The renderer for the game level.
+     * @param direction The direction of the move.
+     */
     public void performMove(double newX, double newY, LevelRenderer levelRenderer, Direction direction) {
         isMoving = true;
         Timeline timeline = createTimeline(newX, newY);
@@ -108,6 +192,14 @@ public abstract class Actor extends ImageView implements Entity {
         timeline.play();
     }
 
+    /**
+     * Updates the tile occupancy based on the actor's new position.
+     *
+     * @param levelRenderer The renderer for the game level.
+     * @param newX The new x-coordinate of the actor.
+     * @param newY The new y-coordinate of the actor.
+     * @param direction The direction of the move.
+     */
     private void updateTileOccupancy(LevelRenderer levelRenderer, double newX, double newY, Direction direction) {
         levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY())
                 .ifPresent(tile -> tile.setOccupiedBy(null));
@@ -121,6 +213,13 @@ public abstract class Actor extends ImageView implements Entity {
                 });
     }
 
+    /**
+     * Creates a timeline for smooth animation of the actor's movement.
+     *
+     * @param newX The new x-coordinate of the actor.
+     * @param newY The new y-coordinate of the actor.
+     * @return The timeline object for the animation.
+     */
     private Timeline createTimeline(double newX, double newY) {
         double offset = calculateOffset();
 

@@ -18,10 +18,11 @@ public class Player extends Actor {
     private boolean isAlive = true;
     private int chipsCount;
     private final Set<Key.KeyColor> collectedKeys = EnumSet.noneOf(Key.KeyColor.class);
+    private static final int MOVE_INTERVAL = 10;
 
     public Player(double x, double y) {
         super(PLAYER_IMAGE_PATH, x, y);
-        this.moveInterval = 10;
+        this.moveInterval = MOVE_INTERVAL;
     }
 
     public void addKey(Key key) {
@@ -37,8 +38,8 @@ public class Player extends Actor {
         if (isMoving) return;
 
         Direction direction = Direction.fromDelta(dx, dy);
-        double newX = currentPosition.getX() + dx;
-        double newY = currentPosition.getY() + dy;
+        double newX = getCurrentPosition().getX() + dx;
+        double newY = getCurrentPosition().getY() + dy;
 
         processTileInteraction(newX, newY, dx, dy, levelRenderer, direction);
 
@@ -106,8 +107,8 @@ public class Player extends Actor {
     public JSONObject serialize() {
         JSONObject json = new JSONObject();
         json.put("type", "Player");
-        json.put("x", currentPosition.getX());
-        json.put("y", currentPosition.getY());
+        json.put("x", getCurrentPosition().getX());
+        json.put("y", getCurrentPosition().getY());
         json.put("isAlive", isAlive);
         json.put("chipsCount", chipsCount);
 

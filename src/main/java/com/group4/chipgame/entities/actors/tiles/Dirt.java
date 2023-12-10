@@ -29,6 +29,6 @@ public class Dirt extends Tile {
                        final Direction incomingDirection) {
         Path path = new Path();
         path.setOccupiedBy(actor);
-        levelRenderer.updateTile(this.gridX, this.gridY, path);
+        levelRenderer.updateTile(this.getGridX(), this.getGridY(), path);
     }
 }

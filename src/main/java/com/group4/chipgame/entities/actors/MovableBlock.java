@@ -6,15 +6,17 @@ import com.group4.chipgame.entities.actors.tiles.Path;
 import com.group4.chipgame.entities.actors.tiles.Water;
 
 public class MovableBlock extends Actor {
+    private static final String BLOCK_IMAGE_PATH = "/images/chipgame/actors/wood.png";
+
 
     public MovableBlock(double x, double y) {
-        super("/images/chipgame/actors/wood.png", x, y);
+        super(BLOCK_IMAGE_PATH, x, y);
         this.moveInterval = 3;
     }
 
     public void push(double dx, double dy, LevelRenderer levelRenderer) {
-        double newX = currentPosition.getX() + dx;
-        double newY = currentPosition.getY() + dy;
+        double newX = getCurrentPosition().getX() + dx;
+        double newY = getCurrentPosition().getY() + dy;
 
         if (levelRenderer.getTileAtGridPosition((int) newX, (int) newY)
                 .map(tile -> tile.getOccupiedBy() instanceof Player)

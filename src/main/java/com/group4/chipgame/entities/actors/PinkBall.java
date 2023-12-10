@@ -7,11 +7,12 @@ import org.json.JSONObject;
 public class PinkBall extends Enemy {
     private static final String IMAGE_PATH = "/images/chipgame/actors/pinkBall.png";
     private Direction currentDirection;
+    private static final int MOVE_INTERVAL = 100;
 
     public PinkBall(double x, double y, Direction initialDirection) {
         super(IMAGE_PATH, x, y);
         this.currentDirection = initialDirection;
-        this.moveInterval = 100;
+        this.moveInterval = MOVE_INTERVAL;
     }
 
     @Override
@@ -32,8 +33,8 @@ public class PinkBall extends Enemy {
     public JSONObject serialize() {
         JSONObject object = new JSONObject();
         object.put("type", this.getClass().getSimpleName());
-        object.put("x", currentPosition.getX());
-        object.put("y", currentPosition.getY());
+        object.put("x", getCurrentPosition().getX());
+        object.put("y", getCurrentPosition().getY());
         object.put("initialDirection", currentDirection.name());
         return object;
     }

@@ -1,11 +1,13 @@
 {
     "profiles": [{
         "completedLevels": [
+            "src/main/java/levels/level2.json",
             "src/main/java/levels/level3.json",
             "src/main/java/levels/level1.json",
             "src\\main\\java\\levels\\level2.json"
         ],
         "levelScores": {
+            "src/main/java/levels/level2.json": 51,
             "src/main/java/levels/level3.json": 118,
             "src/main/java/levels/level1.json": 119,
             "src\\main\\java\\levels\\level2.json": 58
@@ -23,7 +25,12 @@
             "src/main/java/saves/1_quickSave_20231209182007.json",
             "src/main/java/saves/1_quickSave_20231209182043.json",
             "src/main/java/saves/1_quickSave_20231209182112.json",
-            "src/main/java/saves/1_quickSave_20231209182539.json"
+            "src/main/java/saves/1_quickSave_20231209182539.json",
+            "src/main/java/saves/1_xd.json",
+            "src/main/java/saves/1_quickSave_20231210031228.json",
+            "src/main/java/saves/1_quickSave_20231210032209.json",
+            "src/main/java/saves/1_quickSave_20231210145858.json",
+            "src/main/java/saves/1_quickSave_20231210145902.json"
         ],
         "name": "1"
     }],
