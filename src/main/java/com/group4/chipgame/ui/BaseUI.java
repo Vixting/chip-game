@@ -4,12 +4,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.Node;
 
 public abstract class BaseUI {
-    protected Pane rootPane;
+    private final Pane rootPane;
 
     public BaseUI(Pane rootPane) {
         this.rootPane = rootPane;
         createUI();
         addSizeListeners();
+    }
+
+    public Pane getRootPane() {
+        return rootPane;
     }
 
     protected abstract void createUI();

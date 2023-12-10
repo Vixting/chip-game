@@ -14,12 +14,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * A class responsible for saving and loading level states in the ChipGame.
+ * This class handles serialization and deserialization of level data to and from JSON format.
+ */
 public class LevelStateManager {
+    private static final int INDENT_FACTOR = 4;
+    private static final int DEFAULT_TIMER = 60;
 
+    /**
+     * Saves the current state of the level to a file.
+     *
+     * @param levelData The current state of the level.
+     * @param filePath  The file path where the level data should be saved.
+     * @throws IOException If an error occurs while writing the file.
+     */
     public static void saveLevel(LevelData levelData, String filePath) throws IOException {
         JSONObject levelState = new JSONObject();
         JSONArray tilesArray = new JSONArray();
@@ -36,7 +47,7 @@ public class LevelStateManager {
         levelState.put("actors", actorsArray);
         levelState.put("collectibles", collectiblesArray);
 
-        saveToFile(filePath, levelState.toString(4));
+        saveToFile(filePath, levelState.toString(INDENT_FACTOR));
     }
 
     private static void serializeTiles(LevelData levelData, JSONArray tilesArray) {
@@ -68,11 +79,19 @@ public class LevelStateManager {
         Files.writeString(path, content);
     }
 
+    /**
+     * Loads a level from a file into a LevelData object.
+     *
+     * @param filePath  The file path of the level data to load.
+     * @param renderer  The renderer to be used for the loaded level.
+     * @return The loaded LevelData object.
+     * @throws IOException If an error occurs while reading the file.
+     */
     public static LevelData loadLevel(String filePath, LevelRenderer renderer) throws IOException {
         String fileContent = Files.readString(Paths.get(filePath));
         JSONObject levelState = new JSONObject(fileContent);
 
-        int timer = levelState.optInt("timer", 60);
+        int timer = levelState.optInt("timer", DEFAULT_TIMER);
         String levelFilePath = levelState.optString("levelPath", "null");
 
         JSONArray tilesArray = levelState.getJSONArray("tiles");

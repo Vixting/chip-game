@@ -2,11 +2,9 @@ package com.group4.chipgame.menu;
 
 import com.group4.chipgame.Main;
 import com.group4.chipgame.profile.ProfileManager;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -15,10 +13,18 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This class is responsible for displaying and managing the profile menu.
+ * It allows users to create, select, and delete profiles.
+ */
 public class ProfileMenu extends BaseMenu {
 
-    private static final String MENU_STYLE = "-fx-background-color: linear-gradient(to bottom, #222, #333); -fx-padding: 30; -fx-spacing: 20;";
+    private static final String MENU_STYLE = "-fx-background-color: linear-gradient(to bottom, #222, #333);";
+    private static final String BUTTON_DELETE_STYLE = "-fx-background-color: #FF6347; -fx-text-fill: white;";
+    private static final String BUTTON_CREATE_STYLE = "-fx-background-color: #2E8B57; -fx-text-fill: white;"; // Slightly darker green
     private static final int PROFILES_PER_PAGE = 5;
+    private static final int MENU_SPACING = 20;
+    private static final Insets STACK_PANE_INSETS = new Insets(5);
     private static int currentPage = 0;
 
     private final ProfileManager profileManager;
@@ -26,18 +32,39 @@ public class ProfileMenu extends BaseMenu {
     private final Stage primaryStage;
     private VBox menuBox;
 
+    /**
+     * Constructor for ProfileMenu.
+     *
+     * @param profileManager The profile manager to handle profile operations.
+     * @param mainApp        The main application instance.
+     * @param primaryStage   The primary stage of the application.
+     */
     public ProfileMenu(ProfileManager profileManager, Main mainApp, Stage primaryStage) {
         this.profileManager = profileManager;
         this.mainApp = mainApp;
         this.primaryStage = primaryStage;
     }
 
-    public VBox createProfileMenu() {
-        menuBox = createMenuBox(20, MENU_STYLE);
+    /**
+     * Creates and returns a ScrollPane containing the profile menu UI.
+     *
+     * @return A ScrollPane containing the profile menu.
+     */
+    public ScrollPane createProfileMenu() {
+        menuBox = createMenuBox(MENU_SPACING, MENU_STYLE);
         updateProfileList();
-        return menuBox;
+
+        ScrollPane scrollPane = new ScrollPane(menuBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background: #000;");
+
+
+        return scrollPane;
     }
 
+    /**
+     * Updates the list of profiles displayed in the menu.
+     */
     private void updateProfileList() {
         menuBox.getChildren().clear();
 
@@ -48,6 +75,7 @@ public class ProfileMenu extends BaseMenu {
         for (int i = startIndex; i < endIndex; i++) {
             String profileName = profileNames.get(i);
             StackPane profileStack = new StackPane();
+            profileStack.setPadding(STACK_PANE_INSETS);
             Button profileButton = createButton(profileName, menuBox.widthProperty(), menuBox.heightProperty(), () -> {
                 profileManager.setCurrentProfile(profileManager.getProfileByName(profileName).orElse(null));
                 try {
@@ -58,6 +86,7 @@ public class ProfileMenu extends BaseMenu {
                 mainApp.showMainMenu(primaryStage);
             });
             Button deleteButton = new Button("X");
+            deleteButton.setStyle(BUTTON_DELETE_STYLE);
             deleteButton.setOnAction(e -> deleteProfile(profileName));
             StackPane.setAlignment(deleteButton, Pos.TOP_RIGHT);
             profileStack.getChildren().addAll(profileButton, deleteButton);
@@ -65,6 +94,7 @@ public class ProfileMenu extends BaseMenu {
         }
 
         Button newProfileButton = new Button("Create New Profile");
+        newProfileButton.setStyle(BUTTON_CREATE_STYLE);
         newProfileButton.setOnAction(event -> createNewProfile());
         menuBox.getChildren().add(newProfileButton);
 
@@ -72,6 +102,9 @@ public class ProfileMenu extends BaseMenu {
         menuBox.getChildren().add(createBackButton(primaryStage, mainApp));
     }
 
+    /**
+     * Creates a new profile using a TextInputDialog for user input.
+     */
     private void createNewProfile() {
         TextInputDialog dialog = new TextInputDialog("New Profile");
         dialog.setTitle("Create New Profile");
@@ -91,6 +124,11 @@ public class ProfileMenu extends BaseMenu {
         });
     }
 
+    /**
+     * Deletes a profile after confirmation from the user.
+     *
+     * @param profileName The name of the profile to delete.
+     */
     private void deleteProfile(String profileName) {
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + profileName + "?", ButtonType.YES, ButtonType.NO);
         confirmDialog.showAndWait().ifPresent(response -> {
@@ -106,10 +144,19 @@ public class ProfileMenu extends BaseMenu {
         });
     }
 
+    /**
+     * Refreshes the profile menu to update the list of profiles.
+     */
     private void refreshProfileMenu() {
         updateProfileList();
     }
 
+    /**
+     * Adds navigation buttons to the menu for scrolling through profiles.
+     *
+     * @param menuBox       The VBox container for the buttons.
+     * @param totalProfiles The total number of profiles available.
+     */
     private void addNavigationButtons(VBox menuBox, int totalProfiles) {
         if (currentPage > 0) {
             addButton("Previous", menuBox, primaryStage, mainApp, () -> {

@@ -16,10 +16,22 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiFunction;
 
+/**
+ * A class for loading level data from a JSON file.
+ * This class is responsible for parsing level data and instantiating corresponding game entities.
+ */
 public class LevelLoader {
     private static final String BUTTON_PREFIX = "B_";
     private static final String TRAP_PREFIX = "T_";
+    private static final int CHIPSOCKET = 3;
 
+    /**
+     * Loads JSON content from a file and parses it into a JSONObject.
+     *
+     * @param path The path to the file containing JSON data.
+     * @return A JSONObject representing the parsed data.
+     * @throws IOException If an error occurs while reading the file.
+     */
     private JSONObject loadJsonFromFile(String path) throws IOException {
         String content = Files.readString(Paths.get(path));
         return new JSONObject(content);
@@ -65,16 +77,39 @@ public class LevelLoader {
         put("Chip", Chip::new);
     }};
 
+    /**
+     * Loads and creates actors based on the JSON data in a level file.
+     *
+     * @param levelFilePath The file path for the level data.
+     * @param levelRenderer The renderer for the game level.
+     * @return A list of created actors.
+     * @throws IOException If an error occurs while reading the level file.
+     */
     public List<Actor> loadActors(String levelFilePath, LevelRenderer levelRenderer) throws IOException {
         JSONObject levelData = loadJsonFromFile(levelFilePath);
         return createEntities(levelData.getJSONArray("actors"), actorCreators, levelRenderer.getTiles());
     }
 
+    /**
+     * Loads and creates collectibles based on the JSON data in a level file.
+     *
+     * @param levelFilePath The file path for the level data.
+     * @param levelRenderer The renderer for the game level.
+     * @return A list of created collectibles.
+     * @throws IOException If an error occurs while reading the level file.
+     */
     public List<Collectible> loadCollectibles(String levelFilePath, LevelRenderer levelRenderer) throws IOException {
         JSONObject levelData = loadJsonFromFile(levelFilePath);
         return createEntities(levelData.getJSONArray("collectibles"), collectibleCreators, levelRenderer.getTiles());
     }
 
+    /**
+     * Loads and creates tiles for the level based on the JSON data in a level file.
+     *
+     * @param levelFilePath The file path for the level data.
+     * @return A 2D array of created tiles.
+     * @throws IOException If an error occurs while reading the level file.
+     */
     public Tile[][] loadTiles(String levelFilePath) throws IOException {
         JSONObject levelData = loadJsonFromFile(levelFilePath);
         JSONArray tilesArray = levelData.getJSONArray("tiles");
@@ -86,6 +121,12 @@ public class LevelLoader {
         return levelTiles;
     }
 
+    /**
+     * Iterates through each tile specified in the JSONArray and applies the given action.
+     *
+     * @param tilesArray The JSONArray containing tile data.
+     * @param levelTiles   The action to perform on each tile.
+     */
     private Map<String, Button> createButtons(JSONArray tilesArray, Tile[][] levelTiles) {
         Map<String, Button> tempButtonMap = new HashMap<>();
         iterateTiles(tilesArray, (x, y, tileType) -> {
@@ -119,7 +160,11 @@ public class LevelLoader {
         });
     }
 
-    private <T> List<T> createEntities(JSONArray dataArray, Map<String, BiFunction<Integer, Integer, T>> creators, Tile[][] tiles) {
+    private <T> List<T> createEntities(
+                    JSONArray dataArray, Map<String,
+                    BiFunction<Integer,
+                    Integer,
+                    T>> creators, Tile[][] tiles) {
         List<T> entities = new ArrayList<>();
         for (int i = 0; i < dataArray.length(); i++) {
             JSONObject data = dataArray.getJSONObject(i);
@@ -153,7 +198,7 @@ public class LevelLoader {
                 }
 
                 if (tileType.startsWith("CS_")) {
-                    int requiredChips = Integer.parseInt(tileType.substring(3));
+                    int requiredChips = Integer.parseInt(tileType.substring(CHIPSOCKET));
                     tileCreators.put(tileType, (tx, ty) -> new ChipSocket(requiredChips));
                 }
 
@@ -162,6 +207,9 @@ public class LevelLoader {
         }
     }
 
+    /**
+     * Interface for performing actions on individual tiles during iteration.
+     */
     private interface TileIterator {
         void execute(int x, int y, String tileType);
     }

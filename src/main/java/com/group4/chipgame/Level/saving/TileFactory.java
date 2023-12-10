@@ -8,10 +8,21 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * A factory class for creating Tile instances from JSON data.
+ * This class is responsible for instantiating different types of Tile objects based on JSON input.
+ */
 public class TileFactory {
-    private static final Map<String, Button> buttonMap = new HashMap<>();
-    private static final Map<String, Trap> pendingTraps = new HashMap<>();
+    private static final Map<String, Button> BUTTON_MAP = new HashMap<>();
+    private static final Map<String, Trap> PENDING_TRAPS = new HashMap<>();
 
+    /**
+     * Creates a Tile object from the provided JSON data.
+     * The specific type of Tile (e.g., LockedDoor, Button, Ice, etc.) is determined by the 'type' field in the JSON object.
+     *
+     * @param tileJson The JSON object containing the data for the tile.
+     * @return An instance of a Tile, as specified in the JSON object.
+     */
     public static Tile createTile(JSONObject tileJson) {
         String type = tileJson.getString("type");
 
@@ -25,7 +36,7 @@ public class TileFactory {
             case "Trap" -> createTrap(tileJson);
             case "Wall" -> new Wall();
             case "Water" -> new Water();
-            case "ChipSocket" -> createChipSocket(tileJson); // Add case for ChipSocket
+            case "ChipSocket" -> createChipSocket(tileJson);
             default -> null;
         };
     }
@@ -43,7 +54,7 @@ public class TileFactory {
     private static Button createButton(JSONObject tileJson) {
         String buttonId = tileJson.getString("id");
         Button button = new Button(buttonId);
-        buttonMap.put(buttonId, button);
+        BUTTON_MAP.put(buttonId, button);
         linkPendingTraps(buttonId, button);
         return button;
     }
@@ -58,22 +69,29 @@ public class TileFactory {
 
     private static Trap createTrap(JSONObject tileJson) {
         String linkedButtonId = tileJson.getString("id");
-        Button linkedButton = buttonMap.get(linkedButtonId);
+        Button linkedButton = BUTTON_MAP.get(linkedButtonId);
         Trap trap;
         if (linkedButton != null) {
             trap = new Trap(linkedButton, linkedButtonId);
         } else {
             trap = new Trap(null, linkedButtonId);
-            pendingTraps.put(linkedButtonId, trap);
+            PENDING_TRAPS.put(linkedButtonId, trap);
         }
         return trap;
     }
 
+    /**
+     * Links pending traps to a button that has just been created.
+     * This method is used to establish the relationship between traps and their corresponding buttons.
+     *
+     * @param buttonId The identifier of the button.
+     * @param button   The button object to link to the trap.
+     */
     private static void linkPendingTraps(String buttonId, Button button) {
-        if (pendingTraps.containsKey(buttonId)) {
-            Trap pendingTrap = pendingTraps.get(buttonId);
+        if (PENDING_TRAPS.containsKey(buttonId)) {
+            Trap pendingTrap = PENDING_TRAPS.get(buttonId);
             pendingTrap.setLinkedButton(button);
-            pendingTraps.remove(buttonId);
+            PENDING_TRAPS.remove(buttonId);
         }
     }
 }

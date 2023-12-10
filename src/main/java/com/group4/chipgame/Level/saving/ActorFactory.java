@@ -6,8 +6,20 @@ import com.group4.chipgame.entities.actors.collectibles.Key;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * A factory class for creating Actor instances from JSON data.
+ * This class is responsible for instantiating different types of Actor objects based on JSON input.
+ */
 public class ActorFactory {
 
+    /**
+     * Creates an Actor object from the provided JSON data.
+     * The specific type of Actor (e.g., Player, Bug, Frog, etc.) is determined by the 'type' field in the JSON object.
+     *
+     * @param actorJson The JSON object containing the data for the actor.
+     * @return An instance of an Actor, as specified in the JSON object.
+     * @throws IllegalStateException If the actor type is not recognized.
+     */
     public static Actor createActor(JSONObject actorJson) {
         String type = actorJson.getString("type");
         double x = actorJson.getDouble("x");
@@ -23,6 +35,13 @@ public class ActorFactory {
         };
     }
 
+    /**
+     * Creates a Player object from the provided JSON data.
+     * This method specifically handles the instantiation of a Player, including setting its properties based on the JSON object.
+     *
+     * @param actorJson The JSON object containing the data for the player.
+     * @return An instance of a Player, with properties set as per the JSON object.
+     */
     private static Player createPlayer(JSONObject actorJson) {
         Player player = new Player(actorJson.getDouble("x"), actorJson.getDouble("y"));
         player.setAlive(actorJson.getBoolean("isAlive"));

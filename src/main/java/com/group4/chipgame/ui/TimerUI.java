@@ -31,7 +31,7 @@ public class TimerUI extends BaseUI {
         timerLabel.setTextFill(currentColor);
         StackPane.setAlignment(timerLabel, Pos.TOP_RIGHT);
         StackPane.setMargin(timerLabel, new Insets(10, 10, 0, 0));
-        rootPane.getChildren().add(timerLabel);
+        getRootPane().getChildren().add(timerLabel);
     }
 
     @Override
