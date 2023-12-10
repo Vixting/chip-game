@@ -202,8 +202,8 @@ public class LevelRenderer {
      * @param actor The actor to remove.
      */
     public void remove(final Actor actor) {
-        this.currentLevelData.getActors().remove(actor);
         modifyPaneLater(() -> actorsPane.getChildren().remove(actor));
+        this.currentLevelData.getActors().remove(actor);
     }
 
     /**

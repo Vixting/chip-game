@@ -164,14 +164,14 @@ public abstract class Actor extends ImageView implements Entity {
      */
     protected boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
         Optional<Tile> targetTileOpt =
-                        levelRenderer.getTileAtGridPosition((int) newPosition.getX(),
+                levelRenderer.getTileAtGridPosition((int) newPosition.getX(),
                         (int) newPosition.getY());
         if (targetTileOpt.isEmpty()) {
             return false;
         }
 
         Optional<Tile> currentTileOpt =
-                        levelRenderer.getTileAtGridPosition((int) currentPosition.getX(),
+                levelRenderer.getTileAtGridPosition((int) currentPosition.getX(),
                         (int) currentPosition.getY());
         if (currentTileOpt.isPresent() && currentTileOpt.get() instanceof Trap currentTrap && currentTrap.isActive()) {
             return false;

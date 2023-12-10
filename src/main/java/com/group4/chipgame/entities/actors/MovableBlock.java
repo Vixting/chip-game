@@ -3,7 +3,10 @@ package com.group4.chipgame.entities.actors;
 import com.group4.chipgame.Direction;
 import com.group4.chipgame.Level.LevelRenderer;
 import com.group4.chipgame.entities.actors.tiles.Path;
+import com.group4.chipgame.entities.actors.tiles.Tile;
 import com.group4.chipgame.entities.actors.tiles.Water;
+
+import java.util.Optional;
 
 /**
  * Represents a movable block in the ChipGame.
@@ -45,7 +48,7 @@ public class MovableBlock extends Actor {
         if (canMove(dx, dy, levelRenderer) || isPushIntoWater(newX, newY, levelRenderer)) {
             performMove(newX, newY, levelRenderer, Direction.fromDelta(dx, dy));
             if (isPushIntoWater(newX, newY, levelRenderer)) {
-                transformIntoDirt(newX, newY, levelRenderer);
+                transformIntoPath(newX, newY, levelRenderer);
             }
         }
     }
@@ -72,10 +75,14 @@ public class MovableBlock extends Actor {
      * @param y             The y-coordinate where the block is transformed.
      * @param levelRenderer The renderer for the game level.
      */
-    private void transformIntoDirt(double x, double y, LevelRenderer levelRenderer) {
+    private void transformIntoPath(double x, double y, LevelRenderer levelRenderer) {
+        Optional<Tile> currentTile = levelRenderer.getTileAtGridPosition((int)
+                getCurrentPosition().getX(), (int) getCurrentPosition().getY());
+        currentTile.ifPresent(tile -> tile.setOccupiedBy(null));
         levelRenderer.updateTile((int) x, (int) y, new Path());
         levelRenderer.remove(this);
     }
+
 
     /**
      * Kills the player at the specified position.

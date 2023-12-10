@@ -27,6 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Main application class for the Chip Game.
+ * Handles initialization and switching between different game scenes.
+ */
 public class Main extends Application {
     public static final SimpleIntegerProperty TILE_SIZE = new SimpleIntegerProperty(50);
     public static final SimpleIntegerProperty ACTOR_SIZE = new SimpleIntegerProperty((int) (TILE_SIZE.get() / 1.5));
@@ -38,6 +42,15 @@ public class Main extends Application {
     private static final String SAVES_DIR = "src/main/java/saves";
     private static final long INPUT_DELAY = 200;
     private static final int MAX_QUEUE_SIZE = 5;
+    private static final double TILE_SIZE_DIMENSION_RATIO = 1.5;
+    private static final int TILE_MAIN = 100;
+    private static final int TILE_DIVIDE = 10;
+    private static final double DEFAULT_SCENE_WIDTH = 400;
+    private static final double DEFAULT_SCENE_HEIGHT = 400;
+    private static final double SCENE_MIN_WIDTH = 400;
+    private static final double SCENE_MIN_HEIGHT = 400;
+    private static final int DEFAULT_TIMER = 300;
+    private static final int INSECT = 10;
 
     private GameLoop gameLoop;
     private Stage primaryStage;
@@ -52,6 +65,11 @@ public class Main extends Application {
         launch(args);
     }
 
+    /**
+     * Starts the application and initializes the main game window.
+     * @param primaryStage The primary stage for this application.
+     * @throws IOException if there is an error loading level data.
+     */
     @Override
     public void start(Stage primaryStage) throws IOException {
         this.primaryStage = primaryStage;
@@ -66,38 +84,62 @@ public class Main extends Application {
         addStageSizeListeners(primaryStage);
     }
 
+    /**
+     * Adds listeners to the stage's size properties to update game elements' sizes.
+     * @param stage The primary stage of the application.
+     */
     private void addStageSizeListeners(Stage stage) {
         stage.widthProperty().addListener((obs, oldVal, newVal) -> updateSizes(stage));
         stage.heightProperty().addListener((obs, oldVal, newVal) -> updateSizes(stage));
     }
 
+    /**
+     * Updates the sizes of tiles and actors based on the stage size.
+     * @param stage The primary stage of the application.
+     */
     private void updateSizes(Stage stage) {
         int newTileSize = calculateTileSize(stage);
         TILE_SIZE.set(newTileSize);
-        ACTOR_SIZE.set((int) (newTileSize / 1.5));
+        ACTOR_SIZE.set((int) (newTileSize / TILE_SIZE_DIMENSION_RATIO));
     }
 
+    /**
+     * Displays the save/load game menu.
+     */
     public void showSaveLoadMenu() {
         SaveLoadMenu saveLoadMenu = new SaveLoadMenu(this, primaryStage, profileManager);
         VBox saveLoadMenuPane = saveLoadMenu.createSaveLoadMenu();
         primaryStage.getScene().setRoot(saveLoadMenuPane);
     }
 
+    /**
+     * Calculates the tile size based on the current stage size.
+     * @param stage The primary stage of the application.
+     * @return Calculated tile size.
+     */
     private int calculateTileSize(Stage stage) {
-        return Math.min((int) stage.getWidth(), (int) stage.getHeight() - 100) / 10;
+        return Math.min((int) stage.getWidth(), (int) stage.getHeight() - TILE_MAIN) / TILE_DIVIDE;
     }
 
+    /**
+     * Shows the main menu of the game.
+     * @param primaryStage The primary stage of the application.
+     */
     public void showMainMenu(Stage primaryStage) {
         MainMenu mainMenu = new MainMenu();
         StackPane menuPane = mainMenu.createMainMenu(primaryStage, this);
         settingsMenu = new SettingsMenu().createSettingsMenu(primaryStage, this);
         settingsMenu.setVisible(false);
         menuPane.getChildren().add(settingsMenu);
-        Scene scene = new Scene(menuPane, 400, 400);
+        Scene scene = new Scene(menuPane, DEFAULT_SCENE_WIDTH, DEFAULT_SCENE_HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
+    /**
+     * Gets the profile manager instance.
+     * @return The profile manager.
+     */
     public ProfileManager getProfileManager() {
         return profileManager;
     }
@@ -133,7 +175,7 @@ public class Main extends Application {
 
     private void adjustWindowSizeForLevel(LevelData levelData) {
         double requiredWidth = levelData.gridWidth * TILE_SIZE.get();
-        double requiredHeight = levelData.gridHeight * TILE_SIZE.get() + 100;
+        double requiredHeight = levelData.gridHeight * TILE_SIZE.get();
 
         primaryStage.setWidth(requiredWidth);
         primaryStage.setHeight(requiredHeight);
@@ -163,11 +205,11 @@ public class Main extends Application {
         double sceneWidth = calculateSceneDimension(
                 levelData.gridWidth * TILE_SIZE.get(),
                 primaryStage.getWidth(),
-                300);
+                SCENE_MIN_WIDTH);
 
         double sceneHeight = calculateSceneDimension(
                 levelData.gridHeight * TILE_SIZE.get(),
-                primaryStage.getHeight(), 300);
+                primaryStage.getHeight(), SCENE_MIN_HEIGHT);
 
         StackPane gamePane = initGamePane(levelData);
         initScene(gamePane, primaryStage, (int) sceneWidth, (int) sceneHeight, GAME_TITLE);
@@ -187,8 +229,10 @@ public class Main extends Application {
     private void adjustStageAndStartGame(Stage primaryStage, LevelData levelData) {
         double stageWidth = primaryStage.getWidth();
         double stageHeight = primaryStage.getHeight();
-        double sceneWidth = calculateSceneDimension(levelData.gridWidth * TILE_SIZE.get(), stageWidth, 300);
-        double sceneHeight = calculateSceneDimension(levelData.gridHeight * TILE_SIZE.get(), stageHeight, 300);
+        double sceneWidth = calculateSceneDimension(levelData.gridWidth
+                * TILE_SIZE.get(), stageWidth, MIN_WINDOW_SIZE);
+        double sceneHeight = calculateSceneDimension(levelData.gridHeight
+                * TILE_SIZE.get(), stageHeight, MIN_WINDOW_SIZE);
         StackPane gamePane = initGamePane(levelData);
         initScene(gamePane, primaryStage, (int) sceneWidth, (int) sceneHeight, GAME_TITLE);
         initGameLoop(levelData);
@@ -202,7 +246,7 @@ public class Main extends Application {
     private LevelData loadLevel(String levelPath) throws IOException {
         String content = Files.readString(Paths.get(levelPath));
         JSONObject levelJson = new JSONObject(content);
-        int timer = levelJson.optInt("timer", 60);
+        int timer = levelJson.optInt("timer", DEFAULT_TIMER);
 
         LevelLoader levelLoader = new LevelLoader();
         Tile[][] tiles = levelLoader.loadTiles(levelPath);
@@ -238,7 +282,7 @@ public class Main extends Application {
         this.timerUI = new TimerUI(levelData.levelRenderer.getGamePane(), levelData.getTimer());
         rootPane.getChildren().add(timerUI.getTimerLabel());
         StackPane.setAlignment(timerUI.getTimerLabel(), Pos.TOP_RIGHT);
-        StackPane.setMargin(timerUI.getTimerLabel(), new Insets(10, 10, 0, 0));
+        StackPane.setMargin(timerUI.getTimerLabel(), new Insets(INSECT, INSECT, 0, 0));
         return rootPane;
     }
 
@@ -253,10 +297,11 @@ public class Main extends Application {
 
         gameLoop = new GameLoop(levelData.getActors(), levelData.levelRenderer, camera, timerUI);
 
-        long inputDelay = 200;
-        int maxQueueSize = 5;
-        KeybindHandler movementHandler = new KeybindHandler(gameLoop, profileManager, this, inputDelay, maxQueueSize);
-        levelData.levelRenderer.getGamePane().getScene().setOnKeyPressed(event -> movementHandler.handleKeyPress(event.getCode()));
+
+        KeybindHandler movementHandler =
+                new KeybindHandler(gameLoop, profileManager, this, INPUT_DELAY, MAX_QUEUE_SIZE);
+        levelData.levelRenderer.getGamePane().getScene().setOnKeyPressed(event
+                -> movementHandler.handleKeyPress(event.getCode()));
 
         gameLoop.start();
     }
@@ -295,6 +340,7 @@ public class Main extends Application {
             case MAIN_MENU -> showMainMenu(primaryStage);
             case SETTINGS -> settingsMenu.setVisible(true);
             case GAME -> settingsMenu.setVisible(false);
+            default -> throw new IllegalArgumentException("Invalid scene type: " + sceneType);
         }
     }
 

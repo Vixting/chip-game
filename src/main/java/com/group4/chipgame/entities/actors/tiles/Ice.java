@@ -97,7 +97,7 @@ public class Ice extends Tile {
         if (actor instanceof Player) {
             ((Player) actor).checkForCollectibles(newX, newY, levelRenderer);
         }
-
+        System.out.println("Sliding to " + newX + ", " + newY);
         handleActorOnIce(actor, newX, newY, levelRenderer, slideDirection);
     }
 
@@ -148,6 +148,7 @@ public class Ice extends Tile {
             Tile targetTile,
             LevelRenderer levelRenderer,
             Direction incomingDirection) {
+        System.out.println("Handling tile interaction");
         if (actor instanceof Player player && targetTile instanceof LockedDoor door) {
             handlePlayerDoorInteraction(player, door, levelRenderer, incomingDirection);
             return;
@@ -198,10 +199,13 @@ public class Ice extends Tile {
             double newY,
             LevelRenderer levelRenderer,
             Direction incomingDirection) {
-        if (targetTile.isOccupied()) {
+        if (!targetTile.isOccupied()) {
             actor.performMove(newX, newY, levelRenderer, incomingDirection);
+            System.out.println("Sliding to " + newX + ", " + newY);
         } else {
+
             Entity actorOnTile = targetTile.getOccupiedBy();
+            System.out.println("Actor on tile: " + actorOnTile);
             if (actor instanceof Player) {
                 if (actorOnTile instanceof Collectible) {
                     onStep(actor, levelRenderer, incomingDirection);
@@ -231,7 +235,7 @@ public class Ice extends Tile {
         double blockNewX = block.getPosition().getX() + direction.getDx();
         double blockNewY = block.getPosition().getY() + direction.getDy();
         Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
-        if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && blockTargetTile.get().isOccupied()) {
+        if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && !blockTargetTile.get().isOccupied()) {
             block.performMove(blockNewX, blockNewY, levelRenderer, direction);
             actor.performMove(
                     actor.getPosition().getX() + direction.getDx(),
@@ -249,7 +253,7 @@ public class Ice extends Tile {
         Optional<Tile> reverseTileOptional = levelRenderer.getTileAtGridPosition((int) reverseX, (int) reverseY);
         if (reverseTileOptional.isPresent()
                 && reverseTileOptional.get().isWalkable()
-                && reverseTileOptional.get().isOccupied()) {
+                && !reverseTileOptional.get().isOccupied()) {
             actor.performMove(reverseX, reverseY, levelRenderer, effectiveReverseDirection);
         }
     }

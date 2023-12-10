@@ -1,0 +1,11 @@
+{
+  "timer": 120,
+  "tiles": [
+    ["I","I","I","I","I","I","I","I","I","I","I","I","I","I","I","I"]
+  ],
+  "collectibles" : [
+  ],
+  "actors": [
+    {"type": "Player", "x": 0, "y": 0}
+  ]
+}

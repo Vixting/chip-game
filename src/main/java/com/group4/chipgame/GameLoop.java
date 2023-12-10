@@ -10,6 +10,10 @@ import javafx.animation.AnimationTimer;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * This class handles the main game loop, including updating actors' movements,
+ * rendering the level, and managing the game timer.
+ */
 public class GameLoop extends AnimationTimer {
     private List<Actor> actors;
     private final Queue<Direction> moveQueue = new LinkedList<>();
@@ -18,7 +22,16 @@ public class GameLoop extends AnimationTimer {
     private final TimerUI timerUI;
     private long ticksElapsed = 0;
     private long lastTimerUpdate = 0;
+    private static final long NANOS_PER_SECOND = 1_000_000_000;
 
+    /**
+     * Constructs a GameLoop with the specified actors, level renderer, camera, and timer UI.
+     *
+     * @param actors        The list of actors in the game.
+     * @param levelRenderer The renderer for the game level.
+     * @param camera        The camera following the player.
+     * @param timerUI       The UI component for the game timer.
+     */
     public GameLoop(List<Actor> actors, LevelRenderer levelRenderer, Camera camera, TimerUI timerUI) {
         this.actors = actors;
         this.levelRenderer = levelRenderer;
@@ -26,10 +39,20 @@ public class GameLoop extends AnimationTimer {
         this.timerUI = timerUI;
     }
 
+    /**
+     * Returns the queue of directions for player movement.
+     *
+     * @return The queue of movement directions.
+     */
     public Queue<Direction> getMoveQueue() {
         return moveQueue;
     }
 
+    /**
+     * The main game loop, called at each animation frame. Handles game logic updates.
+     *
+     * @param now The timestamp of the current frame given in nanoseconds.
+     */
     @Override
     public void handle(long now) {
         ticksElapsed++;
@@ -39,7 +62,7 @@ public class GameLoop extends AnimationTimer {
             lastTimerUpdate = now;
         }
 
-        if (now - lastTimerUpdate >= 1_000_000_000) {
+        if (now - lastTimerUpdate >= NANOS_PER_SECOND) {
             updateTimer();
             lastTimerUpdate = now;
         }
@@ -55,6 +78,9 @@ public class GameLoop extends AnimationTimer {
         }
     }
 
+    /**
+     * Updates the game timer and stops the game if time runs out.
+     */
     private void updateTimer() {
         int remainingTime = timerUI.getTimeRemaining() - 1;
         timerUI.updateTime(remainingTime);
@@ -63,6 +89,11 @@ public class GameLoop extends AnimationTimer {
         }
     }
 
+    /**
+     * Handles movement for player characters.
+     *
+     * @param player The player character to move.
+     */
     private void handlePlayerMovement(Player player) {
         camera.setTarget(player);
         if (!moveQueue.isEmpty() && player.isAlive() && !player.isMoving()) {
@@ -73,6 +104,11 @@ public class GameLoop extends AnimationTimer {
         }
     }
 
+    /**
+     * Handles movement decisions for enemy characters.
+     *
+     * @param enemy The enemy character to move.
+     */
     private void handleEnemyMovement(Enemy enemy) {
         if (!enemy.isMoving()) {
             enemy.makeMoveDecision(levelRenderer);
