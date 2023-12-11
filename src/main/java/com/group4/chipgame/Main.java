@@ -195,7 +195,6 @@ public class Main extends Application {
         this.currentLevelPath =
                 currentLevelData.getLevelPath();
 
-        adjustWindowSizeForLevel(currentLevelData);
         reinitializeLevel(currentLevelData);
     }
 
@@ -215,25 +214,6 @@ public class Main extends Application {
                             currentLevelPath, score);
                 });
     }
-
-
-    /**
-     * Adjusts the window size based on the current level's dimensions.
-     *
-     * @param levelData the data of the level for
-     *                  which the window size is adjusted
-     */
-    private void adjustWindowSizeForLevel(final LevelData levelData) {
-        double requiredWidth =
-                levelData.getGridWidth() * TILE_SIZE.get();
-        double requiredHeight =
-                levelData.getGridHeight() * TILE_SIZE.get();
-
-        primaryStage.setWidth(requiredWidth);
-        primaryStage.setHeight(requiredHeight);
-        primaryStage.centerOnScreen();
-    }
-
 
     /**
      * Initializes the game scene with specified parameters.
@@ -261,7 +241,6 @@ public class Main extends Application {
      */
     public void reinitializeLevel(final LevelData levelData) {
         LevelRenderer levelRenderer = levelData.getLevelRenderer();
-        adjustPrimaryStage(primaryStage, levelData);
 
         levelRenderer.setCurrentLevelData(levelData);
 
@@ -289,6 +268,8 @@ public class Main extends Application {
                 (int) sceneWidth,
                 (int) sceneHeight
         );
+        adjustPrimaryStage(primaryStage, levelData);
+
     }
 
 

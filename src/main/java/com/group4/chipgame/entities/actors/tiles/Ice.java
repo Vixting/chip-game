@@ -190,15 +190,23 @@ public class Ice extends Tile {
             return;
         }
 
+        if (actor instanceof MovableBlock block && targetTile instanceof Water) {
+            block.transformIntoPath(newX, newY, levelRenderer);
+            levelRenderer.remove(block);
+            return;
+        }
+
         if (targetTile.isWalkable()) {
             Entity actorOnTile = targetTile.getOccupiedBy();
             if (actorOnTile instanceof Player
                     && actor instanceof MovableBlock) {
-                ((Player) actorOnTile).kill(levelRenderer);
 
                 continueSlide(actor,
                         levelRenderer,
                         incomingDirection);
+
+                ((Player) actorOnTile).kill(levelRenderer);
+
             } else {
                 handleTileOccupancy(targetTile,
                         actor,

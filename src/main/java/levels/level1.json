@@ -1,26 +1,27 @@
 {
-  "timer": 120,
+  "timer": 600,
   "tiles": [
-    ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W"],
-    ["W", "W", "W", "P", "P", "P", "P", "W", "W", "W"],
-    ["W", "W", "P", "P", "G", "W", "P", "P", "W", "W"],
-    ["W", "P", "T_1", "B_1", "E", "S", "S", "P", "P", "W"],
-    ["W", "P", "P", "P", "P", "P", "I", "P", "P", "W"],
-    ["W", "P", "I_TL", "I_TR", "I", "I", "I", "P", "P", "W"],
-    ["W", "P", "I_BL", "I_BR", "I", "I", "I", "P", "P", "W"],
-    ["W", "W", "T_2", "B_2", "RD", "P", "P", "P", "W", "W"],
-    ["W", "W", "W", "P", "P", "P", "P", "W", "W", "W"],
-    ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W"]
-  ],
-  "collectibles" : [
-    {"type": "blueKey", "x": 6, "y": 5},
-    {"type": "Chip", "x": 6, "y": 4}
+    ["P","P","P","P","P","P","P","P","P","P","P"],
+    ["P","B_1","P","P","P","P","P","P","P","P","P"],
+    ["P","T_1","P","P","P","P","P","P","P","P","P"],
+    ["P","P","P","P","P","P","P","P","P","P","P"],
+    ["W","P","P","P","P","P","P","P","P","P","E"],
+    ["P","I","P","I","I","P","P","P","P","P","P"],
+    ["P","I","P","I_BL","I_BR","P","P","P","P","P","P"],
+    ["P","G","P","P","P","P","P","P","P","P","P"],
+    ["P","P","P","P","P","P","P","P","P","P","P"]
 
+  ],
+
+  "collectibles" : [
   ],
 
   "actors": [
-    {"type": "Player", "x": 4, "y": 4},
-    {"type": "MovableBlock", "x": 6, "y": 7},
-    {"type": "MovableBlock", "x": 6, "y": 3}
+    {"type": "Player", "x": 0, "y": 0},
+    {"type": "UPinkBall", "x": 1, "y": 3},
+
+    {"type": "MovableBlock", "x": 1, "y": 4},
+    {"type": "MovableBlock", "x": 3, "y": 4}
+
   ]
 }

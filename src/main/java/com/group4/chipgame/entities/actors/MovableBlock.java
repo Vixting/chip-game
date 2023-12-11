@@ -49,6 +49,7 @@ public class MovableBlock extends Actor {
                 .map(tile
                         -> tile.getOccupiedBy() instanceof Player)
                 .orElse(false)) {
+            performMove(newX, newY, levelRenderer, Direction.fromDelta(dx, dy));
             killPlayerAt(newX, newY, levelRenderer);
             return;
         }
@@ -64,11 +65,6 @@ public class MovableBlock extends Actor {
 
     /**
      * Checks if the block is being pushed into water.
-     *
-     * @param newX          The new x-coordinate after the push.
-     * @param newY          The new y-coordinate after the push.
-     * @param levelRenderer The renderer for the game level.
-     * @return True if the block is being pushed into water, false otherwise.
      */
     private boolean isPushIntoWater(final double newX,
                                     final double newY,
@@ -87,7 +83,7 @@ public class MovableBlock extends Actor {
      * @param y             The y-coordinate where the block is transformed.
      * @param levelRenderer The renderer for the game level.
      */
-    private void transformIntoPath(final double x,
+    public void transformIntoPath(final double x,
                                    final double y,
                                    final LevelRenderer levelRenderer) {
         Optional<Tile> currentTile =
@@ -105,10 +101,6 @@ public class MovableBlock extends Actor {
     /**
      * Kills the player at the specified position.
      * This is called when a block is pushed onto a player's position.
-     *
-     * @param x             The x-coordinate where the player is located.
-     * @param y             The y-coordinate where the player is located.
-     * @param levelRenderer The renderer for the game level.
      */
     private void killPlayerAt(final double x,
                               final double y,

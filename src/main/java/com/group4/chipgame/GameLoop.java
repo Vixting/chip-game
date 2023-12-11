@@ -99,14 +99,16 @@ public class GameLoop extends AnimationTimer {
      * Handles movement for player characters.
      */
     private void handlePlayerMovement(final Player player) {
-        camera.setTarget(player);
-        if (!moveQueue.isEmpty()
-                && player.isAlive()
-                && !player.isMoving()) {
-            Direction direction = moveQueue.poll();
-            assert direction != null;
-            double[] delta = Direction.toDelta(direction);
-            player.move(delta[0], delta[1], levelRenderer);
+        if (player.isAlive()) {
+            camera.setTarget(player);
+            if (!moveQueue.isEmpty()
+                    && player.isAlive()
+                    && !player.isMoving()) {
+                Direction direction = moveQueue.poll();
+                assert direction != null;
+                double[] delta = Direction.toDelta(direction);
+                player.move(delta[0], delta[1], levelRenderer);
+            }
         }
     }
 

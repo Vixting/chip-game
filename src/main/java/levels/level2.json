@@ -1,27 +1,32 @@
 {
- "tiles": [
-  ["P","P","E","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"],
-  ["P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"],
-  ["P","P","P","RD","BD","YD","GD","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"],
-  ["P","CS_2","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"],
-  ["P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"],
-  ["P","I","I_TR","I_TL","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"],
-  ["P","P","I_BR","I_BL","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"],
-  ["P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P","P"]
- ],
+  "timer": 120,
+  "tiles": [
+    ["G", "P", "G", "P", "G", "P", "G", "P", "G", "E", "G"],
+    ["G", "P", "G", "P", "G", "P", "G", "P", "G", "P", "G"],
+    ["G", "CS_3", "G", "RD", "G", "GD", "G", "YD", "G", "BD", "G"],
+    ["G", "W", "P", "P", "P", "P", "P", "P", "P", "S", "P"],
+    ["G", "P", "P", "P", "P", "P", "B_1", "P", "P", "S", "P"],
+    ["G", "P", "P", "P", "P", "P", "P", "P", "P", "S", "P"],
+    ["G", "G", "P", "G", "G", "W", "W", "T_1", "W", "W", "W"],
+    ["I_TL", "I", "I", "I_TR", "G", "P", "P", "P", "P", "P", "P"],
+    ["I", "I", "I", "W", "P", "P", "P", "P", "P", "P", "P"],
+    ["I_BL", "I", "I_BR", "G", "G", "W", "W", "W", "S", "S", "S"]
+  ],
 
- "collectibles" : [
-  {"type":  "Chip", "x": 2, "y":  0},
-  {"type":  "redKey", "x": 3, "y":  0},
-  {"type":  "blueKey", "x": 4, "y":  0},
-  {"type":  "yellowKey", "x": 5, "y":  0},
-  {"type":  "greenKey", "x": 6, "y":  0}
+  "collectibles" : [
+    {"type": "redKey", "x": 1, "y": 1},
+    {"type": "blueKey", "x": 7, "y": 1},
+    {"type": "greenKey", "x": 3, "y": 1},
+    {"type": "yellowKey", "x": 5, "y": 1},
+    {"type": "Chip", "x": 10, "y": 9},
+    {"type": "Chip", "x": 9, "y": 9},
+    {"type": "Chip", "x": 8, "y": 9}
+  ],
 
-
- ],
- "actors": [
-  {"type": "Player", "x": 1, "y": 0},
-  {"type":  "rightBug", "x":  4, "y" : 4}
-
- ]
+  "actors": [
+    {"type": "Player", "x": 2, "y": 4},
+    {"type": "Frog", "x": 10, "y": 4},
+    {"type": "MovableBlock", "x": 2, "y": 6},
+    {"type": "MovableBlock", "x": 5, "y": 4}
+  ]
 }

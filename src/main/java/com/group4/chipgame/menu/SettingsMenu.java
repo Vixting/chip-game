@@ -1,7 +1,9 @@
 package com.group4.chipgame.menu;
 
 import com.group4.chipgame.Main;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -18,6 +20,9 @@ public class SettingsMenu extends BaseMenu {
     private static final int SPACING = 5;
     private static final String BACKGROUND_STYLE =
             "-fx-background-color: rgba(102, 102, 102, 2);";
+    private static final String LABEL_STYLE =
+            "-fx-font-size: 20px; -fx-text-fill: #ffffff; -fx-font-weight: bold;";
+    private static final int INSIDE_PADDING = 20;
 
     /**
      * Creates the settings menu UI as a StackPane.
@@ -26,13 +31,19 @@ public class SettingsMenu extends BaseMenu {
      * @param mainApp      The main application object.
      * @return A StackPane containing the settings menu UI.
      */
-    public StackPane createSettingsMenu(final Stage primaryStage,
-                                        final Main mainApp) {
+    public StackPane createSettingsMenu(final Stage primaryStage, final Main mainApp) {
         VBox settingsBox = createMenuBox(SPACING, BACKGROUND_STYLE);
+        settingsBox.setPadding(new Insets(
+                INSIDE_PADDING, INSIDE_PADDING,
+                INSIDE_PADDING, INSIDE_PADDING));
         populateSettingsBox(settingsBox, primaryStage, mainApp);
 
         StackPane settingsRootPane = createMenuRootPane(settingsBox);
         configureRootPaneSize(settingsRootPane, primaryStage);
+
+        Label titleLabel = new Label("Settings");
+        titleLabel.setStyle(LABEL_STYLE);
+        settingsBox.getChildren().add(0, titleLabel);
 
         return settingsRootPane;
     }
@@ -69,12 +80,13 @@ public class SettingsMenu extends BaseMenu {
      * @param rootPane      The root StackPane to configure.
      * @param primaryStage  The primary stage of the application.
      */
-    private void configureRootPaneSize(final StackPane rootPane,
-                                       final Stage primaryStage) {
-        rootPane.maxWidthProperty().bind(
-                primaryStage.widthProperty().multiply(WIDTH_MULTIPLIER));
-        rootPane.maxHeightProperty().bind(
-                primaryStage.heightProperty().multiply(HEIGHT_MULTIPLIER));
+    private void configureRootPaneSize(final StackPane rootPane, final Stage primaryStage) {
+        rootPane.maxWidthProperty().
+                bind(primaryStage.widthProperty().
+                        multiply(WIDTH_MULTIPLIER));
+        rootPane.maxHeightProperty().
+                bind(primaryStage.heightProperty().
+                        multiply(HEIGHT_MULTIPLIER));
         StackPane.setAlignment(rootPane, Pos.CENTER);
     }
 }

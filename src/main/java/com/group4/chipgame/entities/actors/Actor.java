@@ -223,7 +223,7 @@ public abstract class Actor extends ImageView implements Entity {
 
         updateTileOccupancy(levelRenderer, newX, newY, direction);
 
-        isMoving = false;
+        timeline.setOnFinished(event -> isMoving = false);
         timeline.play();
     }
 

@@ -80,25 +80,32 @@ public abstract class Enemy extends Actor {
      * @return True if the enemy can move to the new position, false otherwise.
      */
     @Override
-    protected boolean canMove(final double dx,
-                              final double dy,
-                              final LevelRenderer levelRenderer) {
+    protected boolean canMove(final double dx, final double dy, final LevelRenderer levelRenderer) {
+        Tile currentTile = levelRenderer.getTileAtGridPosition((int) getCurrentPosition().getX(), (int) getCurrentPosition().getY())
+                .orElseThrow(() -> new IllegalStateException("Current tile not found"));
+
+        if (currentTile instanceof Trap && ((Trap) currentTile).isActive()) {
+            return false;
+        }
+
         Point2D newPosition = getCurrentPosition().add(dx, dy);
-        Optional<Tile> targetTileOpt =
-                        levelRenderer.getTileAtGridPosition(
-                                (int) newPosition.getX(),
-                                (int) newPosition.getY());
+        Optional<Tile> targetTileOpt = levelRenderer.getTileAtGridPosition((int) newPosition.getX(), (int) newPosition.getY());
 
         if (!isMoveValid(newPosition, levelRenderer)) {
             return false;
         }
 
-        Tile targetTile = targetTileOpt.orElseThrow(()
-                -> new IllegalStateException("Target tile not found"));
+        Tile targetTile = targetTileOpt.
+                orElseThrow(() -> new IllegalStateException("Target tile not found"));
+
         if (targetTile.getOccupiedBy() instanceof Player) {
             ((Player) targetTile.getOccupiedBy()).kill(levelRenderer);
             targetTile.setOccupiedBy(null);
         }
+
         return targetTile.isWalkable();
     }
+
+
+
 }
