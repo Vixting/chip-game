@@ -6,9 +6,11 @@ import com.group4.chipgame.entities.actors.Actor;
 
 /**
  * Represents a Dirt tile in the ChipGame.
+ * @author William Buckley
  */
 public class Dirt extends Tile {
-    private static final String DIRT_IMAGE_PATH = "/images/chipgame/tiles/dirt.jpg";
+    private static final String DIRT_IMAGE_PATH =
+            "/images/chipgame/tiles/dirt.jpg";
 
     /**
      * Constructs a new Dirt tile.
@@ -22,13 +24,16 @@ public class Dirt extends Tile {
      *
      * @param actor The Actor stepping on the tile.
      * @param levelRenderer The renderer for the level.
-     * @param incomingDirection The direction from which the Actor steps onto the tile.
+     * @param incomingDirection The direction from
+     *                          which the Actor steps onto the tile.
      */
     @Override
-    public void onStep(final Actor actor, final LevelRenderer levelRenderer,
+    public void onStep(final Actor actor,
+                       final LevelRenderer levelRenderer,
                        final Direction incomingDirection) {
         Path path = new Path();
         path.setOccupiedBy(actor);
+        System.out.println(this.getGridX() + " " + this.getGridY());
         levelRenderer.updateTile(this.getGridX(), this.getGridY(), path);
     }
 }

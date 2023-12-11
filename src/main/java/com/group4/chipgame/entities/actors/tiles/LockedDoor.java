@@ -8,14 +8,20 @@ import com.group4.chipgame.entities.actors.collectibles.Key;
 import org.json.JSONObject;
 
 /**
- * Represents a locked door tile in the game that requires a specific key color to open.
+ * Represents a locked door tile in the game
+ * that requires a specific key color to open.
+ * @author William Buckley
  */
 public class LockedDoor extends Tile {
 
-    private static final String RED_DOOR_IMAGE_PATH = "/images/chipgame/tiles/doors/redDoor.png";
-    private static final String GREEN_DOOR_IMAGE_PATH = "/images/chipgame/tiles/doors/greenDoor.png";
-    private static final String YELLOW_DOOR_IMAGE_PATH = "/images/chipgame/tiles/doors/yellowDoor.png";
-    private static final String BLUE_DOOR_IMAGE_PATH = "/images/chipgame/tiles/doors/blueDoor.png";
+    private static final String RED_DOOR_IMAGE_PATH =
+            "/images/chipgame/tiles/doors/redDoor.png";
+    private static final String GREEN_DOOR_IMAGE_PATH =
+            "/images/chipgame/tiles/doors/greenDoor.png";
+    private static final String YELLOW_DOOR_IMAGE_PATH =
+            "/images/chipgame/tiles/doors/yellowDoor.png";
+    private static final String BLUE_DOOR_IMAGE_PATH =
+            "/images/chipgame/tiles/doors/blueDoor.png";
 
     private final Key.KeyColor requiredKeyColor;
 
@@ -24,7 +30,7 @@ public class LockedDoor extends Tile {
      *
      * @param requiredKeyColor The color of the key required to open the door.
      */
-    public LockedDoor(Key.KeyColor requiredKeyColor) {
+    public LockedDoor(final Key.KeyColor requiredKeyColor) {
         super(getImagePathForColor(requiredKeyColor), false);
         this.requiredKeyColor = requiredKeyColor;
     }
@@ -56,7 +62,7 @@ public class LockedDoor extends Tile {
      * @param color The color of the door.
      * @return The image path for the door.
      */
-    private static String getImagePathForColor(Key.KeyColor color) {
+    private static String getImagePathForColor(final Key.KeyColor color) {
         return switch (color) {
             case RED -> RED_DOOR_IMAGE_PATH;
             case GREEN -> GREEN_DOOR_IMAGE_PATH;
@@ -71,13 +77,19 @@ public class LockedDoor extends Tile {
      *
      * @param actor The actor stepping on the tile.
      * @param levelRenderer The renderer for the level.
-     * @param incomingDirection The direction from which the actor steps onto the tile.
+     * @param incomingDirection The direction from
+     *                          which the actor steps onto the tile.
      */
     @Override
-    public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
+    public void onStep(final Actor actor,
+                       final LevelRenderer levelRenderer,
+                       final Direction incomingDirection) {
         if (actor instanceof Player player) {
             if (player.hasKey(requiredKeyColor)) {
-                levelRenderer.updateTile(this.getGridX(), this.getGridY(), new Path());
+                levelRenderer.updateTile(
+                        this.getGridX(),
+                        this.getGridY(),
+                        new Path());
             }
         }
     }

@@ -10,7 +10,9 @@ import javafx.scene.paint.Color;
 
 /**
  * TimerUI is a user interface component for displaying a countdown timer.
- * It extends BaseUI and provides functionalities to update and display remaining time.
+ * It extends BaseUI and provides functionalities
+ * to update and display remaining time.
+ * @author William Buckley
  */
 public class TimerUI extends BaseUI {
     private Label timerLabel;
@@ -19,7 +21,8 @@ public class TimerUI extends BaseUI {
     private Color currentColor;
 
     private static final double FONT_SIZE_RATIO = 20.0;
-    private static final Insets TIMER_LABEL_MARGINS = new Insets(10, 10, 0, 0);
+    private static final Insets TIMER_LABEL_MARGINS =
+            new Insets(10, 10, 0, 0);
     private static final Pos TIMER_LABEL_ALIGNMENT = Pos.TOP_RIGHT;
 
     /**
@@ -28,7 +31,8 @@ public class TimerUI extends BaseUI {
      * @param rootPane The root pane to which the timer UI will be added.
      * @param initialTime The initial time for the timer, in seconds.
      */
-    public TimerUI(Pane rootPane, int initialTime) {
+    public TimerUI(final Pane rootPane,
+                   final int initialTime) {
         super(rootPane);
         this.timeRemaining = initialTime;
         this.maxTime = initialTime;
@@ -48,7 +52,8 @@ public class TimerUI extends BaseUI {
     }
 
     /**
-     * Adjusts the UI based on the size of the root pane, particularly the font size of the timer label.
+     * Adjusts the UI based on the size of the
+     * root pane, particularly the font size of the timer label.
      */
     @Override
     protected void adjustUI() {
@@ -60,7 +65,7 @@ public class TimerUI extends BaseUI {
      *
      * @param time The new time to display, in seconds.
      */
-    public void updateTime(int time) {
+    public void updateTime(final int time) {
         Platform.runLater(() -> {
             this.timeRemaining = time;
             timerLabel.setText("Time: " + time);
@@ -69,11 +74,13 @@ public class TimerUI extends BaseUI {
     }
 
     /**
-     * Updates the color of the timer label based on the fraction of time remaining.
+     * Updates the color of the timer label
+     * based on the fraction of time remaining.
      *
-     * @param time The current time, used to calculate the fraction of time remaining.
+     * @param time The current time, used to
+     *            calculate the fraction of time remaining.
      */
-    private void updateLabelColor(int time) {
+    private void updateLabelColor(final int time) {
         double fraction = (double) time / maxTime;
         currentColor = interpolateColor(fraction);
         timerLabel.setTextFill(currentColor);
@@ -86,7 +93,7 @@ public class TimerUI extends BaseUI {
      * @param fraction The fraction used to interpolate between red and green.
      * @return The interpolated color.
      */
-    private Color interpolateColor(double fraction) {
+    private Color interpolateColor(final double fraction) {
         double r = Math.max(0.0, Math.min(1.0, Color.RED.getRed()
                                 - (Color.RED.getRed()
                                 - Color.GREEN.getRed())

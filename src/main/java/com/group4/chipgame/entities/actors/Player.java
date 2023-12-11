@@ -17,6 +17,7 @@ import java.util.Set;
  * Represents the player character in the ChipGame.
  * The player can move around the level,
  * collect items, and interact with various tiles.
+ * @author William Buckley
  */
 public class Player extends Actor {
     private static final String PLAYER_IMAGE_PATH =
@@ -91,9 +92,6 @@ public class Player extends Actor {
 
     /**
      * Checks if the player is currently on an ice tile.
-     *
-     * @param levelRenderer The renderer for the game level.
-     * @return True if the player is on an ice tile, false otherwise.
      */
     private boolean isOnIce(final LevelRenderer levelRenderer) {
         return levelRenderer.getTileAtGridPosition((int) getCurrentPosition().getX(),
@@ -132,13 +130,6 @@ public class Player extends Actor {
 
     /**
      * Processes interactions when the player moves to a new tile.
-     *
-     * @param newX          The new x-coordinate.
-     * @param newY          The new y-coordinate.
-     * @param dx            The change in the x-coordinate.
-     * @param dy            The change in the y-coordinate.
-     * @param levelRenderer The renderer for the game level.
-     * @param direction     The direction of the move.
      */
     private void processTileInteraction(
             final double newX,
@@ -205,9 +196,6 @@ public class Player extends Actor {
 
     /**
      * Processes the collection of an entity, such as a key.
-     *
-     * @param collectible   The entity being collected.
-     * @param levelRenderer The renderer for the game level.
      */
     private void onCollect(final Entity collectible,
                            final LevelRenderer levelRenderer) {

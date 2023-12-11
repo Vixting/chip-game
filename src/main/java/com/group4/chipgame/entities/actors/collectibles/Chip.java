@@ -6,6 +6,7 @@ import com.group4.chipgame.entities.actors.Player;
 /**
  * Represents a chip collectible in the game.
  * Chips are collected by the player to achieve objectives or score points.
+ * @author William Buckley
  */
 public class Chip extends Collectible {
 

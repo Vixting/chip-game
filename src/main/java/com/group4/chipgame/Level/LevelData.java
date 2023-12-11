@@ -8,16 +8,18 @@ import java.util.List;
 
 /**
  * Represents the data for a single level in the ChipGame.
- * This class contains all the necessary information for a level, including tiles, actors, collectibles, and the renderer.
+ * This class contains all the necessary information for
+ * a level, including tiles, actors, collectibles, and the renderer.
+ * @author William Buckley
  */
 public class LevelData {
     private final Tile[][] tiles;
-    public final int gridWidth;
-    public final int gridHeight;
+    private final int gridWidth;
+    private final int gridHeight;
     private int timer;
-    public List<Actor> actors;
-    public List<Collectible> collectibles;
-    public LevelRenderer levelRenderer;
+    private List<Actor> actors;
+    private List<Collectible> collectibles;
+    private LevelRenderer levelRenderer;
     private final String levelFilePath;
 
     /**
@@ -32,7 +34,14 @@ public class LevelData {
      * @param levelFilePath The file path to the level data.
      * @param timer         The timer for the level.
      */
-    public LevelData(Tile[][] tiles, int gridWidth, int gridHeight, List<Actor> actors, List<Collectible> collectibles, LevelRenderer levelRenderer, String levelFilePath, int timer) {
+    public LevelData(final Tile[][] tiles,
+                     final int gridWidth,
+                     final int gridHeight,
+                     final List<Actor> actors,
+                     final List<Collectible> collectibles,
+                     final LevelRenderer levelRenderer,
+                     final String levelFilePath,
+                     final int timer) {
         this.tiles = tiles;
         this.actors = actors;
         this.collectibles = collectibles;
@@ -53,6 +62,25 @@ public class LevelData {
     }
 
     /**
+     * Gets the width of the grid.
+     *
+     * @return The width of the grid.
+     */
+    public int getGridWidth() {
+        return gridWidth;
+    }
+
+    /**
+     * Gets the height of the grid.
+     *
+     * @return The height of the grid.
+     */
+    public int getGridHeight() {
+        return gridHeight;
+    }
+
+
+    /**
      * Gets the array of tiles for the level.
      *
      * @return The array of tiles.
@@ -66,7 +94,7 @@ public class LevelData {
      *
      * @param levelRenderer The renderer to be set for the level.
      */
-    public void setLevelRenderer(LevelRenderer levelRenderer) {
+    public void setLevelRenderer(final LevelRenderer levelRenderer) {
         this.levelRenderer = levelRenderer;
     }
 
@@ -93,7 +121,7 @@ public class LevelData {
      *
      * @param collectibles The list of collectibles to be set.
      */
-    public void setCollectibles(List<Collectible> collectibles) {
+    public void setCollectibles(final List<Collectible> collectibles) {
         this.collectibles = collectibles;
     }
 
@@ -102,7 +130,7 @@ public class LevelData {
      *
      * @param actors The list of actors to be set.
      */
-    public void setActors(List<Actor> actors) {
+    public void setActors(final List<Actor> actors) {
         this.actors = actors;
     }
 
@@ -120,7 +148,7 @@ public class LevelData {
      *
      * @param i The new timer value.
      */
-    public void setTimer(int i) {
+    public void setTimer(final int i) {
         this.timer = i;
     }
 

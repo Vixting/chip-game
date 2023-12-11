@@ -4,21 +4,26 @@ import org.json.JSONObject;
 
 /**
  * Represents a trap tile in the ChipGame.
- * A trap tile can be linked to a button and changes its state based on the button's state.
+ * A trap tile can be linked to a button
+ * and changes its state based on the button's state.
+ * @author William Buckley
  */
 public class Trap extends Tile {
-    private static final String TRAP_IMAGE_PATH = "/images/chipgame/tiles/trap.jpg";
+    private static final String TRAP_IMAGE_PATH =
+            "/images/chipgame/tiles/trap.jpg";
 
     private Button linkedButton;
     private String id;
 
     /**
-     * Constructs a new Trap tile linked to a button and with a specific identifier.
+     * Constructs a new Trap tile linked to a
+     * button and with a specific identifier.
      *
      * @param linkedButton The button linked to this trap.
      * @param id           The unique identifier for this trap.
      */
-    public Trap(Button linkedButton, String id) {
+    public Trap(final Button linkedButton,
+                final String id) {
         super(TRAP_IMAGE_PATH, true);
         this.linkedButton = linkedButton;
         this.id = id;
@@ -31,7 +36,8 @@ public class Trap extends Tile {
      * @return true if the trap is active, false otherwise.
      */
     public boolean isActive() {
-        return linkedButton != null && !linkedButton.isActive();
+        return linkedButton != null
+                && !linkedButton.isActive();
     }
 
     /**
@@ -48,7 +54,7 @@ public class Trap extends Tile {
      *
      * @param id The new unique identifier for the trap.
      */
-    public void setConnection(String id) {
+    public void setConnection(final String id) {
         this.id = id;
     }
 
@@ -69,7 +75,7 @@ public class Trap extends Tile {
      *
      * @param linkedButton The button to link to the trap.
      */
-    public void setLinkedButton(Button linkedButton) {
+    public void setLinkedButton(final Button linkedButton) {
         this.linkedButton = linkedButton;
     }
 }

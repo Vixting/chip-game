@@ -7,6 +7,7 @@ import java.util.*;
 /**
  * Represents a player's profile in the game, including their name, keybinds,
  * completed levels, level scores, and save file paths.
+ * @author William Buckley
  */
 public class Profile {
     private String name;
@@ -20,7 +21,7 @@ public class Profile {
      *
      * @param name The name of the profile.
      */
-    public Profile(String name) {
+    public Profile(final String name) {
         this.name = name;
         this.keybinds = new HashMap<>();
         this.completedLevels = new HashSet<>();
@@ -41,7 +42,7 @@ public class Profile {
      *
      * @param name The new name of the profile.
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -52,7 +53,8 @@ public class Profile {
      * @param level The level for which the score is to be set.
      * @param score The score to be set for the level.
      */
-    public void setLevelScore(String level, int score) {
+    public void setLevelScore(final String level,
+                              final int score) {
         levelScores.put(level, score);
     }
 
@@ -88,7 +90,7 @@ public class Profile {
      *
      * @param filePath The file path to be added.
      */
-    public void addSaveFilePath(String filePath) {
+    public void addSaveFilePath(final String filePath) {
         if (!saveFilePaths.contains(filePath)) {
             saveFilePaths.add(filePath);
         }
@@ -99,7 +101,7 @@ public class Profile {
      *
      * @param levelName The name of the level to be marked as completed.
      */
-    public void addCompletedLevel(String levelName) {
+    public void addCompletedLevel(final String levelName) {
         completedLevels.add(levelName);
     }
 

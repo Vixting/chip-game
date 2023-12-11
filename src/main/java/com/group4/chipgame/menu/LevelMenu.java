@@ -11,8 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class is responsible for creating and displaying the level selection menu.
- * It allows users to scroll through available levels and select one to play.
+ * This class is responsible for creating
+ * and displaying the level selection menu.
+ * It allows users to scroll through
+ * available levels and select one to play.
+ * @author William Buckler
  */
 public class LevelMenu extends BaseMenu {
 
@@ -25,27 +28,41 @@ public class LevelMenu extends BaseMenu {
                     + " -fx-background-radius: 10;";
 
     /**
-     * Populates the provided VBox with buttons corresponding to levels available for play.
+     * Populates the provided VBox with buttons
+     * corresponding to levels available for play.
      *
      * @param menuBox       The VBox container to add level buttons to.
      * @param primaryStage  The primary stage of the application.
      * @param mainApp       The main application class instance.
      */
-    public static void populateLevelMenu(VBox menuBox, Stage primaryStage, Main mainApp) {
+    public static void populateLevelMenu(final VBox menuBox,
+                                         final Stage primaryStage,
+                                         final Main mainApp) {
         menuBox.getChildren().clear();
         try {
             List<File> allFiles = loadLevelFiles();
 
-            int startIndex = currentPage * LEVELS_PER_PAGE;
-            int endIndex = Math.min(startIndex + LEVELS_PER_PAGE, allFiles.size());
+            int startIndex = currentPage
+                    * LEVELS_PER_PAGE;
+            int endIndex = Math.min(startIndex
+                    + LEVELS_PER_PAGE,
+                    allFiles.size());
 
             for (int i = startIndex; i < endIndex; i++) {
                 File child = allFiles.get(i);
-                String levelDisplayName = formatLevelDisplayName(child.getName());
-                addButtonForLevel(menuBox, levelDisplayName, child.getName(), primaryStage, mainApp);
+                String levelDisplayName =
+                        formatLevelDisplayName(child.getName());
+                addButtonForLevel(menuBox,
+                        levelDisplayName,
+                        child.getName(),
+                        primaryStage,
+                        mainApp);
             }
 
-            addNavigationButtons(menuBox, primaryStage, mainApp, allFiles.size());
+            addNavigationButtons(menuBox,
+                    primaryStage,
+                    mainApp,
+                    allFiles.size());
 
             Button backButton = createBackButton(primaryStage, mainApp);
             backButton.setStyle(LEVEL_BUTTON_STYLE);
@@ -58,9 +75,6 @@ public class LevelMenu extends BaseMenu {
 
     /**
      * Loads level files from a specified directory path.
-     *
-     * @return A list of level file objects.
-     * @throws IOException if there's an issue loading the level files.
      */
     private static List<File> loadLevelFiles() throws IOException {
         String levelsPath = "src/main/java/levels";
@@ -74,7 +88,9 @@ public class LevelMenu extends BaseMenu {
                 allFiles.addAll(Arrays.asList(directoryListing));
             }
         } else {
-            throw new IOException("Levels directory not found or not a directory: " + levelsPath);
+            throw new IOException(
+                    "Levels directory not found or not a directory: "
+                            + levelsPath);
         }
 
         return allFiles;
@@ -82,20 +98,17 @@ public class LevelMenu extends BaseMenu {
 
     /**
      * Adds a button for the specified level to the menu.
-     *
-     * @param menuBox           The VBox container to add the level button to.
-     * @param levelDisplayName  The display name for the level button.
-     * @param fileName          The file name of the level to be loaded when the button is pressed.
-     * @param primaryStage      The primary stage of the application.
-     * @param mainApp           The main application class instance.
      */
     private static void addButtonForLevel(
-            VBox menuBox,
-            String levelDisplayName,
-            String fileName,
-            Stage primaryStage,
-            Main mainApp) {
-        Button levelButton = createButton(levelDisplayName, menuBox.widthProperty(), menuBox.heightProperty(), () -> {
+            final VBox menuBox,
+            final String levelDisplayName,
+            final String fileName,
+            final Stage primaryStage,
+            final Main mainApp) {
+        Button levelButton =
+                createButton(levelDisplayName,
+                        menuBox.widthProperty(),
+                        menuBox.heightProperty(), () -> {
             try {
                 String filePath = "src/main/java/levels/" + fileName;
                 mainApp.startLevel(filePath, primaryStage);
@@ -108,14 +121,13 @@ public class LevelMenu extends BaseMenu {
     }
 
     /**
-     * Adds navigation buttons (previous, next) for scrolling through the levels.
-     *
-     * @param menuBox      The VBox container to add navigation buttons to.
-     * @param primaryStage The primary stage of the application.
-     * @param mainApp      The main application class instance.
-     * @param totalLevels  The total number of levels available.
+     * Adds navigation buttons
+     * (previous, next) for scrolling through the levels.
      */
-    private static void addNavigationButtons(VBox menuBox, Stage primaryStage, Main mainApp, int totalLevels) {
+    private static void addNavigationButtons(final VBox menuBox,
+                                             final Stage primaryStage,
+                                             final Main mainApp,
+                                             final int totalLevels) {
         if (currentPage > 0) {
             addButton("Previous", menuBox, primaryStage, mainApp, () -> {
                 currentPage--;
@@ -133,11 +145,8 @@ public class LevelMenu extends BaseMenu {
 
     /**
      * Formats the display name for a level based on its file name.
-     *
-     * @param fileName The file name of the level.
-     * @return A formatted display name for the level.
      */
-    private static String formatLevelDisplayName(String fileName) {
+    private static String formatLevelDisplayName(final String fileName) {
         return "Start " + fileName.substring(0, fileName.lastIndexOf('.'));
     }
 }

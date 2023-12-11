@@ -14,6 +14,7 @@ import java.util.Objects;
 
 /**
  * Represents a collectible entity in the game.
+ * @author William Buckley
  */
 public class Collectible extends ImageView implements Entity {
     private final Point2D currentPosition;

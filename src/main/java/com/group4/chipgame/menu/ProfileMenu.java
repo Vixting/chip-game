@@ -16,12 +16,17 @@ import java.util.Optional;
 /**
  * This class is responsible for displaying and managing the profile menu.
  * It allows users to create, select, and delete profiles.
+ * @author William Buckley
  */
 public class ProfileMenu extends BaseMenu {
 
-    private static final String MENU_STYLE = "-fx-background-color: linear-gradient(to bottom, #222, #333);";
-    private static final String BUTTON_DELETE_STYLE = "-fx-background-color: #FF6347; -fx-text-fill: white;";
-    private static final String BUTTON_CREATE_STYLE = "-fx-background-color: #2E8B57; -fx-text-fill: white;"; // Slightly darker green
+    private static final String MENU_STYLE =
+            "-fx-background-color: linear-gradient(to bottom, #222, #333);";
+    private static final String BUTTON_DELETE_STYLE =
+            "-fx-background-color: #FF6347; -fx-text-fill: white;";
+    private static final String BUTTON_CREATE_STYLE =
+            "-fx-background-color: #2E8B57;"
+                    + " -fx-text-fill: white;";
     private static final int PROFILES_PER_PAGE = 5;
     private static final int MENU_SPACING = 20;
     private static final Insets STACK_PANE_INSETS = new Insets(5);
@@ -39,7 +44,9 @@ public class ProfileMenu extends BaseMenu {
      * @param mainApp        The main application instance.
      * @param primaryStage   The primary stage of the application.
      */
-    public ProfileMenu(ProfileManager profileManager, Main mainApp, Stage primaryStage) {
+    public ProfileMenu(final ProfileManager profileManager,
+                       final Main mainApp,
+                       final Stage primaryStage) {
         this.profileManager = profileManager;
         this.mainApp = mainApp;
         this.primaryStage = primaryStage;
@@ -70,14 +77,18 @@ public class ProfileMenu extends BaseMenu {
 
         List<String> profileNames = profileManager.getProfileNames();
         int startIndex = currentPage * PROFILES_PER_PAGE;
-        int endIndex = Math.min(startIndex + PROFILES_PER_PAGE, profileNames.size());
+        int endIndex = Math.min(startIndex
+                + PROFILES_PER_PAGE, profileNames.size());
 
         for (int i = startIndex; i < endIndex; i++) {
             String profileName = profileNames.get(i);
             StackPane profileStack = new StackPane();
             profileStack.setPadding(STACK_PANE_INSETS);
-            Button profileButton = createButton(profileName, menuBox.widthProperty(), menuBox.heightProperty(), () -> {
-                profileManager.setCurrentProfile(profileManager.getProfileByName(profileName).orElse(null));
+            Button profileButton = createButton(profileName,
+                    menuBox.widthProperty(),
+                    menuBox.heightProperty(), () -> {
+                profileManager.setCurrentProfile(profileManager.
+                        getProfileByName(profileName).orElse(null));
                 try {
                     profileManager.saveProfiles();
                 } catch (IOException e) {
@@ -116,7 +127,8 @@ public class ProfileMenu extends BaseMenu {
             try {
                 profileManager.addProfile(name);
                 profileManager.saveProfiles();
-                profileManager.setCurrentProfile(profileManager.getProfileByName(name).orElse(null));
+                profileManager.setCurrentProfile(profileManager.
+                        getProfileByName(name).orElse(null));
                 refreshProfileMenu();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -126,11 +138,12 @@ public class ProfileMenu extends BaseMenu {
 
     /**
      * Deletes a profile after confirmation from the user.
-     *
-     * @param profileName The name of the profile to delete.
      */
-    private void deleteProfile(String profileName) {
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + profileName + "?", ButtonType.YES, ButtonType.NO);
+    private void deleteProfile(final String profileName) {
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION,
+                "Delete " + profileName + "?",
+                ButtonType.YES,
+                ButtonType.NO);
         confirmDialog.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
@@ -153,9 +166,6 @@ public class ProfileMenu extends BaseMenu {
 
     /**
      * Adds navigation buttons to the menu for scrolling through profiles.
-     *
-     * @param menuBox       The VBox container for the buttons.
-     * @param totalProfiles The total number of profiles available.
      */
     private void addNavigationButtons(VBox menuBox, int totalProfiles) {
         if (currentPage > 0) {

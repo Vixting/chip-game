@@ -1,7 +1,9 @@
 package com.group4.chipgame.entities.actors;
 
-import com.group4.chipgame.*;
+import com.group4.chipgame.Direction;
+import com.group4.chipgame.EffectManager;
 import com.group4.chipgame.Level.LevelRenderer;
+import com.group4.chipgame.Main;
 import com.group4.chipgame.entities.actors.collectibles.Collectible;
 import com.group4.chipgame.entities.actors.tiles.Tile;
 import com.group4.chipgame.entities.actors.tiles.Trap;
@@ -19,7 +21,9 @@ import java.util.Optional;
 
 /**
  * Represents an abstract actor in the ChipGame.
- * An actor is an entity that can move and interact with tiles and other actors.
+ * An actor is an entity that can move
+ * and interact with tiles and other actors.
+ * @author William Buckley
  */
 public abstract class Actor extends ImageView implements Entity {
     private Point2D currentPosition;
@@ -37,13 +41,16 @@ public abstract class Actor extends ImageView implements Entity {
     }
 
     /**
-     * Constructs an Actor with the specified image, initial position, and move interval.
+     * Constructs an Actor with the specified image,
+     * initial position, and move interval.
      *
      * @param imagePath The path to the image representing the actor.
      * @param x         The initial x-coordinate of the actor.
      * @param y         The initial y-coordinate of the actor.
      */
-    public Actor(String imagePath, double x, double y) {
+    public Actor(final String imagePath,
+                 final double x,
+                 final double y) {
         initializeImage(imagePath);
         currentPosition = new Point2D(x, y);
         updatePosition();
@@ -55,8 +62,10 @@ public abstract class Actor extends ImageView implements Entity {
      *
      * @param imagePath The path to the image file for this actor.
      */
-    private void initializeImage(String imagePath) {
-        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+    private void initializeImage(final String imagePath) {
+        Image image = new Image(
+                Objects.requireNonNull(
+                        getClass().getResourceAsStream(imagePath)));
         setImage(image);
         setSmooth(true);
         fitWidthProperty().bind(Main.ACTOR_SIZE);
@@ -77,7 +86,8 @@ public abstract class Actor extends ImageView implements Entity {
     }
 
     /**
-     * Updates the position of the actor on the screen based on its current grid position.
+     * Updates the position of the actor on
+     * the screen based on its current grid position.
      */
     private void updatePosition() {
         double offset = calculateOffset();
@@ -110,7 +120,7 @@ public abstract class Actor extends ImageView implements Entity {
      * @param ticksElapsed The number of game ticks that have elapsed.
      * @return True if the actor should move, false otherwise.
      */
-    public boolean shouldMove(long ticksElapsed) {
+    public boolean shouldMove(final long ticksElapsed) {
         return ticksElapsed % this.moveInterval == 0;
     }
 
@@ -121,7 +131,9 @@ public abstract class Actor extends ImageView implements Entity {
      * @param dy The change in the y-coordinate.
      * @param levelRenderer The renderer for the game level.
      */
-    public void move(double dx, double dy, LevelRenderer levelRenderer) {
+    public void move(final double dx,
+                     final double dy,
+                     final LevelRenderer levelRenderer) {
         if (isMoving) {
             return;
         }
@@ -150,7 +162,9 @@ public abstract class Actor extends ImageView implements Entity {
      * @param levelRenderer The renderer for the game level.
      * @return True if the move is valid, false otherwise.
      */
-    protected boolean canMove(double dx, double dy, LevelRenderer levelRenderer) {
+    protected boolean canMove(final double dx,
+                              final double dy,
+                              final LevelRenderer levelRenderer) {
         Point2D newPosition = currentPosition.add(dx, dy);
         return isMoveValid(newPosition, levelRenderer);
     }
@@ -162,7 +176,8 @@ public abstract class Actor extends ImageView implements Entity {
      * @param levelRenderer The renderer for the game level.
      * @return True if the move is valid, false otherwise.
      */
-    protected boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
+    protected boolean isMoveValid(final Point2D newPosition,
+                                  final LevelRenderer levelRenderer) {
         Optional<Tile> targetTileOpt =
                 levelRenderer.getTileAtGridPosition((int) newPosition.getX(),
                         (int) newPosition.getY());
@@ -171,9 +186,12 @@ public abstract class Actor extends ImageView implements Entity {
         }
 
         Optional<Tile> currentTileOpt =
-                levelRenderer.getTileAtGridPosition((int) currentPosition.getX(),
+                levelRenderer.getTileAtGridPosition(
+                        (int) currentPosition.getX(),
                         (int) currentPosition.getY());
-        if (currentTileOpt.isPresent() && currentTileOpt.get() instanceof Trap currentTrap && currentTrap.isActive()) {
+        if (currentTileOpt.isPresent()
+                && currentTileOpt.get() instanceof Trap currentTrap
+                && currentTrap.isActive()) {
             return false;
         }
 
@@ -196,7 +214,10 @@ public abstract class Actor extends ImageView implements Entity {
      * @param levelRenderer The renderer for the game level.
      * @param direction The direction of the move.
      */
-    public void performMove(double newX, double newY, LevelRenderer levelRenderer, Direction direction) {
+    public void performMove(final double newX,
+                            final double newY,
+                            final LevelRenderer levelRenderer,
+                            final Direction direction) {
         isMoving = true;
         Timeline timeline = createTimeline(newX, newY);
 
@@ -214,8 +235,13 @@ public abstract class Actor extends ImageView implements Entity {
      * @param newY The new y-coordinate of the actor.
      * @param direction The direction of the move.
      */
-    private void updateTileOccupancy(LevelRenderer levelRenderer, double newX, double newY, Direction direction) {
-        levelRenderer.getTileAtGridPosition((int) currentPosition.getX(), (int) currentPosition.getY())
+    private void updateTileOccupancy(final LevelRenderer levelRenderer,
+                                     final double newX,
+                                     final double newY,
+                                     final Direction direction) {
+        levelRenderer.getTileAtGridPosition(
+                (int) currentPosition.getX(),
+                        (int) currentPosition.getY())
                 .ifPresent(tile -> tile.setOccupiedBy(null));
 
         currentPosition = new Point2D(newX, newY);
@@ -234,20 +260,23 @@ public abstract class Actor extends ImageView implements Entity {
      * @param newY The new y-coordinate of the actor.
      * @return The timeline object for the animation.
      */
-    private Timeline createTimeline(double newX, double newY) {
+    private Timeline createTimeline(final double newX,
+                                    final double newY) {
         double offset = calculateOffset();
 
         double distance = currentPosition.distance(newX, newY);
         double durationMillis = distance / BASE_SPEED;
 
-        KeyValue kvX = new KeyValue(this.layoutXProperty(), newX * Main.TILE_SIZE.get() + offset);
-        KeyValue kvY = new KeyValue(this.layoutYProperty(), newY * Main.TILE_SIZE.get() + offset);
+        KeyValue kvX = new KeyValue(this.layoutXProperty(),
+                newX * Main.TILE_SIZE.get() + offset);
+        KeyValue kvY = new KeyValue(this.layoutYProperty(),
+                newY * Main.TILE_SIZE.get() + offset);
         KeyFrame kf = new KeyFrame(Duration.millis(durationMillis), kvX, kvY);
 
         return new Timeline(kf);
     }
 
-    protected void setMoveInterval(int i) {
+    protected void setMoveInterval(final int i) {
         this.moveInterval = i;
     }
 }

@@ -15,6 +15,7 @@ import java.util.Optional;
 
 /**
  * Class representing an Ice tile in the game.
+ * @author William Buckley
  */
 public class Ice extends Tile {
 
@@ -33,18 +34,15 @@ public class Ice extends Tile {
      *
      * @param corner The corner direction of the ice.
      */
-    public Ice(Direction.Corner corner) {
+    public Ice(final Direction.Corner corner) {
         super(getImagePathForCorner(corner), true);
         this.corner = corner;
     }
 
     /**
      * Gets the image path for the specified corner of ice.
-     *
-     * @param corner The corner for which the image path is required.
-     * @return The image path as a string.
      */
-    private static String getImagePathForCorner(Direction.Corner corner) {
+    private static String getImagePathForCorner(final Direction.Corner corner) {
         return switch (corner) {
             case NONE -> BASE_PATH + ICE;
             case BOTTOM_LEFT -> BASE_PATH + ICE_BOTTOM_LEFT;
@@ -60,11 +58,15 @@ public class Ice extends Tile {
      *
      * @param actor The actor stepping on the tile.
      * @param levelRenderer The renderer for the level.
-     * @param incomingDirection The direction from which the actor steps onto the tile.
+     * @param incomingDirection The direction from
+     *                          which the actor steps onto the tile.
      */
-    public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
-        System.out.println("Sliding!");
-        PauseTransition pause = createPauseTransition(actor, levelRenderer, incomingDirection);
+    public void onStep(final Actor actor,
+                       final LevelRenderer levelRenderer,
+                       final Direction incomingDirection) {
+        PauseTransition pause = createPauseTransition(actor,
+                levelRenderer,
+                incomingDirection);
         pause.play();
     }
 
@@ -80,16 +82,25 @@ public class Ice extends Tile {
         return json;
     }
 
+    /**
+     * Creates a pause transition for an actor, used to delay actions such as sliding.
+     */
     private PauseTransition createPauseTransition(
-            Actor actor,
-            LevelRenderer levelRenderer,
-            Direction incomingDirection) {
+            final Actor actor,
+            final LevelRenderer levelRenderer,
+            final Direction incomingDirection) {
         PauseTransition pause = new PauseTransition(Duration.millis(DURATION));
-        pause.setOnFinished(event -> performSlide(actor, levelRenderer, incomingDirection));
+        pause.setOnFinished(event
+                -> performSlide(actor, levelRenderer, incomingDirection));
         return pause;
     }
 
-    private void performSlide(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
+    /**
+     * Executes the slide movement for an actor, typically used on ice or similar surfaces.
+     */
+    private void performSlide(final Actor actor,
+                              final LevelRenderer levelRenderer,
+                              final Direction incomingDirection) {
         Direction slideDirection = determineSlideDirection(incomingDirection);
         double newX = actor.getPosition().getX() + slideDirection.getDx();
         double newY = actor.getPosition().getY() + slideDirection.getDy();
@@ -101,34 +112,51 @@ public class Ice extends Tile {
         handleActorOnIce(actor, newX, newY, levelRenderer, slideDirection);
     }
 
-    private Direction determineSlideDirection(Direction incomingDirection) {
+    /**
+     * Determines the slide direction based on the incoming direction and the current position
+     * of the actor, especially when encountering corners.
+     */
+    private Direction determineSlideDirection(
+            final Direction incomingDirection) {
         return switch (corner) {
             case BOTTOM_LEFT ->
                     (incomingDirection == Direction.LEFT)
-                            ? Direction.UP : (incomingDirection == Direction.DOWN)
-                            ? Direction.RIGHT : incomingDirection;
+                            ? Direction.UP
+                            : (incomingDirection == Direction.DOWN)
+                            ? Direction.RIGHT
+                            : incomingDirection;
             case BOTTOM_RIGHT ->
                     (incomingDirection == Direction.RIGHT)
-                            ? Direction.UP : (incomingDirection == Direction.DOWN)
-                            ? Direction.LEFT : incomingDirection;
+                            ? Direction.UP
+                            : (incomingDirection == Direction.DOWN)
+                            ? Direction.LEFT
+                            : incomingDirection;
             case TOP_LEFT ->
                     (incomingDirection == Direction.LEFT)
-                            ? Direction.DOWN : (incomingDirection == Direction.UP)
-                            ? Direction.RIGHT : incomingDirection;
+                            ? Direction.DOWN
+                            : (incomingDirection == Direction.UP)
+                            ? Direction.RIGHT
+                            : incomingDirection;
             case TOP_RIGHT ->
                     (incomingDirection == Direction.RIGHT)
-                            ? Direction.DOWN : (incomingDirection == Direction.UP)
-                            ? Direction.LEFT : incomingDirection;
+                            ? Direction.DOWN
+                            : (incomingDirection == Direction.UP)
+                            ? Direction.LEFT
+                            : incomingDirection;
             default -> incomingDirection;
         };
     }
 
+    /**
+     * Handles the interaction of an actor when on ice, including continuing the slide or
+     * interacting with other tiles.
+     */
     private void handleActorOnIce(
-            Actor actor,
-            double newX,
-            double newY,
-            LevelRenderer levelRenderer,
-            Direction incomingDirection) {
+            final Actor actor,
+            final double newX,
+            final double newY,
+            final LevelRenderer levelRenderer,
+            final Direction incomingDirection) {
         Optional<Tile> targetTileOptional =
                 levelRenderer.getTileAtGridPosition((int) newX, (int) newY);
         targetTileOptional.ifPresent(tile ->
@@ -141,64 +169,102 @@ public class Ice extends Tile {
                         incomingDirection));
     }
 
+    /**
+     * Manages interactions between an actor and a tile, such as
+     * opening doors or collecting items.
+     */
     private void handleTileInteraction(
-            Actor actor,
-            double newX,
-            double newY,
-            Tile targetTile,
-            LevelRenderer levelRenderer,
-            Direction incomingDirection) {
+            final Actor actor,
+            final double newX,
+            final double newY,
+            final Tile targetTile,
+            final LevelRenderer levelRenderer,
+            final Direction incomingDirection) {
         System.out.println("Handling tile interaction");
-        if (actor instanceof Player player && targetTile instanceof LockedDoor door) {
-            handlePlayerDoorInteraction(player, door, levelRenderer, incomingDirection);
+        if (actor instanceof Player player
+                && targetTile instanceof LockedDoor door) {
+            handlePlayerDoorInteraction(player,
+                    door,
+                    levelRenderer,
+                    incomingDirection);
             return;
         }
 
         if (targetTile.isWalkable()) {
             Entity actorOnTile = targetTile.getOccupiedBy();
-            if (actorOnTile instanceof Player && actor instanceof MovableBlock) {
+            if (actorOnTile instanceof Player
+                    && actor instanceof MovableBlock) {
                 ((Player) actorOnTile).kill(levelRenderer);
 
-                continueSlide(actor, levelRenderer, incomingDirection);
+                continueSlide(actor,
+                        levelRenderer,
+                        incomingDirection);
             } else {
-                handleTileOccupancy(targetTile, actor, newX, newY, levelRenderer, incomingDirection);
+                handleTileOccupancy(targetTile,
+                        actor,
+                        newX,
+                        newY,
+                        levelRenderer,
+                        incomingDirection);
             }
         } else {
-            handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
+            handleReverseSlide(actor,
+                    levelRenderer,
+                    incomingDirection.getOpposite());
         }
     }
 
-    private void continueSlide(Actor actor, LevelRenderer levelRenderer, Direction direction) {
+    /**
+     * Continues the sliding motion of an actor if the next tile in the
+     * slide direction is walkable.
+     */
+    private void continueSlide(final Actor actor,
+                                final LevelRenderer levelRenderer,
+                                final Direction direction) {
         double nextX = actor.getPosition().getX() + direction.getDx();
         double nextY = actor.getPosition().getY() + direction.getDy();
 
-        Optional<Tile> nextTileOpt = levelRenderer.getTileAtGridPosition((int) nextX, (int) nextY);
-        if (nextTileOpt.isPresent() && nextTileOpt.get().isWalkable() && !nextTileOpt.get().isOccupied()) {
+        Optional<Tile> nextTileOpt =
+                levelRenderer.getTileAtGridPosition(
+                        (int) nextX, (int) nextY);
+        if (nextTileOpt.isPresent()
+                && nextTileOpt.get().isWalkable()
+                && !nextTileOpt.get().isOccupied()) {
             actor.performMove(nextX, nextY, levelRenderer, direction);
         }
     }
 
-
+    /**
+     * Manages the interaction between a player and a locked door.
+     * The player can open the door if they have the required key,
+     * or be forced to slide in the opposite direction if not.
+     */
     private void handlePlayerDoorInteraction(
-            Player player,
-            LockedDoor door,
-            LevelRenderer levelRenderer,
-            Direction incomingDirection) {
+            final Player player,
+            final LockedDoor door,
+            final LevelRenderer levelRenderer,
+            final Direction incomingDirection) {
         if (player.hasKey(door.getRequiredKeyColor())) {
             door.onStep(player, levelRenderer, incomingDirection);
             onStep(player, levelRenderer, incomingDirection);
         } else {
-            handleReverseSlide(player, levelRenderer, incomingDirection.getOpposite());
+            handleReverseSlide(player,
+                    levelRenderer,
+                    incomingDirection.getOpposite());
         }
     }
 
+    /**
+     * Manages the interaction when an actor moves onto a tile,
+     * handling scenarios like collecting items or interacting with movable blocks.
+     */
     private void handleTileOccupancy(
-            Tile targetTile,
-            Actor actor,
-            double newX,
-            double newY,
-            LevelRenderer levelRenderer,
-            Direction incomingDirection) {
+            final Tile targetTile,
+            final Actor actor,
+            final double newX,
+            final double newY,
+            final LevelRenderer levelRenderer,
+            final Direction incomingDirection) {
         if (!targetTile.isOccupied()) {
             actor.performMove(newX, newY, levelRenderer, incomingDirection);
             System.out.println("Sliding to " + newX + ", " + newY);
@@ -216,26 +282,40 @@ public class Ice extends Tile {
                             incomingDirection,
                             levelRenderer);
                     if (!blockMoved) {
-                        handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
+                        handleReverseSlide(actor,
+                                levelRenderer,
+                                incomingDirection.getOpposite());
                     }
                 } else {
-                    onStep(actor, levelRenderer, incomingDirection);
+                    onStep(actor,
+                            levelRenderer,
+                            incomingDirection);
                 }
             } else {
-                handleReverseSlide(actor, levelRenderer, incomingDirection.getOpposite());
+                handleReverseSlide(actor,
+                        levelRenderer,
+                        incomingDirection.getOpposite());
             }
         }
     }
 
+    /**
+     * Manages the interaction between an actor and a movable block,
+     * determining if the block can be moved and updating positions accordingly.
+     */
     private boolean handleMovableBlockInteraction(
-            Actor actor,
-            Actor block,
-            Direction direction,
-            LevelRenderer levelRenderer) {
+            final Actor actor,
+            final Actor block,
+            final Direction direction,
+            final LevelRenderer levelRenderer) {
         double blockNewX = block.getPosition().getX() + direction.getDx();
         double blockNewY = block.getPosition().getY() + direction.getDy();
-        Optional<Tile> blockTargetTile = levelRenderer.getTileAtGridPosition((int) blockNewX, (int) blockNewY);
-        if (blockTargetTile.isPresent() && blockTargetTile.get().isWalkable() && !blockTargetTile.get().isOccupied()) {
+        Optional<Tile> blockTargetTile =
+                levelRenderer.getTileAtGridPosition(
+                        (int) blockNewX, (int) blockNewY);
+        if (blockTargetTile.isPresent()
+                && blockTargetTile.get().isWalkable()
+                && !blockTargetTile.get().isOccupied()) {
             block.performMove(blockNewX, blockNewY, levelRenderer, direction);
             actor.performMove(
                     actor.getPosition().getX() + direction.getDx(),
@@ -246,15 +326,30 @@ public class Ice extends Tile {
         return false;
     }
 
-    private void handleReverseSlide(Actor actor, LevelRenderer levelRenderer, Direction reverseDirection) {
-        Direction effectiveReverseDirection = determineSlideDirection(reverseDirection);
-        double reverseX = actor.getPosition().getX() + effectiveReverseDirection.getDx();
-        double reverseY = actor.getPosition().getY() + effectiveReverseDirection.getDy();
-        Optional<Tile> reverseTileOptional = levelRenderer.getTileAtGridPosition((int) reverseX, (int) reverseY);
+    /**
+     * Handles the reverse sliding of an actor, typically triggered when an obstacle is encountered.
+     * The actor slides in the opposite direction of the incoming movement.
+     */
+    private void handleReverseSlide(final Actor actor,
+                                    final LevelRenderer levelRenderer,
+                                    final Direction reverseDirection) {
+        Direction effectiveReverseDirection =
+                determineSlideDirection(reverseDirection);
+        double reverseX = actor.getPosition().getX()
+                + effectiveReverseDirection.getDx();
+        double reverseY = actor.getPosition().getY()
+                + effectiveReverseDirection.getDy();
+        Optional<Tile> reverseTileOptional =
+                levelRenderer.getTileAtGridPosition(
+                        (int) reverseX,
+                        (int) reverseY);
         if (reverseTileOptional.isPresent()
                 && reverseTileOptional.get().isWalkable()
                 && !reverseTileOptional.get().isOccupied()) {
-            actor.performMove(reverseX, reverseY, levelRenderer, effectiveReverseDirection);
+            actor.performMove(reverseX,
+                    reverseY,
+                    levelRenderer,
+                    effectiveReverseDirection);
         }
     }
 }

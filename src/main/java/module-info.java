@@ -8,6 +8,8 @@ module com.group.chipgame {
 
     opens com.group4.chipgame to javafx.fxml;
     exports com.group4.chipgame;
+    exports com.group4.chipgame.ui;
+    exports com.group4.chipgame.profile;
     exports com.group4.chipgame.Level.saving;
     exports com.group4.chipgame.entities.actors;
     exports com.group4.chipgame.entities.actors.collectibles;

@@ -14,6 +14,7 @@ import java.util.*;
 
 /**
  * Renderer for the level in the ChipGame.
+ * @author William Buckley
  */
 public class LevelRenderer {
     private static final String FONT_ARIAL = "Arial";
@@ -64,7 +65,8 @@ public class LevelRenderer {
                 tiles[y][x].setOccupiedBy(actor);
             }
         }
-        for (final Collectible collectible : currentLevelData.getCollectibles()) {
+        for (final Collectible collectible
+                : currentLevelData.getCollectibles()) {
             Point2D collectiblePosition = collectible.getPosition();
             int x = (int) collectiblePosition.getX();
             int y = (int) collectiblePosition.getY();
@@ -77,10 +79,6 @@ public class LevelRenderer {
 
     /**
      * Checks if the given coordinates are valid within the tile grid.
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @return true if coordinates are valid, false otherwise.
      */
     private boolean isValidCoordinate(final int x, final int y) {
         return x >= 0 && y >= 0 && y < tiles.length && x < tiles[y].length;
@@ -160,14 +158,17 @@ public class LevelRenderer {
 
     /**
      * Renders a label for a ChipSocket.
-     *
-     * @param chipSocket The ChipSocket to render a label for.
      */
-    private void renderChipSocketLabel(final ChipSocket chipSocket) {
-        Label chipCountLabel = new Label(String.valueOf(chipSocket.getRequiredChips()));
-        chipCountLabel.setFont(new Font(FONT_ARIAL, CHIP_COUNT_FONT_SIZE));
-        chipCountLabel.setTextFill(javafx.scene.paint.Color.WHITE);
-        Point2D position = new Point2D(chipSocket.getGridX(), chipSocket.getGridY());
+    private void renderChipSocketLabel(
+            final ChipSocket chipSocket) {
+        Label chipCountLabel =
+                new Label(String.valueOf(chipSocket.getRequiredChips()));
+        chipCountLabel.setFont(
+                new Font(FONT_ARIAL, CHIP_COUNT_FONT_SIZE));
+        chipCountLabel.setTextFill(
+                javafx.scene.paint.Color.WHITE);
+        Point2D position = new Point2D(
+                chipSocket.getGridX(), chipSocket.getGridY());
         chipSocketLabels.put(position, chipCountLabel);
         double labelX = chipSocket.getLayoutX()
                 + (Main.TILE_SIZE.get() - chipCountLabel.getWidth()) / 2.0;
@@ -213,13 +214,13 @@ public class LevelRenderer {
      */
     public void remove(final Collectible collectible) {
         this.currentLevelData.getCollectibles().remove(collectible);
-        Platform.runLater(() -> collectiblesPane.getChildren().remove(collectible));
+        Platform.runLater(()
+                -> collectiblesPane.getChildren().remove(collectible));
     }
 
     /**
-     * Schedules a modification of a pane to be executed on the JavaFX application thread.
-     *
-     * @param action The action to be performed.
+     * Schedules a modification of a pane
+     * to be executed on the JavaFX application thread.
      */
     private void modifyPaneLater(final Runnable action) {
         Platform.runLater(action);
@@ -227,11 +228,6 @@ public class LevelRenderer {
 
     /**
      * Casts and collects all nodes of a specified type from a pane.
-     *
-     * @param <T>   The type of nodes to collect.
-     * @param pane  The pane to collect from.
-     * @param clazz The class of the nodes to collect.
-     * @return A list of nodes of the specified type.
      */
     private <T> List<T> castToList(final Pane pane, final Class<T> clazz) {
         List<T> list = new ArrayList<>();
@@ -245,10 +241,6 @@ public class LevelRenderer {
 
     /**
      * Renders nodes in a pane.
-     *
-     * @param <T>   The type of nodes to render.
-     * @param pane  The pane to render nodes in.
-     * @param nodes The nodes to be rendered.
      */
     private <T> void renderNodes(final Pane pane, final List<T> nodes) {
         pane.getChildren().clear();
@@ -261,10 +253,6 @@ public class LevelRenderer {
 
     /**
      * Renders a tile.
-     *
-     * @param tile The tile to render.
-     * @param x    The x-coordinate of the tile.
-     * @param y    The y-coordinate of the tile.
      */
     private void renderTile(final Tile tile, final int x, final int y) {
         tile.setGridPosition(x, y);
@@ -275,11 +263,9 @@ public class LevelRenderer {
 
     /**
      * Positions and adds a given node to the specified pane.
-     * The method positions the node based on its type (either Collectible or Actor)
+     * The method positions the node based on
+     * its type (either Collectible or Actor)
      * and adds it to the pane.
-     *
-     * @param pane The pane to which the node is to be added.
-     * @param node The node to be positioned and added. Can be a Collectible or an Actor.
      */
     private <T> void positionAndAddNode(final Pane pane, final T node) {
         if (node instanceof Collectible) {
@@ -292,8 +278,6 @@ public class LevelRenderer {
 
     /**
      * Positions an Actor based on its current position.
-     *
-     * @param actor The actor to be positioned.
      */
     private void position(final Actor actor) {
         position(actor, actor.getPosition());
@@ -301,28 +285,29 @@ public class LevelRenderer {
 
     /**
      * Positions a Collectible based on its current position.
-     *
-     * @param collectible The collectible to be positioned.
      */
     private void position(final Collectible collectible) {
         position(collectible, collectible.getPosition());
     }
 
     /**
-     * Positions a JavaFX Node (Actor or Collectible) at a specified position.
+     * Positions a JavaFX Node (Actor or Collectible)
+     * at a specified position.
      * The position is adjusted based on the tile size and actor size.
-     *
-     * @param node     The node to be positioned.
-     * @param position The target position for the node.
      */
-    private void position(final javafx.scene.Node node, final Point2D position) {
+    private void position(final javafx.scene.Node node,
+                          final Point2D position) {
         if (position == null) {
             return;
         }
-        double offsetX = (Main.TILE_SIZE.get() - Main.ACTOR_SIZE.get()) / 2.0;
-        double offsetY = (Main.TILE_SIZE.get() - Main.ACTOR_SIZE.get()) / 2.0;
-        node.setLayoutX(position.getX() * Main.TILE_SIZE.get() + offsetX);
-        node.setLayoutY(position.getY() * Main.TILE_SIZE.get() + offsetY);
+        double offsetX = (Main.TILE_SIZE.get()
+                - Main.ACTOR_SIZE.get()) / 2.0;
+        double offsetY = (Main.TILE_SIZE.get()
+                - Main.ACTOR_SIZE.get()) / 2.0;
+        node.setLayoutX(position.getX()
+                * Main.TILE_SIZE.get() + offsetX);
+        node.setLayoutY(position.getY()
+                * Main.TILE_SIZE.get() + offsetY);
     }
 
     /**
@@ -330,18 +315,19 @@ public class LevelRenderer {
      *
      * @param x The x-coordinate of the grid position.
      * @param y The y-coordinate of the grid position.
-     * @return An Optional containing the Tile at the specified position, or an empty Optional if out of bounds.
+     * @return An Optional containing the Tile atthe
+     * specified position, or an empty Optional if out of bounds.
      */
-    public Optional<Tile> getTileAtGridPosition(final int x, final int y) {
-        return isOutOfBounds(x, y) ? Optional.empty() : Optional.ofNullable(tiles[y][x]);
+    public Optional<Tile> getTileAtGridPosition(final int x,
+                                                final int y) {
+        return isOutOfBounds(x, y)
+                ? Optional.empty()
+                : Optional.ofNullable(tiles[y][x]);
     }
 
     /**
-     * Checks if the specified coordinates are out of the bounds of the tile array.
-     *
-     * @param x The x-coordinate to check.
-     * @param y The y-coordinate to check.
-     * @return true if the coordinates are out of bounds, false otherwise.
+     * Checks if the specified coordinates are
+     * out of the bounds of the tile array.
      */
     private boolean isOutOfBounds(final int x, final int y) {
         return x < 0 || x >= tiles[0].length || y < 0 || y >= tiles.length;
@@ -349,14 +335,17 @@ public class LevelRenderer {
 
     /**
      * Updates a tile at a specific grid position with a new tile.
-     * If the position is out of bounds or the new tile is null, the method returns without making any changes.
+     * If the position is out of bounds or the new
+     * tile is null, the method returns without making any changes.
      * Occupancy is transferred from the old tile to the new tile.
      *
      * @param x       The x-coordinate of the tile to update.
      * @param y       The y-coordinate of the tile to update.
      * @param newTile The new Tile to place at the specified position.
      */
-    public void updateTile(final int x, final int y, final Tile newTile) {
+    public void updateTile(final int x,
+                           final int y,
+                           final Tile newTile) {
         if (isOutOfBounds(x, y) || newTile == null) {
             return;
         }
@@ -366,9 +355,11 @@ public class LevelRenderer {
             oldTile.setOccupiedBy(null);
         }
         Point2D position = new Point2D(x, y);
-        if (chipSocketLabels.containsKey(position)) {
+        if (chipSocketLabels.containsKey(
+                position)) {
             Label labelToRemove = chipSocketLabels.remove(position);
-            Platform.runLater(() -> tilesPane.getChildren().remove(labelToRemove));
+            Platform.runLater(()
+                    -> tilesPane.getChildren().remove(labelToRemove));
         }
         newTile.setGridPosition(x, y);
         tiles[y][x] = newTile;

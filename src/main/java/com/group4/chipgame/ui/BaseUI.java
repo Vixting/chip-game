@@ -5,18 +5,21 @@ import javafx.scene.Node;
 
 /**
  * This abstract class provides a base for creating user interface components.
- * It manages a root pane and provides methods for UI creation and dynamic adjustment based on size changes.
+ * It manages a root pane and provides methods
+ * for UI creation and dynamic adjustment based on size changes.
+ * @author William Buckley
  */
 public abstract class BaseUI {
     private final Pane rootPane;
 
     /**
      * Constructs a BaseUI object with a specified root pane.
-     * This constructor initializes the UI and sets up listeners for size changes.
+     * This constructor initializes the UI
+     * and sets up listeners for size changes.
      *
      * @param rootPane The root pane for this UI component.
      */
-    public BaseUI(Pane rootPane) {
+    public BaseUI(final Pane rootPane) {
         this.rootPane = rootPane;
         createUI();
         addSizeListeners();
@@ -32,7 +35,8 @@ public abstract class BaseUI {
     }
 
     /**
-     * Abstract method to create UI components. Implementations should define how the UI is set up.
+     * Abstract method to create UI components.
+     * Implementations should define how the UI is set up.
      */
     protected abstract void createUI();
 
@@ -41,8 +45,10 @@ public abstract class BaseUI {
      * These listeners invoke the adjustUI method to handle size changes.
      */
     private void addSizeListeners() {
-        rootPane.widthProperty().addListener((obs, oldVal, newVal) -> adjustUI());
-        rootPane.heightProperty().addListener((obs, oldVal, newVal) -> adjustUI());
+        rootPane.widthProperty().addListener(
+                (obs, oldVal, newVal) -> adjustUI());
+        rootPane.heightProperty().addListener(
+                (obs, oldVal, newVal) -> adjustUI());
     }
 
     /**
@@ -57,10 +63,13 @@ public abstract class BaseUI {
      * dimension of the root pane, divided by the given ratio.
      *
      * @param node The node whose font size is to be set.
-     * @param ratio The ratio to determine the font size relative to the root pane's size.
+     * @param ratio The ratio to determine
+     *              the font size relative to the root pane's size.
      */
-    protected void setFontSizeFor(Node node, double ratio) {
-        double fontSize = Math.min(rootPane.getWidth(), rootPane.getHeight()) / ratio;
+    protected void setFontSizeFor(final Node node,
+                                  final double ratio) {
+        double fontSize = Math.min(rootPane.getWidth(),
+                rootPane.getHeight()) / ratio;
         node.setStyle("-fx-font-size: " + fontSize + "px;");
     }
 }

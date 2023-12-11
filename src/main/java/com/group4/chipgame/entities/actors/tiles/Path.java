@@ -7,10 +7,12 @@ import com.group4.chipgame.entities.actors.Actor;
 /**
  * Represents a path tile in the ChipGame.
  * Path tiles are walkable areas in the game level.
+ * @author William Buckley
  */
 public class Path extends Tile {
 
-    private static final String PATH_IMAGE_PATH = "/images/chipgame/tiles/path.png";
+    private static final String PATH_IMAGE_PATH =
+            "/images/chipgame/tiles/path.png";
 
     /**
      * Constructs a new Path tile.
@@ -35,10 +37,13 @@ public class Path extends Tile {
      *
      * @param actor The actor stepping on the tile.
      * @param levelRenderer The renderer for the level.
-     * @param incomingDirection The direction from which the actor steps onto the tile.
+     * @param incomingDirection The direction from
+     *                          which the actor steps onto the tile.
      */
     @Override
-    public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
+    public void onStep(final Actor actor,
+                       final LevelRenderer levelRenderer,
+                       final Direction incomingDirection) {
         // No specific action defined for stepping on a Path tile.
     }
 }

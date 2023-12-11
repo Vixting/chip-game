@@ -4,7 +4,9 @@ import javafx.geometry.Point2D;
 
 /**
  * Represents a generic entity in the ChipGame.
- * This interface defines the basic functionality that all entities in the game should have.
+ * This interface defines the basic functionality
+ * that all entities in the game should have.
+ * @author William Buckley
  */
 public interface Entity {
 

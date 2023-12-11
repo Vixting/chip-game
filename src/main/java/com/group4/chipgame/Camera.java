@@ -10,8 +10,11 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 /**
- * This class represents a camera that focuses on a target actor in a game scene.
- * It manages the viewport and adjusts the view based on the position of the target actor.
+ * This class represents a camera that focuses
+ * on a target actor in a game scene.
+ * It manages the viewport and adjusts the
+ * view based on the position of the target actor.
+ * @author William Buckley
  */
 public class Camera {
     private final Pane gamePane;
@@ -31,10 +34,16 @@ public class Camera {
      * @param viewWidth The initial width of the camera's viewport.
      * @param viewHeight The initial height of the camera's viewport.
      */
-    public Camera(Pane gamePane, double viewWidth, double viewHeight) {
+    public Camera(final Pane gamePane,
+                  final double viewWidth,
+                  final double viewHeight) {
         this.gamePane = gamePane;
-        this.viewPort = new Rectangle2D(0, 0, viewWidth, viewHeight);
-        this.gamePane.setClip(new javafx.scene.shape.Rectangle(viewWidth, viewHeight));
+        this.viewPort = new Rectangle2D(0,
+                0,
+                viewWidth,
+                viewHeight);
+        this.gamePane.setClip(new javafx.scene.shape.
+                Rectangle(viewWidth, viewHeight));
         addPaneSizeListeners();
         addWindowSizeListeners();
     }
@@ -43,9 +52,11 @@ public class Camera {
      * Adds listeners to adjust the viewport when the pane's size changes.
      */
     private void addPaneSizeListeners() {
-        gamePane.widthProperty().addListener((observable, oldValue, newValue) ->
+        gamePane.widthProperty().
+                addListener((observable, oldValue, newValue) ->
                 updateViewportWidth(newValue.doubleValue()));
-        gamePane.heightProperty().addListener((observable, oldValue, newValue) ->
+        gamePane.heightProperty().
+                addListener((observable, oldValue, newValue) ->
                 updateViewportHeight(newValue.doubleValue()));
     }
 
@@ -54,8 +65,11 @@ public class Camera {
      *
      * @param newWidth The new width of the viewport.
      */
-    private void updateViewportWidth(double newWidth) {
-        viewPort = new Rectangle2D(viewPort.getMinX(), viewPort.getMinY(), newWidth, viewPort.getHeight());
+    private void updateViewportWidth(final double newWidth) {
+        viewPort = new Rectangle2D(viewPort.getMinX(),
+                viewPort.getMinY(),
+                newWidth,
+                viewPort.getHeight());
         adjustCamera();
     }
 
@@ -64,8 +78,11 @@ public class Camera {
      *
      * @param newHeight The new height of the viewport.
      */
-    private void updateViewportHeight(double newHeight) {
-        viewPort = new Rectangle2D(viewPort.getMinX(), viewPort.getMinY(), viewPort.getWidth(), newHeight);
+    private void updateViewportHeight(final double newHeight) {
+        viewPort = new Rectangle2D(viewPort.getMinX(),
+                viewPort.getMinY(),
+                viewPort.getWidth(),
+                newHeight);
         adjustCamera();
     }
 
@@ -73,25 +90,33 @@ public class Camera {
      * Adds listeners to adjust the camera when the window size changes.
      */
     private void addWindowSizeListeners() {
-        gamePane.sceneProperty().addListener((observable, oldScene, newScene) -> {
+        gamePane.sceneProperty().addListener(
+                (observable, oldScene, newScene) -> {
             if (oldScene == null && newScene != null) {
-                newScene.widthProperty().addListener((obs, oldVal, newVal) -> adjustCamera());
-                newScene.heightProperty().addListener((obs, oldVal, newVal) -> adjustCamera());
+                newScene.widthProperty().addListener(
+                        (obs, oldVal, newVal) -> adjustCamera());
+                newScene.heightProperty().addListener(
+                        (obs, oldVal, newVal) -> adjustCamera());
             }
         });
     }
 
     /**
-     * Calculates the dynamic duration for the camera's movement animation based on distance.
+     * Calculates the dynamic duration for the
+     * camera's movement animation based on distance.
      *
      * @param newTranslateX The target X translation.
      * @param newTranslateY The target Y translation.
      * @return A Duration object representing the calculated duration.
      */
-    private Duration calculateDynamicDuration(double newTranslateX, double newTranslateY) {
+    private Duration calculateDynamicDuration(final double newTranslateX,
+                                              final double newTranslateY) {
         double currentX = gamePane.getTranslateX();
         double currentY = gamePane.getTranslateY();
-        double distance = Math.sqrt(Math.pow(newTranslateX - currentX, 2) + Math.pow(newTranslateY - currentY, 2));
+        double distance = Math.sqrt(Math.pow(newTranslateX
+                - currentX, 2)
+                + Math.pow(newTranslateY
+                - currentY, 2));
         return Duration.millis(Math.min(MIN_ANIMATION_DURATION
                         + distance
                         * ANIMATION_SPEED_MULTIPLIER, MAX_ANIMATION_DURATION));
@@ -102,14 +127,14 @@ public class Camera {
      *
      * @param target The actor that the camera should follow.
      */
-    public void setTarget(Actor target) {
+    public void setTarget(final Actor target) {
         this.target = target;
         if (cameraTimer != null) {
             cameraTimer.stop();
         }
         cameraTimer = new AnimationTimer() {
             @Override
-            public void handle(long now) {
+            public void handle(final long now) {
                 adjustCamera();
             }
         };
@@ -122,7 +147,10 @@ public class Camera {
     public void updateViewportSize() {
         double width = gamePane.getWidth();
         double height = gamePane.getHeight();
-        viewPort = new Rectangle2D(viewPort.getMinX(), viewPort.getMinY(), width, height);
+        viewPort = new Rectangle2D(viewPort.getMinX(),
+                viewPort.getMinY(),
+                width,
+                height);
     }
 
     /**
@@ -147,16 +175,21 @@ public class Camera {
      * @param newTranslateX The target X translation.
      * @param newTranslateY The target Y translation.
      */
-    private void animateCameraTransition(double newTranslateX, double newTranslateY) {
-        Duration animationDuration = calculateDynamicDuration(newTranslateX, newTranslateY);
+    private void animateCameraTransition(final double newTranslateX,
+                                         final double newTranslateY) {
+        Duration animationDuration =
+                calculateDynamicDuration(newTranslateX, newTranslateY);
 
         if (currentTimeline != null) {
             currentTimeline.stop();
         }
 
-        KeyValue kvX = new KeyValue(gamePane.translateXProperty(), newTranslateX);
-        KeyValue kvY = new KeyValue(gamePane.translateYProperty(), newTranslateY);
-        KeyFrame kf = new KeyFrame(animationDuration, kvX, kvY);
+        KeyValue kvX = new KeyValue(
+                gamePane.translateXProperty(), newTranslateX);
+        KeyValue kvY = new KeyValue(
+                gamePane.translateYProperty(), newTranslateY);
+        KeyFrame kf = new KeyFrame(
+                animationDuration, kvX, kvY);
 
         currentTimeline = new Timeline(kf);
         currentTimeline.play();
@@ -168,9 +201,12 @@ public class Camera {
      * @return The calculated X translation.
      */
     private double calculateTranslateX() {
-        double targetCenterX = target.getLayoutX() + target.getFitWidth() / 2.0;
-        double newTranslateX = viewPort.getWidth() / 2.0 - targetCenterX;
-        return -clampTranslate(-newTranslateX, gamePane.getScaleX());
+        double targetCenterX =
+                target.getLayoutX() + target.getFitWidth() / 2.0;
+        double newTranslateX =
+                viewPort.getWidth() / 2.0 - targetCenterX;
+        return -clampTranslate(
+                -newTranslateX, gamePane.getScaleX());
     }
 
     /**
@@ -179,20 +215,28 @@ public class Camera {
      * @return The calculated Y translation.
      */
     private double calculateTranslateY() {
-        double targetCenterY = target.getLayoutY() + target.getFitHeight() / 2.0;
-        double newTranslateY = viewPort.getHeight() / 2.0 - targetCenterY;
+        double targetCenterY = target.getLayoutY()
+                + target.getFitHeight() / 2.0;
+        double newTranslateY = viewPort.getHeight()
+                / 2.0 - targetCenterY;
         return -clampTranslate(-newTranslateY, gamePane.getScaleY());
     }
 
     /**
-     * Clamps the translation values to prevent the camera from moving out of bounds.
+     * Clamps the translation values to prevent
+     * the camera from moving out of bounds.
      *
      * @param value The translation value to clamp.
      * @param scale The scale factor of the game pane.
      * @return The clamped translation value.
      */
-    private double clampTranslate(double value, double scale) {
-        double minTranslate = gamePane.getWidth() * scale - viewPort.getWidth();
-        return minTranslate < 0 ? Math.min(0, Math.max(value, minTranslate)) : value;
+    private double clampTranslate(final double value,
+                                  final double scale) {
+        double minTranslate = gamePane.getWidth()
+                * scale
+                - viewPort.getWidth();
+        return minTranslate < 0
+                ? Math.min(0, Math.max(value, minTranslate))
+                : value;
     }
 }

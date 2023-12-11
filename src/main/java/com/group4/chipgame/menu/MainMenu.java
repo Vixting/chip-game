@@ -12,33 +12,50 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * This class represents the main menu of the game. It provides methods to create
- * and display the main menu and its options like loading a game, viewing levels, profiles, and high scores.
+ * This class represents the main menu of
+ * the game. It provides methods to create
+ * and display the main menu and its options
+ * like loading a game, viewing levels, profiles, and high scores.
+ * @author William Buckley
  */
 public class MainMenu extends BaseMenu {
 
-    private static final String MENU_STYLE = "-fx-background-color: linear-gradient(to bottom, #222, #333); -fx-padding: 30; -fx-spacing: 20;";
-    private static final String BUTTON_STYLE = "-fx-background-color: linear-gradient(to bottom, #444, #555); -fx-text-fill: #EEE; -fx-font-size: 20px; -fx-background-radius: 15;";
-    private static final String BUTTON_HOVER_STYLE = "-fx-background-color: linear-gradient(to bottom, #666, #777);";
-    private static final DropShadow BUTTON_SHADOW = new DropShadow(20, javafx.scene.paint.Color.GREY);
+    private static final String MENU_STYLE =
+            "-fx-background-color: linear-gradient(to bottom, #222, #333);"
+                    + " -fx-padding: 30;"
+                    + " -fx-spacing: 20;";
+    private static final String BUTTON_STYLE =
+            "-fx-background-color: linear-gradient(to bottom, #444, #555);"
+                    + " -fx-text-fill: #EEE; -fx-font-size: 20px;"
+                    + " -fx-background-radius: 15;";
+    private static final String BUTTON_HOVER_STYLE =
+            "-fx-background-color: linear-gradient(to bottom, #666, #777);";
+    private static final DropShadow BUTTON_SHADOW =
+            new DropShadow(20, javafx.scene.paint.Color.GREY);
 
     /**
-     * Creates the main menu view with buttons to navigate to different parts of the game.
+     * Creates the main menu view with buttons
+     * to navigate to different parts of the game.
      *
      * @param primaryStage The primary stage of the application.
      * @param mainApp      The main application instance.
      * @return A StackPane containing the main menu.
      */
-    public StackPane createMainMenu(Stage primaryStage, Main mainApp) {
+    public StackPane createMainMenu(final Stage primaryStage,
+                                    final Main mainApp) {
         VBox menuBox = new VBox(20);
         menuBox.setStyle(MENU_STYLE);
         menuBox.setAlignment(Pos.CENTER);
 
         menuBox.getChildren().addAll(
-                createButton("Load Game", () -> openSaveLoadMenu(primaryStage, mainApp)),
-                createButton("Levels", () -> populateLevelMenu(menuBox, primaryStage, mainApp)),
-                createButton("Profiles", () -> openProfileMenu(primaryStage, mainApp)),
-                createButton("High Scores", () -> openHighScoreMenu(primaryStage, mainApp))
+                createButton("Load Game", ()
+                        -> openSaveLoadMenu(primaryStage, mainApp)),
+                createButton("Levels", ()
+                        -> populateLevelMenu(menuBox, primaryStage, mainApp)),
+                createButton("Profiles", ()
+                        -> openProfileMenu(primaryStage, mainApp)),
+                createButton("High Scores", ()
+                        -> openHighScoreMenu(primaryStage, mainApp))
         );
 
         return createMenuRootPane(menuBox);
@@ -46,54 +63,56 @@ public class MainMenu extends BaseMenu {
 
     /**
      * Opens the profile menu.
-     *
-     * @param primaryStage The primary stage of the application.
-     * @param mainApp      The main application instance.
      */
-    private void openProfileMenu(Stage primaryStage, Main mainApp) {
-        ProfileMenu profileMenu = new ProfileMenu(mainApp.getProfileManager(), mainApp, primaryStage);
-        ScrollPane profileMenuPane = profileMenu.createProfileMenu();
+    private void openProfileMenu(final Stage primaryStage,
+                                 final Main mainApp) {
+        ProfileMenu profileMenu = new
+                ProfileMenu(mainApp.getProfileManager(), mainApp, primaryStage);
+        ScrollPane profileMenuPane =
+                profileMenu.createProfileMenu();
         primaryStage.getScene().setRoot(profileMenuPane);
     }
 
     /**
      * Opens the high score menu.
-     *
-     * @param primaryStage The primary stage of the application.
-     * @param mainApp      The main application instance.
      */
-    private void openHighScoreMenu(Stage primaryStage, Main mainApp) {
-        HighScoreMenu highScoreMenu = new HighScoreMenu(mainApp, primaryStage, mainApp.getProfileManager());
-        ScrollPane highScoreMenuPane = highScoreMenu.createHighScoreMenu();
+    private void openHighScoreMenu(final Stage primaryStage,
+                                   final Main mainApp) {
+        HighScoreMenu highScoreMenu =
+                new HighScoreMenu(mainApp,
+                        primaryStage,
+                        mainApp.getProfileManager());
+        ScrollPane highScoreMenuPane =
+                highScoreMenu.createHighScoreMenu();
         primaryStage.getScene().setRoot(highScoreMenuPane);
     }
 
     /**
      * Opens the save/load game menu.
-     *
-     * @param primaryStage The primary stage of the application.
-     * @param mainApp      The main application instance.
      */
-    private void openSaveLoadMenu(Stage primaryStage, Main mainApp) {
-        SaveLoadMenu saveLoadMenu = new SaveLoadMenu(mainApp, primaryStage, mainApp.getProfileManager());
-        VBox saveLoadMenuPane = saveLoadMenu.createSaveLoadMenu();
+    private void openSaveLoadMenu(final Stage primaryStage,
+                                  final Main mainApp) {
+        SaveLoadMenu saveLoadMenu =
+                new SaveLoadMenu(mainApp,
+                        primaryStage,
+                        mainApp.getProfileManager());
+        VBox saveLoadMenuPane =
+                saveLoadMenu.createSaveLoadMenu();
         primaryStage.getScene().setRoot(saveLoadMenuPane);
     }
 
     /**
      * Creates a button with a specific text and an action to perform on click.
-     *
-     * @param text   The text to display on the button.
-     * @param action The action to perform when the button is clicked.
-     * @return A styled Button object.
      */
-    private Button createButton(String text, Runnable action) {
+    private Button createButton(final String text,
+                                final Runnable action) {
         Button button = new Button(text);
         button.setStyle(BUTTON_STYLE);
         button.setEffect(BUTTON_SHADOW);
         button.setOnAction(e -> action.run());
 
-        ScaleTransition st = new ScaleTransition(Duration.millis(200), button);
+        ScaleTransition st =
+                new ScaleTransition(Duration.millis(200), button);
         st.setToX(1.1);
         st.setToY(1.1);
 
@@ -113,12 +132,10 @@ public class MainMenu extends BaseMenu {
 
     /**
      * Populates the provided VBox with level selection options.
-     *
-     * @param menuBox       The VBox to populate with level options.
-     * @param primaryStage  The primary stage of the application.
-     * @param mainApp       The main application instance.
      */
-    private static void populateLevelMenu(VBox menuBox, Stage primaryStage, Main mainApp) {
+    private static void populateLevelMenu(final VBox menuBox,
+                                          final Stage primaryStage,
+                                          final Main mainApp) {
         menuBox.getChildren().clear();
         LevelMenu.populateLevelMenu(menuBox, primaryStage, mainApp);
     }

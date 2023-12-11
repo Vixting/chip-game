@@ -8,17 +8,20 @@ import org.json.JSONObject;
 
 /**
  * Represents a ChipSocket tile in the ChipGame.
+ * @author William Buckley
  */
 public class ChipSocket extends Tile {
-    private static final String CHIP_SOCKET_IMAGE_PATH = "/images/chipgame/tiles/chipSocket.png";
+    private static final String CHIP_SOCKET_IMAGE_PATH =
+            "/images/chipgame/tiles/chipSocket.png";
     private final int requiredChips;
 
     /**
      * Constructs a ChipSocket with the specified number of required chips.
      *
-     * @param requiredChips The number of chips required to activate this ChipSocket.
+     * @param requiredChips The number of chips
+     *                      required to activate this ChipSocket.
      */
-    public ChipSocket(int requiredChips) {
+    public ChipSocket(final int requiredChips) {
         super(CHIP_SOCKET_IMAGE_PATH, false);
         this.requiredChips = requiredChips;
     }
@@ -28,10 +31,13 @@ public class ChipSocket extends Tile {
      *
      * @param actor The Actor stepping on the tile.
      * @param levelRenderer The renderer for the level.
-     * @param incomingDirection The direction from which the Actor steps onto the tile.
+     * @param incomingDirection The direction from
+     *                          which the Actor steps onto the tile.
      */
     @Override
-    public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
+    public void onStep(final Actor actor,
+                       final LevelRenderer levelRenderer,
+                       final Direction incomingDirection) {
         if (actor instanceof Player player) {
             if (player.getChipsCount() >= requiredChips) {
                 player.consumeChips(requiredChips);
@@ -45,8 +51,11 @@ public class ChipSocket extends Tile {
      *
      * @param levelRenderer The renderer for the level.
      */
-    private void openSocket(LevelRenderer levelRenderer) {
-        levelRenderer.updateTile((int) this.getGridX(), (int) this.getGridY(), new Path());
+    private void openSocket(final LevelRenderer levelRenderer) {
+        levelRenderer.updateTile(
+                this.getGridX(),
+                this.getGridY(),
+                new Path());
     }
 
     /**

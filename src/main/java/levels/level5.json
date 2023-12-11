@@ -12,6 +12,7 @@
     ["I", "I", "I", "P", "P", "P", "B_1", "P", "P", "P", "P", "P"],
     ["I_BL", "I", "I_BR", "I", "G", "W", "W", "W", "P", "P", "P", "P"]
   ],
+
   "collectibles" : [
     {"type": "redKey", "x": 1, "y": 1},
     {"type": "blueKey", "x": 7, "y": 1},

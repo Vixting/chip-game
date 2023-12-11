@@ -30,13 +30,17 @@ import java.nio.file.Paths;
 /**
  * Main application class for the Chip Game.
  * Handles initialization and switching between different game scenes.
+ * @author William Buckley
  */
 public class Main extends Application {
-    public static final SimpleIntegerProperty TILE_SIZE = new SimpleIntegerProperty(50);
-    public static final SimpleIntegerProperty ACTOR_SIZE = new SimpleIntegerProperty((int) (TILE_SIZE.get() / 1.5));
+    public static final SimpleIntegerProperty TILE_SIZE =
+            new SimpleIntegerProperty(50);
+    public static final SimpleIntegerProperty ACTOR_SIZE =
+            new SimpleIntegerProperty((int) (TILE_SIZE.get() / 1.5));
     public static final String MAIN_MENU_TITLE = "Chip Game Main Menu";
     public static final String GAME_TITLE = "Chip Game";
-    public static final String BACKGROUND_COLOR = "-fx-background-color: black;";
+    public static final String BACKGROUND_COLOR =
+            "-fx-background-color: black;";
     private static final int MIN_WINDOW_SIZE = 300;
     private static final String LEVELS_BASE_DIR = "src/main/java/levels";
     private static final String SAVES_DIR = "src/main/java/saves";
@@ -61,7 +65,7 @@ public class Main extends Application {
     private String currentLevelPath = LEVELS_BASE_DIR + "/level1.json";
 
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         launch(args);
     }
 
@@ -71,11 +75,11 @@ public class Main extends Application {
      * @throws IOException if there is an error loading level data.
      */
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(final Stage primaryStage) throws IOException {
         this.primaryStage = primaryStage;
         profileManager = new ProfileManager();
-        primaryStage.addEventHandler(LevelCompletedEvent.LEVEL_COMPLETED, event -> {
-            System.out.println("Level completed!");
+        primaryStage.addEventHandler(LevelCompletedEvent.
+                LEVEL_COMPLETED, event -> {
             profileManager.markLevelAsCompleted(currentLevelPath);
             handleLevelCompletion();
             advanceToNextLevel();
@@ -85,19 +89,22 @@ public class Main extends Application {
     }
 
     /**
-     * Adds listeners to the stage's size properties to update game elements' sizes.
+     * Adds listeners to the stage's size
+     * properties to update game elements' sizes.
      * @param stage The primary stage of the application.
      */
-    private void addStageSizeListeners(Stage stage) {
-        stage.widthProperty().addListener((obs, oldVal, newVal) -> updateSizes(stage));
-        stage.heightProperty().addListener((obs, oldVal, newVal) -> updateSizes(stage));
+    private void addStageSizeListeners(final Stage stage) {
+        stage.widthProperty().addListener((obs, oldVal, newVal)
+                -> updateSizes(stage));
+        stage.heightProperty().addListener((obs, oldVal, newVal)
+                -> updateSizes(stage));
     }
 
     /**
      * Updates the sizes of tiles and actors based on the stage size.
      * @param stage The primary stage of the application.
      */
-    private void updateSizes(Stage stage) {
+    private void updateSizes(final Stage stage) {
         int newTileSize = calculateTileSize(stage);
         TILE_SIZE.set(newTileSize);
         ACTOR_SIZE.set((int) (newTileSize / TILE_SIZE_DIMENSION_RATIO));
@@ -107,7 +114,8 @@ public class Main extends Application {
      * Displays the save/load game menu.
      */
     public void showSaveLoadMenu() {
-        SaveLoadMenu saveLoadMenu = new SaveLoadMenu(this, primaryStage, profileManager);
+        SaveLoadMenu saveLoadMenu =
+                new SaveLoadMenu(this, primaryStage, profileManager);
         VBox saveLoadMenuPane = saveLoadMenu.createSaveLoadMenu();
         primaryStage.getScene().setRoot(saveLoadMenuPane);
     }
@@ -117,21 +125,30 @@ public class Main extends Application {
      * @param stage The primary stage of the application.
      * @return Calculated tile size.
      */
-    private int calculateTileSize(Stage stage) {
-        return Math.min((int) stage.getWidth(), (int) stage.getHeight() - TILE_MAIN) / TILE_DIVIDE;
+    private int calculateTileSize(final Stage stage) {
+        return Math.min((int) stage.getWidth(),
+                (int) stage.getHeight() - TILE_MAIN)
+                / TILE_DIVIDE;
     }
 
     /**
      * Shows the main menu of the game.
      * @param primaryStage The primary stage of the application.
      */
-    public void showMainMenu(Stage primaryStage) {
+    public void showMainMenu(final Stage primaryStage) {
         MainMenu mainMenu = new MainMenu();
-        StackPane menuPane = mainMenu.createMainMenu(primaryStage, this);
-        settingsMenu = new SettingsMenu().createSettingsMenu(primaryStage, this);
+        StackPane menuPane = mainMenu.createMainMenu(
+                primaryStage,
+                this);
+        settingsMenu = new SettingsMenu().
+                createSettingsMenu(
+                        primaryStage,
+                        this);
         settingsMenu.setVisible(false);
         menuPane.getChildren().add(settingsMenu);
-        Scene scene = new Scene(menuPane, DEFAULT_SCENE_WIDTH, DEFAULT_SCENE_HEIGHT);
+        Scene scene = new Scene(
+                menuPane,
+                DEFAULT_SCENE_WIDTH, DEFAULT_SCENE_HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -144,38 +161,73 @@ public class Main extends Application {
         return profileManager;
     }
 
-    public void saveGame(String saveName) throws IOException {
-        String profileName = profileManager.getCurrentProfile().getName();
-        String saveFilePath = SAVES_DIR + "/" + profileName + "_" + saveName + ".json";
+    /**
+     * Saves the current game state to a specified file.
+     *
+     * @param saveName the name of the save file
+     * @throws IOException if an I/O error occurs
+     */
+    public void saveGame(final String saveName) throws IOException {
+        String profileName =
+                profileManager.getCurrentProfile().getName();
+        String saveFilePath = SAVES_DIR
+                + "/"
+                + profileName
+                + "_" + saveName
+                + ".json";
         System.out.println(saveFilePath);
         currentLevelData.setTimer(timerUI.getTimeRemaining());
         LevelStateManager.saveLevel(currentLevelData, saveFilePath);
         profileManager.addSaveToProfile(profileName, saveFilePath);
     }
 
-    public void loadGame(String saveName) throws IOException {
-        this.currentLevelData = LevelStateManager.loadLevel(saveName, new LevelRenderer(currentLevelData));
-        this.currentLevelPath = currentLevelData.getLevelPath();
+    /**
+     * Loads a game state from a specified file.
+     *
+     * @param saveName the name of the save file to load
+     * @throws IOException if an I/O error occurs
+     */
+    public void loadGame(final String saveName)
+            throws IOException {
+        this.currentLevelData =
+                LevelStateManager.loadLevel(saveName,
+                        new LevelRenderer(currentLevelData));
+        this.currentLevelPath =
+                currentLevelData.getLevelPath();
 
         adjustWindowSizeForLevel(currentLevelData);
         reinitializeLevel(currentLevelData);
     }
 
 
+    /**
+     * Handles the completion of the current level, updating the player's score.
+     */
     private void handleLevelCompletion() {
         currentLevelData.getActors().stream()
                 .filter(actor -> actor instanceof Player)
                 .findFirst()
                 .ifPresent(actor -> {
                     Player player = (Player) actor;
-                    int score = player.getChipsCount() + timerUI.getTimeRemaining();
-                    profileManager.markLevelAsCompleted(currentLevelPath, score);
+                    int score = player.getChipsCount()
+                            + timerUI.getTimeRemaining();
+                    profileManager.markLevelAsCompleted(
+                            currentLevelPath, score);
                 });
     }
 
-    private void adjustWindowSizeForLevel(LevelData levelData) {
-        double requiredWidth = levelData.gridWidth * TILE_SIZE.get();
-        double requiredHeight = levelData.gridHeight * TILE_SIZE.get();
+
+    /**
+     * Adjusts the window size based on the current level's dimensions.
+     *
+     * @param levelData the data of the level for
+     *                  which the window size is adjusted
+     */
+    private void adjustWindowSizeForLevel(final LevelData levelData) {
+        double requiredWidth =
+                levelData.getGridWidth() * TILE_SIZE.get();
+        double requiredHeight =
+                levelData.getGridHeight() * TILE_SIZE.get();
 
         primaryStage.setWidth(requiredWidth);
         primaryStage.setHeight(requiredHeight);
@@ -183,67 +235,139 @@ public class Main extends Application {
     }
 
 
-    private void initScene(StackPane root, Stage stage, int width, int height, String title) {
+    /**
+     * Initializes the game scene with specified parameters.
+     *
+     * @param root   the root pane of the scene
+     * @param stage  the stage to which the scene is set
+     * @param width  the width of the scene
+     * @param height the height of the scene
+     */
+    private void initScene(final StackPane root,
+                           final Stage stage,
+                           final int width,
+                           final int height) {
         Scene scene = new Scene(root, width, height);
         stage.setScene(scene);
-        stage.setTitle(title);
+        stage.setTitle(Main.GAME_TITLE);
         stage.show();
     }
 
-    private void reinitializeLevel(LevelData levelData) {
-        LevelRenderer levelRenderer = levelData.levelRenderer;
+
+    /**
+     * Reinitializes the level with updated level data.
+     *
+     * @param levelData the updated data of the level
+     */
+    public void reinitializeLevel(final LevelData levelData) {
+        LevelRenderer levelRenderer = levelData.getLevelRenderer();
         adjustPrimaryStage(primaryStage, levelData);
 
         levelRenderer.setCurrentLevelData(levelData);
 
-        levelRenderer.renderTiles(levelData.getTiles());
-        levelRenderer.renderActors(levelData.getActors());
-        levelRenderer.renderCollectibles(levelData.getCollectibles());
-
+        levelRenderer.renderTiles(
+                levelData.getTiles());
+        levelRenderer.renderActors(
+                levelData.getActors());
+        levelRenderer.renderCollectibles(
+                levelData.getCollectibles());
         levelRenderer.updateTileOccupation();
-
         double sceneWidth = calculateSceneDimension(
-                levelData.gridWidth * TILE_SIZE.get(),
+                levelData.getGridWidth()
+                        * TILE_SIZE.get(),
                 primaryStage.getWidth(),
                 SCENE_MIN_WIDTH);
-
         double sceneHeight = calculateSceneDimension(
-                levelData.gridHeight * TILE_SIZE.get(),
-                primaryStage.getHeight(), SCENE_MIN_HEIGHT);
+                levelData.getGridHeight()
+                        * TILE_SIZE.get(),
+                primaryStage.getHeight(),
+                SCENE_MIN_HEIGHT);
 
         StackPane gamePane = initGamePane(levelData);
-        initScene(gamePane, primaryStage, (int) sceneWidth, (int) sceneHeight, GAME_TITLE);
+        initScene(gamePane,
+                primaryStage,
+                (int) sceneWidth,
+                (int) sceneHeight
+        );
     }
 
-    public void startLevel(String levelPath, Stage primaryStage) throws IOException {
+
+    /**
+     * Starts a specified level.
+     *
+     * @param levelPath the path to the level file
+     * @param primaryStage the primary stage of the application
+     * @throws IOException if an I/O error occurs
+     */
+    public void startLevel(final String levelPath,
+                           final Stage primaryStage) throws IOException {
         this.currentLevelData = loadLevel(levelPath);
         initGamePane(currentLevelData);
         adjustPrimaryStage(primaryStage, currentLevelData);
     }
 
-    private void adjustPrimaryStage(Stage primaryStage, LevelData levelData) {
+
+    /**
+     * Adjusts the primary stage based on the provided level data.
+     *
+     * @param primaryStage the primary stage of the application
+     * @param levelData the data of the level to adjust the stage for
+     */
+    private void adjustPrimaryStage(final Stage primaryStage,
+                                    final LevelData levelData) {
         primaryStage.setMaximized(true);
-        Platform.runLater(() -> adjustStageAndStartGame(primaryStage, levelData));
+        Platform.runLater(()
+                -> adjustStageAndStartGame(primaryStage, levelData));
     }
 
-    private void adjustStageAndStartGame(Stage primaryStage, LevelData levelData) {
+    /**
+     * Adjusts the stage size based on the
+     * level data and starts the game.
+     * It calculates the size of the scene based on level
+     * dimensions, initializes the game pane,
+     * and starts the game loop.
+     *
+     * @param primaryStage the primary stage of the application
+     * @param levelData the data of the level to be played
+     */
+    private void adjustStageAndStartGame(final Stage primaryStage,
+                                         final LevelData levelData) {
         double stageWidth = primaryStage.getWidth();
         double stageHeight = primaryStage.getHeight();
-        double sceneWidth = calculateSceneDimension(levelData.gridWidth
+        double sceneWidth = calculateSceneDimension(
+                levelData.getGridWidth()
                 * TILE_SIZE.get(), stageWidth, MIN_WINDOW_SIZE);
-        double sceneHeight = calculateSceneDimension(levelData.gridHeight
+        double sceneHeight = calculateSceneDimension(
+                levelData.getGridHeight()
                 * TILE_SIZE.get(), stageHeight, MIN_WINDOW_SIZE);
         StackPane gamePane = initGamePane(levelData);
-        initScene(gamePane, primaryStage, (int) sceneWidth, (int) sceneHeight, GAME_TITLE);
+        initScene(gamePane, primaryStage,
+                (int) sceneWidth,
+                (int) sceneHeight
+        );
         initGameLoop(levelData);
         primaryStage.setMaximized(false);
     }
 
-    private double calculateSceneDimension(double calculatedSize, double stageSize, double minSize) {
-        return Math.max(Math.max(calculatedSize, stageSize), minSize);
+    private double calculateSceneDimension(final double calculatedSize,
+                                           final double stageSize,
+                                           final double minSize) {
+        return Math.max(Math.max(
+                calculatedSize, stageSize), minSize);
     }
 
-    private LevelData loadLevel(String levelPath) throws IOException {
+    /**
+     * Loads level data from the specified path.
+     * This includes reading level configuration,
+     * initializing tiles, actors, collectibles,
+     * and setting up the level renderer with the loaded data.
+     *
+     * @param levelPath The path to the level file.
+     * @return An instance of LevelData containing all thedata for the loaded level.
+     * @throws IOException If there is an error reading the level file.
+     */
+    private LevelData loadLevel(final String levelPath)
+            throws IOException {
         String content = Files.readString(Paths.get(levelPath));
         JSONObject levelJson = new JSONObject(content);
         int timer = levelJson.optInt("timer", DEFAULT_TIMER);
@@ -253,7 +377,8 @@ public class Main extends Application {
         int gridWidth = tiles[0].length;
         int gridHeight = tiles.length;
 
-        LevelRenderer levelRenderer = new LevelRenderer(currentLevelData);
+        LevelRenderer levelRenderer =
+                new LevelRenderer(currentLevelData);
         levelRenderer.renderTiles(tiles);
         this.currentLevelData = new LevelData(
                 tiles,
@@ -271,44 +396,79 @@ public class Main extends Application {
         return currentLevelData;
     }
 
-    private StackPane initGamePane(LevelData levelData) {
-        StackPane rootPane = new StackPane(levelData.levelRenderer.getGamePane());
+    /**
+     * Initializes the game pane with the provided level data.
+     * This includes setting up the game pane's children, style, and rendering actors and collectibles.
+     *
+     * @param levelData The data of the level for which the game pane is initialized.
+     * @return The initialized StackPane representing the game pane.
+     */
+    private StackPane initGamePane(final LevelData levelData) {
+        StackPane rootPane = new StackPane(
+                levelData.getLevelRenderer().getGamePane());
 
         rootPane.getChildren().add(settingsMenu);
         rootPane.setStyle(BACKGROUND_COLOR);
-        levelData.levelRenderer.renderActors(levelData.actors);
-        levelData.levelRenderer.renderCollectibles(levelData.collectibles);
-
-        this.timerUI = new TimerUI(levelData.levelRenderer.getGamePane(), levelData.getTimer());
+        levelData.getLevelRenderer().renderActors(
+                levelData.getActors());
+        levelData.getLevelRenderer().renderCollectibles(
+                levelData.getCollectibles());
+        this.timerUI = new
+                TimerUI(levelData.getLevelRenderer().getGamePane(),
+                levelData.getTimer());
         rootPane.getChildren().add(timerUI.getTimerLabel());
-        StackPane.setAlignment(timerUI.getTimerLabel(), Pos.TOP_RIGHT);
-        StackPane.setMargin(timerUI.getTimerLabel(), new Insets(INSECT, INSECT, 0, 0));
+        StackPane.setAlignment(timerUI.getTimerLabel(),
+                Pos.TOP_RIGHT);
+        StackPane.setMargin(timerUI.getTimerLabel(),
+                new Insets(INSECT, INSECT, 0, 0));
         return rootPane;
     }
 
-    private void initGameLoop(LevelData levelData) {
+    /**
+     * Initializes and starts the game loop for the provided level data.
+     * Stops any existing game loop before starting a new one. Sets up the camera,
+     * game loop, and keybind handler for the level.
+     *
+     * @param levelData The data of the level for which the game loop is initialized.
+     */
+    private void initGameLoop(final LevelData levelData) {
         if (gameLoop != null) {
             gameLoop.stop();
         }
 
-        Camera camera = new Camera(levelData.levelRenderer.getGamePane(),
-                levelData.gridWidth * TILE_SIZE.get(),
-                levelData.gridHeight * TILE_SIZE.get());
+        Camera camera = new Camera(
+                levelData.getLevelRenderer().getGamePane(),
+                levelData.getGridWidth() * TILE_SIZE.get(),
+                levelData.getGridHeight() * TILE_SIZE.get());
 
-        gameLoop = new GameLoop(levelData.getActors(), levelData.levelRenderer, camera, timerUI);
+        gameLoop = new GameLoop(levelData.getActors(),
+                levelData.getLevelRenderer(),
+                camera, timerUI);
 
 
         KeybindHandler movementHandler =
-                new KeybindHandler(gameLoop, profileManager, this, INPUT_DELAY, MAX_QUEUE_SIZE);
-        levelData.levelRenderer.getGamePane().getScene().setOnKeyPressed(event
-                -> movementHandler.handleKeyPress(event.getCode()));
+                new KeybindHandler(gameLoop,
+                        profileManager,
+                        this,
+                        INPUT_DELAY, MAX_QUEUE_SIZE);
+        levelData.getLevelRenderer().
+                getGamePane().getScene().setOnKeyPressed(event
+                -> movementHandler.handleKeyPress(
+                        event.getCode()));
 
         gameLoop.start();
     }
 
+    /**
+     * Advances the game to the
+     * next level based on the current level's path.
+     * Loads the next level and
+     * reinitializes the game with the new level data if available.
+     */
     public void advanceToNextLevel() {
         String nextLevelPath = getNextLevelPath();
-        if (nextLevelPath != null && !nextLevelPath.equals(currentLevelPath)) {
+        if (nextLevelPath != null
+                && !nextLevelPath.equals(currentLevelPath)) {
             try {
                 currentLevelData = loadLevel(nextLevelPath);
                 currentLevelPath = nextLevelPath;
@@ -319,11 +479,27 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Calculates and returns the path to
+     * the next level based on the current level's path.
+     * Determines the next level number
+     * and constructs the path for the next level.
+     *
+     * @return The file path to the next level or null
+     * if the next level does not exist.
+     */
     private String getNextLevelPath() {
-        String currentLevel = currentLevelPath.substring(currentLevelPath.lastIndexOf('/') + 1);
-        int currentLevelNumber = Integer.parseInt(currentLevel.replaceAll("[^0-9]", ""));
-        String nextLevel = "/level" + (currentLevelNumber + 1) + ".json";
-        Path nextLevelPath = Paths.get(LEVELS_BASE_DIR + nextLevel);
+        String currentLevel =
+                currentLevelPath.substring(
+                        currentLevelPath.lastIndexOf('/') + 1);
+        int currentLevelNumber =
+                Integer.parseInt(
+                        currentLevel.replaceAll(
+                                "[^0-9]", ""));
+        String nextLevel = "/level" + (
+                currentLevelNumber + 1) + ".json";
+        Path nextLevelPath = Paths.get(
+                LEVELS_BASE_DIR + nextLevel);
         if (Files.exists(nextLevelPath)) {
             return nextLevelPath.toString();
         } else {
@@ -335,15 +511,30 @@ public class Main extends Application {
         MAIN_MENU, SETTINGS, GAME
     }
 
-    public void switchScene(SceneType sceneType) {
+    /**
+     * Switches the current scene to the specified type.
+     * Changes the visibility of menus and
+     * initializes the appropriate scene based on the type.
+     *
+     * @param sceneType The type of scene to switch to.
+     * @throws IllegalArgumentException if an invalid scene type is provided.
+     */
+    public void switchScene(final SceneType sceneType) {
         switch (sceneType) {
             case MAIN_MENU -> showMainMenu(primaryStage);
             case SETTINGS -> settingsMenu.setVisible(true);
             case GAME -> settingsMenu.setVisible(false);
-            default -> throw new IllegalArgumentException("Invalid scene type: " + sceneType);
+            default -> throw new
+                    IllegalArgumentException("Invalid scene type: "
+                    + sceneType);
         }
     }
 
+    /**
+     * Toggles the visibility of the settings menu.
+     * Switches between the game and settings scenes
+     * based on the current visibility of the settings menu.
+     */
     void toggleSettingsMenu() {
         if (settingsMenu.isVisible()) {
             switchScene(SceneType.GAME);

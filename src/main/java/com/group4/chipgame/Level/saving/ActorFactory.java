@@ -8,19 +8,22 @@ import org.json.JSONObject;
 
 /**
  * A factory class for creating Actor instances from JSON data.
- * This class is responsible for instantiating different types of Actor objects based on JSON input.
+ * This class is responsible for instantiating
+ * different types of Actor objects based on JSON input.
+ * @author William Buckley
  */
 public class ActorFactory {
 
     /**
      * Creates an Actor object from the provided JSON data.
-     * The specific type of Actor (e.g., Player, Bug, Frog, etc.) is determined by the 'type' field in the JSON object.
+     * The specific type of Actor (e.g., Player,
+     * Bug, Frog, etc.) is determined by the 'type' field in the JSON object.
      *
      * @param actorJson The JSON object containing the data for the actor.
      * @return An instance of an Actor, as specified in the JSON object.
      * @throws IllegalStateException If the actor type is not recognized.
      */
-    public static Actor createActor(JSONObject actorJson) {
+    public static Actor createActor(final JSONObject actorJson) {
         String type = actorJson.getString("type");
         double x = actorJson.getDouble("x");
         double y = actorJson.getDouble("y");
@@ -30,20 +33,26 @@ public class ActorFactory {
             case "Bug" -> new Bug(x, y, actorJson.getBoolean("followLeftEdge"));
             case "Frog" -> new Frog(x, y);
             case "MovableBlock" -> new MovableBlock(x, y);
-            case "PinkBall" -> new PinkBall(x, y, Direction.valueOf(actorJson.getString("initialDirection")));
-            default -> throw new IllegalStateException("Unexpected actor type: " + type);
+            case "PinkBall" -> new PinkBall(x, y, Direction.valueOf(
+                    actorJson.getString("initialDirection")));
+            default -> throw new IllegalStateException(
+                    "Unexpected actor type: " + type);
         };
     }
 
     /**
      * Creates a Player object from the provided JSON data.
-     * This method specifically handles the instantiation of a Player, including setting its properties based on the JSON object.
+     * This method specifically handles the instantiation of
+     * a Player, including setting its properties based on the JSON object.
      *
      * @param actorJson The JSON object containing the data for the player.
-     * @return An instance of a Player, with properties set as per the JSON object.
+     * @return An instance of a Player,
+     * with properties set as per the JSON object.
      */
-    private static Player createPlayer(JSONObject actorJson) {
-        Player player = new Player(actorJson.getDouble("x"), actorJson.getDouble("y"));
+    private static Player createPlayer(final JSONObject actorJson) {
+        Player player = new
+                Player(actorJson.getDouble("x"),
+                actorJson.getDouble("y"));
         player.setAlive(actorJson.getBoolean("isAlive"));
         player.setChipsCount(actorJson.getInt("chipsCount"));
 

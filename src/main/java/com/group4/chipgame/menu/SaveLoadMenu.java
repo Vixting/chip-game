@@ -17,6 +17,7 @@ import java.util.Optional;
 /**
  * This class handles the creation and interaction of the Save/Load menu UI,
  * allowing the user to save their game to a new slot or load an existing one.
+ * @author William Buckley
  */
 public class SaveLoadMenu extends BaseMenu {
     private final Main mainApp;
@@ -32,7 +33,9 @@ public class SaveLoadMenu extends BaseMenu {
      * @param primaryStage    The primary stage of the application.
      * @param profileManager  The profile manager handling profile operations.
      */
-    public SaveLoadMenu(Main mainApp, Stage primaryStage, ProfileManager profileManager) {
+    public SaveLoadMenu(final Main mainApp,
+                        final Stage primaryStage,
+                        final ProfileManager profileManager) {
         this.mainApp = mainApp;
         this.primaryStage = primaryStage;
         this.profileManager = profileManager;
@@ -46,23 +49,36 @@ public class SaveLoadMenu extends BaseMenu {
     public VBox createSaveLoadMenu() {
         menuBox = createMenuBox(MENU_SPACING, "-fx-background-color: #333;");
         refreshSaveSlots();
-        addButton("Save to New Slot", menuBox, primaryStage, mainApp, this::saveToNewSlot);
-        menuBox.getChildren().add(createBackButton(primaryStage, mainApp));
+        addButton("Save to New Slot",
+                menuBox,
+                primaryStage,
+                mainApp,
+                this::saveToNewSlot);
+        menuBox.getChildren().add(createBackButton(primaryStage,
+                mainApp));
         return menuBox;
     }
 
     /**
-     * Refreshes the save slots displayed in the menu based on the current profile's saves.
+     * Refreshes the save slots displayed in
+     * the menu based on the current profile's saves.
      */
     private void refreshSaveSlots() {
         menuBox.getChildren().clear();
-        Profile currentProfile = profileManager.getCurrentProfile();
-        List<String> saveSlots = currentProfile.getSaveFilePaths();
+        Profile currentProfile =
+                profileManager.getCurrentProfile();
+        List<String> saveSlots =
+                currentProfile.getSaveFilePaths();
 
         for (String saveSlotPath : saveSlots) {
-            String saveName = Paths.get(saveSlotPath).getFileName().toString();
-            addButton("Load: " + saveName, menuBox, primaryStage, mainApp, () -> {
-                Alert confirmLoad = new Alert(AlertType.CONFIRMATION, "Load this game?");
+            String saveName = Paths.get(saveSlotPath).
+                    getFileName().toString();
+            addButton("Load: " + saveName,
+                    menuBox,
+                    primaryStage,
+                    mainApp, () -> {
+                Alert confirmLoad = new Alert(AlertType.CONFIRMATION,
+                        "Load this game?");
                 confirmLoad.showAndWait().ifPresent(response -> {
                     if (response.getButtonData().isDefaultButton()) {
                         try {
@@ -77,7 +93,8 @@ public class SaveLoadMenu extends BaseMenu {
     }
 
     /**
-     * Prompts the user for a new save slot name and saves the game to that slot.
+     * Prompts the user for a new save
+     * slot name and saves the game to that slot.
      */
     private void saveToNewSlot() {
         TextInputDialog dialog = new TextInputDialog("Enter Slot Name");

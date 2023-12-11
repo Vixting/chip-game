@@ -1,7 +1,6 @@
 package com.group4.chipgame.Level;
 
 import com.group4.chipgame.Direction;
-import com.group4.chipgame.entities.actors.Entity;
 import com.group4.chipgame.entities.actors.*;
 import com.group4.chipgame.entities.actors.collectibles.Chip;
 import com.group4.chipgame.entities.actors.collectibles.Collectible;
@@ -18,7 +17,9 @@ import java.util.function.BiFunction;
 
 /**
  * A class for loading level data from a JSON file.
- * This class is responsible for parsing level data and instantiating corresponding game entities.
+ * This class is responsible for
+ * parsing level data and instantiating corresponding game entities.
+ * @author William Buckley
  */
 public class LevelLoader {
     private static final String BUTTON_PREFIX = "B_";
@@ -32,12 +33,15 @@ public class LevelLoader {
      * @return A JSONObject representing the parsed data.
      * @throws IOException If an error occurs while reading the file.
      */
-    private JSONObject loadJsonFromFile(String path) throws IOException {
+    private JSONObject loadJsonFromFile(final String path) throws IOException {
         String content = Files.readString(Paths.get(path));
         return new JSONObject(content);
     }
 
-    private final Map<String, BiFunction<Integer, Integer, Tile>> tileCreators = new HashMap<>() {{
+    private final Map<String,
+                    BiFunction<Integer,
+                    Integer,
+                    Tile>> tileCreators = new HashMap<>() {{
         put("P", (x, y) -> new Path());
         put("W", (x, y) -> new Water());
         put("G", (x, y) -> new Wall());
@@ -56,7 +60,10 @@ public class LevelLoader {
         put("I_TR", (x, y) -> new Ice(Direction.Corner.TOP_RIGHT));
     }};
 
-    private final Map<String, BiFunction<Integer, Integer, Actor>> actorCreators = new HashMap<>() {{
+    private final Map<String,
+                    BiFunction<Integer,
+                    Integer,
+                    Actor>> actorCreators = new HashMap<>() {{
         put("Frog", Frog::new);
         put("Player", Player::new);
         put("MovableBlock", MovableBlock::new);
@@ -68,7 +75,10 @@ public class LevelLoader {
         put("rightBug", (x, y) -> new Bug(x, y, false));
     }};
 
-    private final Map<String, BiFunction<Integer, Integer, Collectible>> collectibleCreators = new HashMap<>() {{
+    private final Map<String,
+                    BiFunction<Integer,
+                    Integer,
+                    Collectible>> collectibleCreators = new HashMap<>() {{
         put("redKey", (x, y) -> new Key(Key.KeyColor.RED, x, y));
         put("blueKey", (x, y) -> new Key(Key.KeyColor.BLUE, x, y));
         put("greenKey", (x, y) -> new Key(Key.KeyColor.GREEN, x, y));
@@ -85,9 +95,14 @@ public class LevelLoader {
      * @return A list of created actors.
      * @throws IOException If an error occurs while reading the level file.
      */
-    public List<Actor> loadActors(String levelFilePath, LevelRenderer levelRenderer) throws IOException {
+    public List<Actor> loadActors(final String levelFilePath,
+                                  final LevelRenderer levelRenderer)
+            throws IOException {
         JSONObject levelData = loadJsonFromFile(levelFilePath);
-        return createEntities(levelData.getJSONArray("actors"), actorCreators, levelRenderer.getTiles());
+        return createEntities(levelData.getJSONArray(
+                "actors"),
+                actorCreators,
+                levelRenderer.getTiles());
     }
 
     /**
@@ -95,39 +110,49 @@ public class LevelLoader {
      *
      * @param levelFilePath The file path for the level data.
      * @param levelRenderer The renderer for the game level.
-     * @return A list of created collectibles.
+     * @return A list of created
+     * collectibles.
      * @throws IOException If an error occurs while reading the level file.
      */
-    public List<Collectible> loadCollectibles(String levelFilePath, LevelRenderer levelRenderer) throws IOException {
+    public List<Collectible> loadCollectibles(final String levelFilePath,
+                                              final LevelRenderer levelRenderer)
+            throws IOException {
         JSONObject levelData = loadJsonFromFile(levelFilePath);
-        return createEntities(levelData.getJSONArray("collectibles"), collectibleCreators, levelRenderer.getTiles());
+        return createEntities(levelData.getJSONArray("collectibles"),
+                collectibleCreators,
+                levelRenderer.getTiles());
     }
 
     /**
-     * Loads and creates tiles for the level based on the JSON data in a level file.
+     * Loads and creates tiles for the
+     * level based on the JSON data in a level file.
      *
      * @param levelFilePath The file path for the level data.
      * @return A 2D array of created tiles.
      * @throws IOException If an error occurs while reading the level file.
      */
-    public Tile[][] loadTiles(String levelFilePath) throws IOException {
+    public Tile[][] loadTiles(final String levelFilePath) throws IOException {
         JSONObject levelData = loadJsonFromFile(levelFilePath);
         JSONArray tilesArray = levelData.getJSONArray("tiles");
         int width = tilesArray.getJSONArray(0).length();
         int height = tilesArray.length();
         Tile[][] levelTiles = new Tile[height][width];
-        Map<String, Button> tempButtonMap = createButtons(tilesArray, levelTiles);
+        Map<String, Button> tempButtonMap =
+                createButtons(tilesArray, levelTiles);
         createTraps(tilesArray, levelTiles, tempButtonMap);
         return levelTiles;
     }
 
     /**
-     * Iterates through each tile specified in the JSONArray and applies the given action.
+     * Iterates through each tile specified
+     * in the JSONArray and applies the given action.
      *
      * @param tilesArray The JSONArray containing tile data.
      * @param levelTiles   The action to perform on each tile.
      */
-    private Map<String, Button> createButtons(JSONArray tilesArray, Tile[][] levelTiles) {
+    private Map<String, Button> createButtons(
+            final JSONArray tilesArray,
+            final Tile[][] levelTiles) {
         Map<String, Button> tempButtonMap = new HashMap<>();
         iterateTiles(tilesArray, (x, y, tileType) -> {
             if (tileType.startsWith(BUTTON_PREFIX)) {
@@ -137,13 +162,18 @@ public class LevelLoader {
                 levelTiles[y][x] = button;
                 tempButtonMap.put(buttonId, button);
             } else {
-                levelTiles[y][x] = Optional.ofNullable(tileCreators.get(tileType)).orElse((a, b) -> null).apply(x, y);
+                levelTiles[y][x] =
+                        Optional.ofNullable(
+                                tileCreators.get(tileType)).
+                                orElse((a, b) -> null).apply(x, y);
             }
         });
         return tempButtonMap;
     }
 
-    private void createTraps(JSONArray tilesArray, Tile[][] levelTiles, Map<String, Button> tempButtonMap) {
+    private void createTraps(final JSONArray tilesArray,
+                             final Tile[][] levelTiles,
+                             final Map<String, Button> tempButtonMap) {
         iterateTiles(tilesArray, (x, y, tileType) -> {
             if (tileType.startsWith(TRAP_PREFIX)) {
                 String[] parts = tileType.split("_");
@@ -161,17 +191,21 @@ public class LevelLoader {
     }
 
     private <T> List<T> createEntities(
-                    JSONArray dataArray, Map<String,
+            final JSONArray dataArray,
+                    final Map<String,
                     BiFunction<Integer,
                     Integer,
-                    T>> creators, Tile[][] tiles) {
+                    T>> creators,
+                    final Tile[][] tiles) {
         List<T> entities = new ArrayList<>();
         for (int i = 0; i < dataArray.length(); i++) {
             JSONObject data = dataArray.getJSONObject(i);
             String type = data.getString("type");
             int x = data.getInt("x");
             int y = data.getInt("y");
-            T entity = Optional.ofNullable(creators.get(type)).orElse((a, b) -> null).apply(x, y);
+            T entity = Optional.ofNullable(
+                    creators.get(type)).orElse(
+                            (a, b) -> null).apply(x, y);
             if (entity != null) {
                 entities.add(entity);
                 if (tiles[y][x] != null) {
@@ -183,7 +217,8 @@ public class LevelLoader {
     }
 
 
-    private void iterateTiles(JSONArray tilesArray, TileIterator iterator) {
+    private void iterateTiles(final JSONArray tilesArray,
+                              final TileIterator iterator) {
         for (int y = 0; y < tilesArray.length(); y++) {
             JSONArray row = tilesArray.getJSONArray(y);
             for (int x = 0; x < row.length(); x++) {
@@ -198,8 +233,10 @@ public class LevelLoader {
                 }
 
                 if (tileType.startsWith("CS_")) {
-                    int requiredChips = Integer.parseInt(tileType.substring(CHIPSOCKET));
-                    tileCreators.put(tileType, (tx, ty) -> new ChipSocket(requiredChips));
+                    int requiredChips = Integer.parseInt(
+                            tileType.substring(CHIPSOCKET));
+                    tileCreators.put(tileType, (tx, ty)
+                            -> new ChipSocket(requiredChips));
                 }
 
                 iterator.execute(x, y, tileType);

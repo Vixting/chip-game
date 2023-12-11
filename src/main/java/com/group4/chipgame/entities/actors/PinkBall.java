@@ -6,35 +6,44 @@ import org.json.JSONObject;
 
 /**
  * Represents a PinkBall enemy in the ChipGame.
- * PinkBall is a type of enemy that moves in a straight line until it hits an obstacle,
+ * PinkBall is a type of enemy that moves in
+ * a straight line until it hits an obstacle,
  * at which point it reverses direction.
+ * @author William Buckley
  */
 public class PinkBall extends Enemy {
-    private static final String IMAGE_PATH = "/images/chipgame/actors/pinkBall.png";
+    private static final String IMAGE_PATH =
+            "/images/chipgame/actors/pinkBall.png";
     private Direction currentDirection;
     private static final int MOVE_INTERVAL = 100;
 
     /**
-     * Constructs a PinkBall with a specified initial position and direction.
+     * Constructs a PinkBall with a specified
+     * initial position and direction.
      *
      * @param x                The initial x-coordinate of the PinkBall.
      * @param y                The initial y-coordinate of the PinkBall.
-     * @param initialDirection The initial direction in which the PinkBall will move.
+     * @param initialDirection The initial direction
+     *                         in which the PinkBall will move.
      */
-    public PinkBall(double x, double y, Direction initialDirection) {
+    public PinkBall(final double x,
+                    final double y,
+                    final Direction initialDirection) {
         super(IMAGE_PATH, x, y);
         this.currentDirection = initialDirection;
         this.setMoveInterval(MOVE_INTERVAL);
     }
 
     /**
-     * Decides the next move for the PinkBall based on its current direction and position.
-     * The PinkBall moves in its current direction until it can no longer move, at which point it reverses direction.
+     * Decides the next move for the PinkBall
+     * based on its current direction and position.
+     * The PinkBall moves in its current direction
+     * until it can no longer move, at which point it reverses direction.
      *
      * @param levelRenderer The renderer for the game level.
      */
     @Override
-    public void makeMoveDecision(LevelRenderer levelRenderer) {
+    public void makeMoveDecision(final LevelRenderer levelRenderer) {
         double dx = currentDirection.getDx();
         double dy = currentDirection.getDy();
 

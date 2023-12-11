@@ -13,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * This class handles the main game loop, including updating actors' movements,
  * rendering the level, and managing the game timer.
+ * @author William Buckley
  */
 public class GameLoop extends AnimationTimer {
     private List<Actor> actors;
@@ -25,14 +26,18 @@ public class GameLoop extends AnimationTimer {
     private static final long NANOS_PER_SECOND = 1_000_000_000;
 
     /**
-     * Constructs a GameLoop with the specified actors, level renderer, camera, and timer UI.
+     * Constructs a GameLoop with the specified actors,
+     * level renderer, camera, and timer UI.
      *
      * @param actors        The list of actors in the game.
      * @param levelRenderer The renderer for the game level.
      * @param camera        The camera following the player.
      * @param timerUI       The UI component for the game timer.
      */
-    public GameLoop(List<Actor> actors, LevelRenderer levelRenderer, Camera camera, TimerUI timerUI) {
+    public GameLoop(final List<Actor> actors,
+                    final LevelRenderer levelRenderer,
+                    final Camera camera,
+                    final TimerUI timerUI) {
         this.actors = actors;
         this.levelRenderer = levelRenderer;
         this.camera = camera;
@@ -49,12 +54,13 @@ public class GameLoop extends AnimationTimer {
     }
 
     /**
-     * The main game loop, called at each animation frame. Handles game logic updates.
+     * The main game loop, called at each animation frame.
+     * Handles game logic updates.
      *
      * @param now The timestamp of the current frame given in nanoseconds.
      */
     @Override
-    public void handle(long now) {
+    public void handle(final long now) {
         ticksElapsed++;
         this.actors = new CopyOnWriteArrayList<>(actors);
 
@@ -91,12 +97,12 @@ public class GameLoop extends AnimationTimer {
 
     /**
      * Handles movement for player characters.
-     *
-     * @param player The player character to move.
      */
-    private void handlePlayerMovement(Player player) {
+    private void handlePlayerMovement(final Player player) {
         camera.setTarget(player);
-        if (!moveQueue.isEmpty() && player.isAlive() && !player.isMoving()) {
+        if (!moveQueue.isEmpty()
+                && player.isAlive()
+                && !player.isMoving()) {
             Direction direction = moveQueue.poll();
             assert direction != null;
             double[] delta = Direction.toDelta(direction);
@@ -106,10 +112,8 @@ public class GameLoop extends AnimationTimer {
 
     /**
      * Handles movement decisions for enemy characters.
-     *
-     * @param enemy The enemy character to move.
      */
-    private void handleEnemyMovement(Enemy enemy) {
+    private void handleEnemyMovement(final Enemy enemy) {
         if (!enemy.isMoving()) {
             enemy.makeMoveDecision(levelRenderer);
         }

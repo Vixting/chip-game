@@ -2,16 +2,22 @@ package com.group4.chipgame.entities.actors;
 
 import com.group4.chipgame.Direction;
 import com.group4.chipgame.Level.LevelRenderer;
-import com.group4.chipgame.entities.actors.tiles.*;
+import com.group4.chipgame.entities.actors.tiles.Button;
+import com.group4.chipgame.entities.actors.tiles.Path;
+import com.group4.chipgame.entities.actors.tiles.Tile;
 import javafx.geometry.Point2D;
+
 import java.util.*;
 
 /**
  * Represents a Frog enemy in the ChipGame.
- * This class defines the behavior of the Frog enemy, including movement decisions and interactions.
+ * This class defines the behavior of the Frog enemy,
+ * including movement decisions and interactions.
+ * @author William Buckley
  */
 public class Frog extends Enemy {
-    private static final String FROG_IMAGE_PATH = "/images/chipgame/actors/frog.png";
+    private static final String FROG_IMAGE_PATH =
+            "/images/chipgame/actors/frog.png";
     private final Random random = new Random();
     private static final int MOVE_INTERVAL = 100;
 
@@ -21,13 +27,24 @@ public class Frog extends Enemy {
      * @param x The initial x-coordinate of the Frog.
      * @param y The initial y-coordinate of the Frog.
      */
-    public Frog(double x, double y) {
+    public Frog(final double x,
+                final double y) {
         super(FROG_IMAGE_PATH, x, y);
         this.setMoveInterval(MOVE_INTERVAL);
     }
 
+    /**
+     * Determines if a move to a specified position is valid.
+     * Validates the move based on the target tile's walkability, occupancy (excluding Player),
+     * and specific types (Path or Button).
+     *
+     * @param newPosition   The intended new position.
+     * @param levelRenderer The renderer providing level tile information.
+     * @return              True if the move is valid, false otherwise.
+     */
     @Override
-    protected boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
+    protected boolean isMoveValid(final Point2D newPosition,
+                                  final LevelRenderer levelRenderer) {
         Optional<Tile> targetTileOpt =
                 levelRenderer.getTileAtGridPosition((int) newPosition.getX(),
                         (int) newPosition.getY());
@@ -35,7 +52,8 @@ public class Frog extends Enemy {
             return false;
         }
         Tile targetTile = targetTileOpt.get();
-        boolean isTileNotOccupied = targetTile.getOccupiedBy() == null || targetTile.getOccupiedBy() instanceof Player;
+        boolean isTileNotOccupied = targetTile.getOccupiedBy()
+                == null || targetTile.getOccupiedBy() instanceof Player;
         return (targetTile instanceof Path
                 || targetTile instanceof Button)
                 && targetTile.isWalkable()
@@ -43,12 +61,13 @@ public class Frog extends Enemy {
     }
 
     /**
-     * Decides the next move for the Frog based on its current position and movement rules.
+     * Decides the next move for the Frog based
+     * on its current position and movement rules.
      *
      * @param levelRenderer The renderer for the game level.
      */
     @Override
-    public void makeMoveDecision(LevelRenderer levelRenderer) {
+    public void makeMoveDecision(final LevelRenderer levelRenderer) {
         Point2D playerPosition = findPlayerPosition(levelRenderer);
         Point2D nextMove = null;
         if (playerPosition != null) {
@@ -67,10 +86,12 @@ public class Frog extends Enemy {
     /**
      * Finds a random valid move for the Frog.
      *
-     * @param levelRenderer The renderer for the game level.
-     * @return The next valid move as a Point2D, or null if no valid move is found.
+     * @param levelRenderer The renderer
+     *                      for the game level.
+     * @return The next valid move as a Point2D,
+     * or null if no valid move is found.
      */
-    private Point2D findRandomValidMove(LevelRenderer levelRenderer) {
+    private Point2D findRandomValidMove(final LevelRenderer levelRenderer) {
         List<Point2D> validMoves = new ArrayList<>();
         for (Point2D neighborPos : getNeighborPositions(getCurrentPosition())) {
             if (canMoveTo(neighborPos, levelRenderer)) {
@@ -90,13 +111,16 @@ public class Frog extends Enemy {
      * @param dy            The delta y-coordinate for the move.
      * @param levelRenderer The renderer for the game level.
      */
-    public void moveOneStep(double dx, double dy, LevelRenderer levelRenderer) {
+    public void moveOneStep(final double dx,
+                            final double dy,
+                            final LevelRenderer levelRenderer) {
         if (isMoving()) {
             return;
         }
 
         if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-            throw new IllegalArgumentException("Move step too large: dx=" + dx + ", dy=" + dy);
+            throw new IllegalArgumentException(
+                    "Move step too large: dx=" + dx + ", dy=" + dy);
         }
 
         Direction direction = Direction.fromDelta(dx, dy);
@@ -111,10 +135,12 @@ public class Frog extends Enemy {
     /**
      * Finds the position of the player in the game level.
      *
-     * @param levelRenderer The renderer for the game level.
-     * @return The position of the player as a Point2D, or null if the player is not found.
+     * @param levelRenderer The renderer
+     *                      for the game level.
+     * @return The position of the player as a Point2D,
+     * or null if the player is not found.
      */
-    private Point2D findPlayerPosition(LevelRenderer levelRenderer) {
+    private Point2D findPlayerPosition(final LevelRenderer levelRenderer) {
         for (Actor actor : levelRenderer.getActors()) {
             if (actor instanceof Player) {
                 return actor.getPosition();
@@ -128,27 +154,46 @@ public class Frog extends Enemy {
      *
      * @param playerPosition The position of the player.
      * @param levelRenderer The renderer for the game level.
-     * @return The next move as a Point2D, or null if no valid move is found.
+     * @return The next move as a Point2D,
+     * or null if no valid move is found.
      */
-    private Point2D findNextMoveTowardsPlayer(Point2D playerPosition, LevelRenderer levelRenderer) {
+    private Point2D findNextMoveTowardsPlayer(
+            final Point2D playerPosition,
+            final LevelRenderer levelRenderer) {
         List<Node> openList = new ArrayList<>();
         Set<Node> closedSet = new HashSet<>();
-        Node startNode = new Node(getCurrentPosition(), null, 0, getCurrentPosition().distance(playerPosition));
+        Node startNode = new Node(getCurrentPosition(),
+                null, 0,
+                getCurrentPosition().distance(playerPosition));
         openList.add(startNode);
         while (!openList.isEmpty()) {
-            Node currentNode = openList.stream().min(Comparator.comparingDouble(n -> n.fCost)).orElseThrow();
+            Node currentNode = openList.stream().min(Comparator.comparingDouble(
+                    n -> n.fCost)).orElseThrow();
             openList.remove(currentNode);
             closedSet.add(currentNode);
             if (currentNode.position.equals(playerPosition)) {
                 return retracePath(startNode, currentNode);
             }
-            for (Point2D neighborPos : getNeighborPositions(currentNode.position)) {
-                if (!canMoveTo(neighborPos, levelRenderer) || closedSet.contains(new Node(neighborPos, null, 0, 0))) {
+            for (Point2D neighborPos
+                    : getNeighborPositions(currentNode.position)) {
+                if (!canMoveTo(neighborPos, levelRenderer)
+                        || closedSet.contains(
+                                new Node(neighborPos,
+                                        null,
+                                        0,
+                                        0))) {
                     continue;
                 }
-                double newGCost = currentNode.gCost + getCurrentPosition().distance(neighborPos);
-                Node neighborNode = new Node(neighborPos, currentNode, newGCost, neighborPos.distance(playerPosition));
-                if (openList.stream().noneMatch(n -> n.position.equals(neighborPos) && n.gCost <= newGCost)) {
+                double newGCost = currentNode.gCost
+                        + getCurrentPosition().distance(neighborPos);
+                Node neighborNode = new Node(
+                        neighborPos,
+                        currentNode,
+                        newGCost,
+                        neighborPos.distance(playerPosition));
+                if (openList.stream().noneMatch(n
+                        -> n.position.equals(neighborPos)
+                        && n.gCost <= newGCost)) {
                     openList.add(neighborNode);
                 }
             }
@@ -162,7 +207,7 @@ public class Frog extends Enemy {
      * @param position The current position.
      * @return A list of neighboring positions.
      */
-    private List<Point2D> getNeighborPositions(Point2D position) {
+    private List<Point2D> getNeighborPositions(final Point2D position) {
         return Arrays.asList(
                 new Point2D(position.getX() + 1, position.getY()),
                 new Point2D(position.getX() - 1, position.getY()),
@@ -179,7 +224,8 @@ public class Frog extends Enemy {
      * @param levelRenderer The renderer for the game level.
      * @return True if the Frog can move to the position, false otherwise.
      */
-    private boolean canMoveTo(Point2D position, LevelRenderer levelRenderer) {
+    private boolean canMoveTo(final Point2D position,
+                              final LevelRenderer levelRenderer) {
         return isMoveValid(position, levelRenderer);
     }
 
@@ -190,12 +236,17 @@ public class Frog extends Enemy {
      * @param endNode The ending node.
      * @return The next position to move to as part of the path.
      */
-    private Point2D retracePath(Node startNode, Node endNode) {
+    private Point2D retracePath(final Node startNode,
+                                final Node endNode) {
         Node currentNode = endNode;
-        while (currentNode != null && currentNode.parent != null && !currentNode.parent.equals(startNode)) {
+        while (currentNode != null
+                && currentNode.parent != null
+                && !currentNode.parent.equals(startNode)) {
             currentNode = currentNode.parent;
         }
-        return currentNode != null ? currentNode.position : null;
+        return currentNode
+                != null
+                ? currentNode.position : null;
     }
 
     /**
@@ -208,7 +259,10 @@ public class Frog extends Enemy {
         private double hCost;
         private final double fCost;
 
-        Node(Point2D position, Node parent, double gCost, double hCost) {
+        Node(final Point2D position,
+             final Node parent,
+             final double gCost,
+             final double hCost) {
             this.position = position;
             this.parent = parent;
             this.gCost = gCost;
@@ -221,7 +275,8 @@ public class Frog extends Enemy {
             if (this == obj) {
                 return true;
             }
-            if (obj == null || getClass() != obj.getClass()) {
+            if (obj == null || getClass()
+                    != obj.getClass()) {
                 return false;
             }
             Node node = (Node) obj;

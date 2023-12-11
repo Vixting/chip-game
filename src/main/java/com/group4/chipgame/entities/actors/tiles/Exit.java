@@ -10,9 +10,11 @@ import javafx.util.Duration;
 
 /**
  * Represents an Exit tile in the ChipGame.
+ * @author William Buckley
  */
 public class Exit extends Tile {
-    private static final String EXIT_IMAGE_PATH = "/images/chipgame/tiles/exit.png";
+    private static final String EXIT_IMAGE_PATH =
+            "/images/chipgame/tiles/exit.png";
     private static final double PAUSE_DURATION = 0.5;
 
     /**
@@ -27,12 +29,16 @@ public class Exit extends Tile {
      *
      * @param actor The Actor stepping on the tile.
      * @param levelRenderer The renderer for the level.
-     * @param incomingDirection The direction from which the Actor steps onto the tile.
+     * @param incomingDirection The direction from
+     *                          which the Actor steps onto the tile.
      */
     @Override
-    public void onStep(Actor actor, LevelRenderer levelRenderer, Direction incomingDirection) {
+    public void onStep(final Actor actor,
+                       final LevelRenderer levelRenderer,
+                       final Direction incomingDirection) {
         if (actor instanceof Player) {
-            PauseTransition pause = new PauseTransition(Duration.seconds(PAUSE_DURATION));
+            PauseTransition pause =
+                    new PauseTransition(Duration.seconds(PAUSE_DURATION));
             pause.setOnFinished(event -> fireEvent(new LevelCompletedEvent()));
             pause.play();
         }

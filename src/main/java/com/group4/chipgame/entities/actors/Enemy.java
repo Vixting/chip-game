@@ -11,6 +11,7 @@ import java.util.Optional;
 /**
  * Represents an abstract Enemy in the ChipGame.
  * This class provides the basic functionality for all enemy types in the game.
+ * @author William Buckley
  */
 public abstract class Enemy extends Actor {
 
@@ -21,12 +22,15 @@ public abstract class Enemy extends Actor {
      * @param x         The initial x-coordinate of the enemy.
      * @param y         The initial y-coordinate of the enemy.
      */
-    public Enemy(String imagePath, double x, double y) {
+    public Enemy(final String imagePath,
+                 final double x,
+                 final double y) {
         super(imagePath, x, y);
     }
 
     /**
-     * An abstract method that should be implemented to define the enemy's movement decision logic.
+     * An abstract method that should be implemented
+     * to define the enemy's movement decision logic.
      *
      * @param levelRenderer The renderer for the game level.
      */
@@ -34,17 +38,20 @@ public abstract class Enemy extends Actor {
 
     /**
      * Determines if a move to a new position is valid for the enemy.
-     * Checks if the target tile is a valid type (Path, Button, or Trap) and not occupied by another entity.
+     * Checks if the target tile is a valid
+     * type (Path, Button, or Trap) and not occupied by another entity.
      *
      * @param newPosition  The new position to validate.
      * @param levelRenderer The renderer for the game level.
      * @return True if the move is valid, false otherwise.
      */
     @Override
-    protected boolean isMoveValid(Point2D newPosition, LevelRenderer levelRenderer) {
+    protected boolean isMoveValid(final Point2D newPosition,
+                                  final LevelRenderer levelRenderer) {
         Optional<Tile> targetTileOpt =
-                        levelRenderer.getTileAtGridPosition((int) newPosition.getX(),
-                        (int) newPosition.getY());
+                        levelRenderer.getTileAtGridPosition(
+                                (int) newPosition.getX(),
+                                (int) newPosition.getY());
         if (targetTileOpt.isEmpty()) {
             return false;
         }
@@ -63,7 +70,8 @@ public abstract class Enemy extends Actor {
     }
 
     /**
-     * Checks if the enemy can move to a new position based on a specified delta in x and y direction.
+     * Checks if the enemy can move to a new position
+     * based on a specified delta in x and y direction.
      * Also handles the interaction if the target tile is occupied by a player.
      *
      * @param dx            The change in the x-coordinate.
@@ -72,17 +80,21 @@ public abstract class Enemy extends Actor {
      * @return True if the enemy can move to the new position, false otherwise.
      */
     @Override
-    protected boolean canMove(double dx, double dy, LevelRenderer levelRenderer) {
+    protected boolean canMove(final double dx,
+                              final double dy,
+                              final LevelRenderer levelRenderer) {
         Point2D newPosition = getCurrentPosition().add(dx, dy);
         Optional<Tile> targetTileOpt =
-                        levelRenderer.getTileAtGridPosition((int) newPosition.getX(),
-                        (int) newPosition.getY());
+                        levelRenderer.getTileAtGridPosition(
+                                (int) newPosition.getX(),
+                                (int) newPosition.getY());
 
         if (!isMoveValid(newPosition, levelRenderer)) {
             return false;
         }
 
-        Tile targetTile = targetTileOpt.orElseThrow(() -> new IllegalStateException("Target tile not found"));
+        Tile targetTile = targetTileOpt.orElseThrow(()
+                -> new IllegalStateException("Target tile not found"));
         if (targetTile.getOccupiedBy() instanceof Player) {
             ((Player) targetTile.getOccupiedBy()).kill(levelRenderer);
             targetTile.setOccupiedBy(null);

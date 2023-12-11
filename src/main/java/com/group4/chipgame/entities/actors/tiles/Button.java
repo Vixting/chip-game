@@ -4,10 +4,12 @@ import com.group4.chipgame.entities.actors.Entity;
 import org.json.JSONObject;
 
 /**
- * Represents a Button tile in the ChipGame.
+ * Represents a Button tile.
+ * @author William Buckley
  */
 public class Button extends Tile {
-    private static final String BUTTON_IMAGE_PATH = "/images/chipgame/tiles/button.png";
+    private static final String BUTTON_IMAGE_PATH =
+            "/images/chipgame/tiles/button.png";
     private String id;
     private boolean isActive = false;
 
@@ -16,7 +18,7 @@ public class Button extends Tile {
      *
      * @param id The ID of the Button.
      */
-    public Button(String id) {
+    public Button(final String id) {
         super(BUTTON_IMAGE_PATH, true);
         this.id = id;
     }
@@ -35,7 +37,7 @@ public class Button extends Tile {
      *
      * @param id The new ID to be set.
      */
-    public void setConnection(String id) {
+    public void setConnection(final String id) {
         this.id = id;
     }
 
@@ -44,7 +46,7 @@ public class Button extends Tile {
      *
      * @param active The active state to be set.
      */
-    public void setActive(boolean active) {
+    public void setActive(final boolean active) {
         isActive = active;
     }
 
@@ -63,7 +65,7 @@ public class Button extends Tile {
      * @param actor The Entity to occupy the Button.
      */
     @Override
-    public void setOccupiedBy(Entity actor) {
+    public void setOccupiedBy(final Entity actor) {
         super.setOccupiedBy(actor);
         setActive(actor != null);
     }

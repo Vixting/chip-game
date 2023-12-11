@@ -7,9 +7,11 @@ import com.group4.chipgame.entities.actors.Actor;
 /**
  * Represents a wall tile in the ChipGame.
  * Wall tiles are non-walkable barriers in the game level.
+ * @author William Buckley
  */
 public class Wall extends Tile {
-    private static final String WALL_IMAGE_PATH = "/images/chipgame/tiles/iron.jpg";
+    private static final String WALL_IMAGE_PATH =
+            "/images/chipgame/tiles/iron.jpg";
 
     /**
      * Constructs a new Wall tile.

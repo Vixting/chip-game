@@ -1,7 +1,9 @@
 package com.group4.chipgame;
 
 /**
- * This enum represents the possible directions for movement or orientation in the game.
+ * This enum represents the possible directions
+ * for movement or orientation in the game.
+ * @author William Buckley
  */
 public enum Direction {
     NONE(0, 0),
@@ -19,7 +21,8 @@ public enum Direction {
      * @param dx The delta value for the x-axis.
      * @param dy The delta value for the y-axis.
      */
-    Direction(double dx, double dy) {
+    Direction(final double dx,
+              final double dy) {
         this.dx = dx;
         this.dy = dy;
     }
@@ -94,7 +97,8 @@ public enum Direction {
      * @param dy Delta value for the y-axis.
      * @return The corresponding direction based on delta values.
      */
-    public static Direction fromDelta(double dx, double dy) {
+    public static Direction fromDelta(final double dx,
+                                      final double dy) {
         if (dx > 0) {
             return RIGHT;
         }
@@ -114,9 +118,10 @@ public enum Direction {
      * Converts a direction into delta values for x and y axes.
      *
      * @param direction The direction to be converted.
-     * @return An array of two doubles representing delta values for x and y axes.
+     * @return An array of two doubles
+     * representing delta values for x and y axes.
      */
-    public static double[] toDelta(Direction direction) {
+    public static double[] toDelta(final Direction direction) {
         return switch (direction) {
             case UP -> new double[]{0, -1};
             case DOWN -> new double[]{0, 1};
@@ -127,7 +132,8 @@ public enum Direction {
     }
 
     /**
-     * This enum represents corners, used for specific directional orientations or actions.
+     * This enum represents corners,
+     * used for specific directional orientations or actions.
      */
     public enum Corner {
         NONE,

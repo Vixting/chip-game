@@ -5,6 +5,7 @@ import org.json.JSONObject;
 /**
  * Represents a key collectible in the game.
  * Keys can have different colors and are used to unlock specific doors.
+ * @author William Buckley
  */
 public class Key extends Collectible {
 
@@ -43,9 +44,6 @@ public class Key extends Collectible {
 
     /**
      * Provides the image path for a given key color.
-     *
-     * @param color The color of the key.
-     * @return The image path for the specified key color.
      */
     private static String getImagePathForColor(final KeyColor color) {
         return switch (color) {
