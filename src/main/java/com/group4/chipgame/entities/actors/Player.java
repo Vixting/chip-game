@@ -5,6 +5,7 @@ import com.group4.chipgame.Level.LevelRenderer;
 import com.group4.chipgame.entities.actors.collectibles.Collectible;
 import com.group4.chipgame.entities.actors.collectibles.Key;
 import com.group4.chipgame.entities.actors.tiles.ChipSocket;
+import com.group4.chipgame.entities.actors.tiles.Ice;
 import com.group4.chipgame.entities.actors.tiles.LockedDoor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,14 +15,17 @@ import java.util.Set;
 
 /**
  * Represents the player character in the ChipGame.
- * The player can move around the level, collect items, and interact with various tiles.
+ * The player can move around the level,
+ * collect items, and interact with various tiles.
  */
 public class Player extends Actor {
-    private static final String PLAYER_IMAGE_PATH = "/images/chipgame/actors/steve.png";
+    private static final String PLAYER_IMAGE_PATH =
+            "/images/chipgame/actors/steve.png";
 
     private boolean isAlive = true;
     private int chipsCount;
-    private final Set<Key.KeyColor> collectedKeys = EnumSet.noneOf(Key.KeyColor.class);
+    private final Set<Key.KeyColor> collectedKeys =
+            EnumSet.noneOf(Key.KeyColor.class);
     private static final int MOVE_INTERVAL = 10;
 
     /**
@@ -30,7 +34,8 @@ public class Player extends Actor {
      * @param x The initial x-coordinate of the player.
      * @param y The initial y-coordinate of the player.
      */
-    public Player(double x, double y) {
+    public Player(final double x,
+                  final double y) {
         super(PLAYER_IMAGE_PATH, x, y);
         this.setMoveInterval(MOVE_INTERVAL);
     }
@@ -40,7 +45,7 @@ public class Player extends Actor {
      *
      * @param key The key to add.
      */
-    public void addKey(Key key) {
+    public void addKey(final Key key) {
         collectedKeys.add(key.getColor());
     }
 
@@ -50,20 +55,25 @@ public class Player extends Actor {
      * @param keyColor The color of the key to check.
      * @return True if the player has the key, false otherwise.
      */
-    public boolean hasKey(Key.KeyColor keyColor) {
+    public boolean hasKey(final Key.KeyColor keyColor) {
         return collectedKeys.contains(keyColor);
     }
 
     /**
-     * Moves the player by a specified delta in x and y direction, and processes interactions with tiles.
+     * Moves the player by a specified delta in x and y direction,
+     * and processes interactions with tiles. Movement is restricted
+     * on ice tiles.
      *
      * @param dx            The change in the x-coordinate.
      * @param dy            The change in the y-coordinate.
      * @param levelRenderer The renderer for the game level.
      */
     @Override
-    public void move(double dx, double dy, LevelRenderer levelRenderer) {
-        if (isMoving()) {
+    public void move(final double dx,
+                     final double dy,
+                     final LevelRenderer levelRenderer) {
+
+        if (isMoving() || isOnIce(levelRenderer)) {
             return;
         }
 
@@ -80,11 +90,24 @@ public class Player extends Actor {
     }
 
     /**
+     * Checks if the player is currently on an ice tile.
+     *
+     * @param levelRenderer The renderer for the game level.
+     * @return True if the player is on an ice tile, false otherwise.
+     */
+    private boolean isOnIce(final LevelRenderer levelRenderer) {
+        return levelRenderer.getTileAtGridPosition((int) getCurrentPosition().getX(),
+                        (int) getCurrentPosition().getY())
+                .map(tile -> tile instanceof Ice)
+                .orElse(false);
+    }
+
+    /**
      * Adds a specified number of chips to the player's chip count.
      *
      * @param count The number of chips to add.
      */
-    public void addChips(int count) {
+    public void addChips(final int count) {
         this.chipsCount += count;
         System.out.println("Chips count: " + this.chipsCount);
     }
@@ -94,7 +117,7 @@ public class Player extends Actor {
      *
      * @param count The number of chips to consume.
      */
-    public void consumeChips(int count) {
+    public void consumeChips(final int count) {
         this.chipsCount -= count;
     }
 
@@ -118,12 +141,12 @@ public class Player extends Actor {
      * @param direction     The direction of the move.
      */
     private void processTileInteraction(
-            double newX,
-            double newY,
-            double dx,
-            double dy,
-            LevelRenderer levelRenderer,
-            Direction direction) {
+            final double newX,
+            final double newY,
+            final double dx,
+            final double dy,
+            final LevelRenderer levelRenderer,
+            final Direction direction) {
         levelRenderer.getTileAtGridPosition((int) newX, (int) newY)
                 .ifPresent(tile -> {
                     if (tile.getOccupiedBy() instanceof MovableBlock block) {
@@ -137,16 +160,21 @@ public class Player extends Actor {
     }
 
     /**
-     * Checks for collectibles at the specified position and collects them if present.
+     * Checks for collectibles at the specified position
+     * and collects them if present.
      *
      * @param x             The x-coordinate to check for collectibles.
      * @param y             The y-coordinate to check for collectibles.
      * @param levelRenderer The renderer for the game level.
      */
-    public void checkForCollectibles(double x, double y, LevelRenderer levelRenderer) {
-        levelRenderer.getTileAtGridPosition((int) x, (int) y)
+    public void checkForCollectibles(final double x,
+                                     final double y,
+                                     final LevelRenderer levelRenderer) {
+        levelRenderer.getTileAtGridPosition(
+                (int) x, (int) y)
                 .ifPresent(tile -> {
-                    if (tile.getOccupiedBy() instanceof Collectible collectible) {
+                    if (tile.getOccupiedBy()
+                            instanceof Collectible collectible) {
                         collectible.onCollect(this);
                         levelRenderer.remove(collectible);
                         tile.setOccupiedBy(null);
@@ -160,7 +188,7 @@ public class Player extends Actor {
      *
      * @param levelRenderer The renderer for the game level.
      */
-    public void kill(LevelRenderer levelRenderer) {
+    public void kill(final LevelRenderer levelRenderer) {
         isAlive = false;
         levelRenderer.remove(this);
         levelRenderer.getGamePane().getChildren().remove(this);
@@ -181,7 +209,8 @@ public class Player extends Actor {
      * @param collectible   The entity being collected.
      * @param levelRenderer The renderer for the game level.
      */
-    private void onCollect(Entity collectible, LevelRenderer levelRenderer) {
+    private void onCollect(final Entity collectible,
+                           final LevelRenderer levelRenderer) {
         if (collectible instanceof Key key) {
             levelRenderer.remove(key);
             addKey(key);
@@ -215,7 +244,7 @@ public class Player extends Actor {
      *
      * @param chipsCount The new chip count.
      */
-    public void setChipsCount(int chipsCount) {
+    public void setChipsCount(final int chipsCount) {
         this.chipsCount = chipsCount;
     }
 
@@ -224,7 +253,7 @@ public class Player extends Actor {
      *
      * @param isAlive The alive status to set.
      */
-    public void setAlive(boolean isAlive) {
+    public void setAlive(final boolean isAlive) {
         this.isAlive = isAlive;
     }
 }
